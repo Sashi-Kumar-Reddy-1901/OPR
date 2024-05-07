@@ -1,9 +1,14 @@
+import './header.css'
+
 function Header() {
   return (
-    <>
-      <h3>This is Header</h3>
-    </>
+      <header className="header bg-indigo-500">
+          <img src='' alt="Company Logo" className="logo" />
+          <img src='' alt="Company Logo" className="logo" />
+          <img src='' alt="Company Logo" className="logo" />
+          <img src='' alt="Company Logo" className="logo" />
+          <img src='' alt="Company Logo" className="logo" />
+      </header>
   );
 }
-
 export default Header;
