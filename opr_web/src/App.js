@@ -1,11 +1,14 @@
-import './App.css';
-import Login from './Login';
-
+import "./App.css";
+import Header from "./Components/Header/header";
+import Login from "./Components/Login/login";
+import Footer from "./Components/Footer/footer";
 
 function App() {
   return (
     <div className="App">
-    <Login />
+      <Header/>
+      <Login />
+      <Footer/>
     </div>
   );
 }
