@@ -1,27 +1,19 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import BottomNavigation from '@mui/material/BottomNavigation';
-import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import RestoreIcon from '@mui/icons-material/Restore';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+import React from 'react';
 
-export default function Footer() {
-  const [value, setValue] = React.useState(0);
-
+const Footer = () => {
   return (
-    <Box sx={{ width: 500 }}>
-      <BottomNavigation
-        showLabels
-        value={value}
-        onChange={(event, newValue) => {
-          setValue(newValue);
-        }}
-      >
-        <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
-        <BottomNavigationAction label="Favorites" icon={<FavoriteIcon />} />
-        <BottomNavigationAction label="Nearby" icon={<LocationOnIcon />} />
-      </BottomNavigation>
-    </Box>
+    <footer style={{ backgroundColor: '#f0f0f0', padding: '20px', textAlign: 'center' }}>
+      <div>
+        <p style={{ margin: '0' }}>Powered by Finakon</p>
+        <p style={{ margin: '0', fontSize: '14px' }}>© {new Date().getFullYear()} Your Website</p>
+      </div>
+      <div style={{ marginTop: '10px' }}>
+        <a href="#" style={{ marginRight: '10px', color: '#333' }}>Link 1</a>
+        <a href="#" style={{ marginRight: '10px', color: '#333' }}>Link 2</a>
+        <a href="#" style={{ color: '#333' }}>Link 3</a>
+      </div>
+    </footer>
   );
-}
+};
+
+export default Footer;
