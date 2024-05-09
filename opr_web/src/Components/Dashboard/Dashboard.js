@@ -88,14 +88,14 @@ export default function Dashboard() {
     <>
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open} sx={{backgroundColor:"#6366f1"}}>
+      <AppBar position="fixed" elevation={4}  sx={{backgroundColor:"#6366f1"}}>
         <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={()=>{setOpen(!open)}}
             edge="start"
-            sx={{ mr: 2, ...(open && { display: 'none' }) }}
+    
           >
             <MenuIcon />
           </IconButton>
@@ -124,7 +124,7 @@ export default function Dashboard() {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Inbox/ इनबॉक्स', 'Starred / साझा', 'Send email/ ईमेल भेजें', 'Drafts/ ड्राफ्ट'].map((text, index) => (
+          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
             <ListItem key={text} disablePadding onClick={()=> setmenuItem(text)}>
               <ListItemButton>
                 {/* <ListItemIcon>
@@ -138,7 +138,7 @@ export default function Dashboard() {
    
       </Drawer>
       <Main open={open}>
-        {menuItem == "Inbox/ इनबॉक्स" && <Sidenav />}
+        {menuItem === "Inbox" && <Sidenav />}
       </Main>
     </Box>
     </>

@@ -15,3 +15,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.css-12i7wg6-MuiPaper-root-MuiDrawer-paper{
+  z-index: 0 !important;
+}
