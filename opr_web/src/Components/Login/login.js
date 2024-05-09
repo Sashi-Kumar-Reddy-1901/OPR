@@ -1,5 +1,11 @@
+import Header from '../Header/header';
+import Footer from '../Footer/footer'
+import { Link } from 'react-router-dom';
+
 function Login() {
   return (
+    <>
+    <Header />
     <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
       <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
         <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
@@ -37,7 +43,7 @@ function Login() {
                     <circle cx="8.5" cy="7" r="4" />
                     <path d="M20 8v6M23 11h-6" />
                   </svg>
-                  <span className="ml-3">Login</span>
+                  <span className="ml-3" ><Link to="/dashboard"> Login</Link> </span>
                 </button>
                 {/* Terms of Service and Privacy Policy */}
                 <p className="mt-6 text-xs text-gray-600 text-center">
@@ -58,6 +64,8 @@ function Login() {
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   );
 }
 
