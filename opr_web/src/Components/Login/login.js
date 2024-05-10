@@ -1,16 +1,63 @@
 import { Link } from "react-router-dom";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Logo from "../../logo.svg";
+import axios from '../../api/axios';
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
 import "./login.css";
+import ForgotPassword from "../Forgot-Password/ForgotPassword";
+import { padding } from "@mui/system";
+
+
 
 function Login() {
   const email = useRef(null);
-  const password = useRef(null);
-
-  const handleButtonClick = () => {
-    console.log(email.current.value);
-    console.log(password.current.value);
+  const pass = useRef(null);
+  const [openForgotPassword, setOpenForgotPassword] = useState(false);
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    height:350,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
   };
+
+  const handleButtonClick = async () => {
+    console.log(email.current.value);
+    console.log(pass.current.value);
+    const username = email.current.value;
+    const password = pass.current.value;
+    const isLogout = true;
+    // const LOGIN_URL = '/users/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&isLogout=${isLogout}';
+    const LOGIN_URL = `/users/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
+    try {
+      const response = await axios.post(
+          LOGIN_URL,
+           {}, // Ensuring JSON body
+          {
+              headers: { 'Content-Type': 'application/json' },
+        
+          }
+      );
+      console.log(JSON.stringify(response?.data));
+      const accessToken = response?.data?.accessToken;
+      const roles = response?.data?.roles;
+  
+      console.log(accessToken);
+      console.log(roles);
+
+  } catch(error){
+
+  }
+  };
+
+  const handleOpenForgotPassword = () => setOpenForgotPassword(true);
+  const handleCloseForgotPassword = () => setOpenForgotPassword(false);
   return (
     <>
       <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col">
@@ -24,7 +71,7 @@ function Login() {
             <img src={Logo} alt="5" className="header-image" />
           </div>
         </header>
-
+ 
         <div className="max-w-screen-xl m-0 sm:m-2 bg-white shadow sm:rounded-lg flex justify-center flex-1">
           <div className="lg:w-1/2 xl:w-6/12 p-6 sm:p-8">
             <div>
@@ -45,7 +92,7 @@ function Login() {
                       placeholder="User Id / Email"
                     />
                     <input
-                      ref={password}
+                      ref={pass}
                       className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                       type="password"
                       placeholder="Password"
@@ -69,15 +116,18 @@ function Login() {
                         <path d="M20 8v6M23 11h-6" />
                       </svg>
                       <span className="ml-3">
-                        <Link to="/dashboard"> Login</Link>{" "}
+                         Login
                       </span>
                     </button>
                     </Link>
-
+ 
                     {/* Terms of Service and Privacy Policy */}
+                    {/* <Link to="/forgot-password">
                     <p className="mt-6 text-xs text-gray-600 text-center">
-                      I agree to abide by templatana's
+                     Forgot Password?
                     </p>
+                    </Link> */}
+                     <p onClick={handleOpenForgotPassword}>Forgot password</p>
                   </div>
                 </form>
               </div>
@@ -93,7 +143,7 @@ function Login() {
             ></div>
           </div>
         </div>
-
+ 
         {/* Footer */}
         <footer className="bg-gray-200 text-gray-600 py-4">
           <div className="max-w-screen-xl mx-auto px-4">
@@ -101,6 +151,18 @@ function Login() {
           </div>
         </footer>
       </div>
+
+      <Modal
+        keepMounted
+        open={openForgotPassword}
+        onClose={handleCloseForgotPassword}
+        aria-labelledby="keep-mounted-modal-title"
+        aria-describedby="keep-mounted-modal-description"
+      >
+        <Box sx={style}>
+          <ForgotPassword />
+          </Box>
+          </Modal>
     </>
   );
 }

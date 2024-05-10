@@ -4,6 +4,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Login from '../Login/login';
 import Dashboard from '../Dashboard/Dashboard';
 import Sidenav from '../Sidenav/Sidenav';
+import ForgotPassword from '../Forgot-Password/ForgotPassword';
 
 const Body = () => {
     const appRouter = createBrowserRouter([
@@ -18,6 +19,10 @@ const Body = () => {
       {
         path: "/inbox",
         element: <Sidenav />
+      },
+      {
+        path: "/forgot-password",
+        element: <ForgotPassword />
       }
     ]);
   return (
