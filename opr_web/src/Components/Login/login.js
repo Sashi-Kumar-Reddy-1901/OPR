@@ -1,8 +1,17 @@
 import Header from '../Header/header';
 import Footer from '../Footer/footer'
 import { Link } from 'react-router-dom';
+import { useRef } from 'react';
 
 function Login() {
+
+  const email = useRef(null);
+  const password = useRef(null);
+
+  const handleButtonClick = () =>{
+     console.log(email.current.value);
+     console.log(password.current.value);
+  }
   return (
     <>
     <Header />
@@ -18,19 +27,22 @@ function Login() {
             <h1 className="text-2xl xl:text-3xl font-extrabold">Login</h1>
             <div className="w-full flex-1 mt-8">
               {/* Email and Password Inputs */}
+              <form onSubmit={(e) => e.preventDefault()}>
               <div className="mx-auto max-w-xs">
                 <input
+                ref={email}
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                   type="email"
                   placeholder="Email"
                 />
                 <input
+                ref={password}
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                   type="password"
                   placeholder="Password"
                 />
                 {/* Sign Up Button */}
-                <button className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
+                <button onClick={handleButtonClick} className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
                   <svg
                     className="w-6 h-6 -ml-2"
                     fill="none"
@@ -45,11 +57,13 @@ function Login() {
                   </svg>
                   <span className="ml-3" ><Link to="/dashboard"> Login</Link> </span>
                 </button>
+                
                 {/* Terms of Service and Privacy Policy */}
                 <p className="mt-6 text-xs text-gray-600 text-center">
                   I agree to abide by templatana's
                 </p>
               </div>
+              </form>
             </div>
           </div>
         </div>
