@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import Logo from "../../logo.svg";
 import axios from "../../api/axios";
@@ -6,17 +6,21 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import "./login.css";
 import ForgotPassword from "../Forgot-Password/ForgotPassword";
-import { padding } from "@mui/system";
+import Tooltip from "@mui/material/Tooltip";
+import Zoom from "@mui/material/Zoom";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 function Login() {
   const email = useRef(null);
   const pass = useRef(null);
   const [password, setPassword] = useState("");
-  const [isMessageVisible, setIsMessageVisible] = useState(false);
 
   const [errorMessage, seterrorMessage] = useState(false);
   const [passworderrorMessage, setpassworderrorMessage] = useState("");
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const passwordRegex =
@@ -34,9 +38,6 @@ function Login() {
     boxShadow: 24,
     p: 4,
   };
-  const handleInfoButtonClick = () => {
-    setIsMessageVisible(!isMessageVisible);
-  };
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
     setPassword(newPassword);
@@ -48,6 +49,10 @@ function Login() {
         "Password must be 8-15 characters long and include at least one number, one lowercase letter, one uppercase letter, and one special character."
       );
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleButtonClick = async () => {
@@ -119,83 +124,82 @@ function Login() {
                       type="email"
                       placeholder="User Id / Email"
                     />
-                    <input
-                      ref={pass}
-                      value={password}
-                      onChange={handlePasswordChange}
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                      type="password"
-                      placeholder="Password"
-                    />
                     <div
                       style={{
                         position: "relative",
                         display: "flex",
                         alignItems: "center",
-                        marginTop: "10px",
                       }}
                     >
-                      <button
-                        onClick={handleInfoButtonClick}
+                      <input
+                        ref={pass}
+                        value={password}
+                        onChange={handlePasswordChange}
+                        className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        maxLength={15}
+                        minLength={8}
+                      />
+                      <IconButton
+                        onClick={togglePasswordVisibility}
+                        edge="end"
+                        aria-label="toggle password visibility"
                         style={{
-                          backgroundColor: "#007bff",
-                          color: "#fff",
-                          border: "none",
-                          borderRadius: "50%",
-                          width: "24px",
-                          height: "24px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: "pointer",
-                          outline: "none",
-                          marginRight: "10px",
+                          position: "absolute",
+                          right: "15px",
+                          top: "2.8rem",
+                          transform: "translateY(-50%)",
                         }}
                       >
-                        i
-                      </button>
-                      {isMessageVisible && (
-                        <div
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </div>
+                    <div
+                      style={{
+                        position: "relative",
+                        left: "21rem",
+                        top: "-2.2rem",
+                      }}
+                    >
+                      <Tooltip
+                        title={
+                          <span style={{ fontSize: "14px" }}>
+                            The password must be 8-15 characters long and
+                            include at least one number, one lowercase letter,
+                            one uppercase letter, and one special character from
+                            !@#$%^&*().
+                          </span>
+                        }
+                        placement="right"
+                        arrow
+                        TransitionComponent={Zoom}
+                      >
+                        <button
                           style={{
-                            position: "absolute",
-                            top: "35px",
-                            left: "0",
-                            backgroundColor: "#f0f0f0",
-                            padding: "10px",
-                            borderRadius: "5px",
-                            boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                            backgroundColor: "#007bff",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "50%",
+                            width: "15px",
+                            height: "15px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            outline: "none",
+                            fontSize: "12px",
                           }}
                         >
-                          <p>
-                          The password must be 8-15 characters long and include at least one number, one lowercase letter, one uppercase letter, and one special character from !@#$%^&*(). {" "}
-                            <a href="#">Learn more</a>
-                          </p>
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: "-10px",
-                              left: "10px",
-                              width: "0",
-                              height: "0",
-                              borderLeft: "10px solid transparent",
-                              borderRight: "10px solid transparent",
-                              borderBottom: "10px solid #f0f0f0",
-                            }}
-                          ></div>
-                        </div>
-                      )}
+                          i
+                        </button>
+                      </Tooltip>
                     </div>
-                    {/* Sign Up Button */}
-                    {/* {passworderrorMessage && (
-                      <div className="error-message mt-2 text-red-500">
-                        {passworderrorMessage}
-                      </div>
-                    )} */}
                     <p className="errorMessage">{errorMessage}</p>
 
                     <button
                       onClick={handleButtonClick}
-                      className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                      className="mt-3 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                     >
                       <svg
                         className="w-6 h-6 -ml-2"
@@ -218,19 +222,25 @@ function Login() {
                      Forgot Password?
                     </p>
                     </Link> */}
-                    <p onClick={handleOpenForgotPassword}>Forgot password</p>
+                    <p
+                      className="mt-2"
+                      style={{ cursor: "pointer" }}
+                      onClick={handleOpenForgotPassword}
+                    >
+                      Reset / Forgot password
+                    </p>
                   </div>
                 </form>
               </div>
             </div>
           </div>
-          <div className="flex-1 bg-indigo-100 text-center hidden lg:flex">
+          <div className="flex-1 bg-gray-100 text-center hidden lg:flex">
             <div
-              className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
-              style={{
-                backgroundImage:
-                  "url('https://storage.googleapis.com/devitary-image-host.appspot.com/15848031292911696601-undraw_designer_life_w96d.svg')",
-              }}
+              className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat bg-Image"
+              // style={{
+              //   backgroundImage:
+              //     "url('../../Images/opsriskbg_adobe_express.svg')",
+              // }}
             ></div>
           </div>
         </div>
@@ -238,7 +248,7 @@ function Login() {
         {/* Footer */}
         <footer className="bg-gray-200 text-gray-600 py-4">
           <div className="max-w-screen-xl mx-auto px-4">
-            <p style={{ margin: "0" }}>Powered by Finakon</p>
+            <p style={{ margin: "0" }}>Powered by Finakon ®</p>
           </div>
         </footer>
       </div>
