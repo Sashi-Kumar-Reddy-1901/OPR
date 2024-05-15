@@ -1,12 +1,32 @@
 import React from 'react';
 import Logo from "../../logo.svg";
-import { useRef } from "react";
+import {useState, useRef } from "react";
 import axios from '../../api/axios';
 import { Link } from "react-router-dom";
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
+import OTPValidation from '../OTP/OTPValidation';
 
 
 const ForgotPassword = () => {
   const el = useRef(null);
+  const [openOTPScreen, setopenOTPScreen] = useState(false);
+  const [ErrorMessage, setErrorMessage] = useState('');
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    height:350,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+
+ 
+  const handleCloseOTPScreen = () => setopenOTPScreen(false);
   const handleButtonClick = async () => {
     console.log(el.current.value);
     const email = el.current.value;
@@ -21,6 +41,12 @@ const ForgotPassword = () => {
           }
       );
       console.log(JSON.stringify(response?.data));
+      console.log(response?.data?.data?.messageCode );
+      if(response?.data?.data?.messageCode === 110201 || response?.data?.data?.messageCode === 110203 ){
+         setopenOTPScreen(true);
+      }else{
+        setErrorMessage(response?.data?.data?.message);
+      }
       const accessToken = response?.data?.accessToken;
       const roles = response?.data?.roles;
   
@@ -30,20 +56,10 @@ const ForgotPassword = () => {
 
   }
   };
+
   return (
     <>
     <div className="bg-gray-100 text-gray-900 flex flex-col">
-      {/* Header */}
-      {/* <header className="bg-gray-200 py-4">
-        <div className="max-w-screen-xl mx-auto px-4 flex justify-between items-center">
-          <img src={Logo} alt="1" className="header-image" />
-          <img src={Logo} alt="2" className="header-image" />
-          <img src={Logo} alt="3" className="header-image" />
-          <img src={Logo} alt="4" className="header-image" />
-          <img src={Logo} alt="5" className="header-image" />
-        </div>
-      </header> */}
-
       <div className="max-w-screen-xl m-0 sm:m-2 bg-white shadow sm:rounded-lg flex justify-center flex-1">
         <div className=" p-6 sm:p-8">
     
@@ -61,7 +77,7 @@ const ForgotPassword = () => {
                   />
                
                   {/* Sign Up Button */}
-                  <Link to="/dashboard" className="block w-full">
+                  {/* <Link to="/dashboard" className="block w-full"> */}
                   <button
                     onClick={handleButtonClick}
                     className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
@@ -79,36 +95,33 @@ const ForgotPassword = () => {
                       <path d="M20 8v6M23 11h-6" />
                     </svg>
                     <span className="ml-3">
-                      <Link to="/dashboard"> Reset</Link>{" "}
+                      <p > Reset </p>
                     </span>
                   </button>
-                  </Link>
-
-                  {/* Terms of Service and Privacy Policy */}
-                
+                  {/* </Link>         */}
+                  <p className="error-class">{ErrorMessage}</p>
                 </div>
               </form>
             </div>
           </div>
         </div>
-        {/* <div className="flex-1 bg-indigo-100 text-center hidden lg:flex">
-          <div
-            className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
-            style={{
-              backgroundImage:
-                "url('https://storage.googleapis.com/devitary-image-host.appspot.com/15848031292911696601-undraw_designer_life_w96d.svg')",
-            }}
-          ></div>
-        </div> */}
+  
       </div>
 
-      {/* Footer */}
-      {/* <footer className="bg-gray-200 text-gray-600 py-4">
-        <div className="max-w-screen-xl mx-auto px-4">
-          <p style={{ margin: "0" }}>Powered by Finakon</p>
-        </div>
-      </footer> */}
+ 
     </div>
+
+    <Modal
+        keepMounted
+        open={openOTPScreen}
+        onClose={handleCloseOTPScreen}
+        aria-labelledby="keep-mounted-modal-title"
+        aria-describedby="keep-mounted-modal-description"
+      >
+        <Box sx={style}>
+         <OTPValidation />
+          </Box>
+          </Modal>
   </>
   )
 }

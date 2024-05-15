@@ -1,30 +1,53 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import Logo from "../../logo.svg";
-import axios from '../../api/axios';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
+import axios from "../../api/axios";
+import Box from "@mui/material/Box";
+import Modal from "@mui/material/Modal";
 import "./login.css";
 import ForgotPassword from "../Forgot-Password/ForgotPassword";
 import { padding } from "@mui/system";
 
-
-
 function Login() {
   const email = useRef(null);
   const pass = useRef(null);
+  const [password, setPassword] = useState("");
+  const [isMessageVisible, setIsMessageVisible] = useState(false);
+
+  const [errorMessage, seterrorMessage] = useState(false);
+  const [passworderrorMessage, setpassworderrorMessage] = useState("");
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const passwordRegex =
+    /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,15}$/;
+
   const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 400,
-    height:350,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    height: 350,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
+  };
+  const handleInfoButtonClick = () => {
+    setIsMessageVisible(!isMessageVisible);
+  };
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+
+    if (passwordRegex.test(newPassword)) {
+      setpassworderrorMessage("");
+    } else {
+      setpassworderrorMessage(
+        "Password must be 8-15 characters long and include at least one number, one lowercase letter, one uppercase letter, and one special character."
+      );
+    }
   };
 
   const handleButtonClick = async () => {
@@ -34,26 +57,31 @@ function Login() {
     const password = pass.current.value;
     const isLogout = true;
     // const LOGIN_URL = '/users/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&isLogout=${isLogout}';
-    const LOGIN_URL = `/users/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
+    const LOGIN_URL = `/users/login?username=${encodeURIComponent(
+      username
+    )}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
     try {
       const response = await axios.post(
-          LOGIN_URL,
-           {}, // Ensuring JSON body
-          {
-              headers: { 'Content-Type': 'application/json' },
-        
-          }
+        LOGIN_URL,
+        {}, // Ensuring JSON body
+        {
+          headers: { "Content-Type": "application/json" },
+        }
       );
       console.log(JSON.stringify(response?.data));
       const accessToken = response?.data?.accessToken;
       const roles = response?.data?.roles;
-  
+      console.log(response?.data?.data?.data);
+      if (response?.data?.data?.data !== null) {
+        navigate("/dashboard");
+      } else {
+        seterrorMessage(response?.data?.data?.message);
+        console.log(errorMessage);
+      }
+
       console.log(accessToken);
       console.log(roles);
-
-  } catch(error){
-
-  }
+    } catch (error) {}
   };
 
   const handleOpenForgotPassword = () => setOpenForgotPassword(true);
@@ -71,7 +99,7 @@ function Login() {
             <img src={Logo} alt="5" className="header-image" />
           </div>
         </header>
- 
+
         <div className="max-w-screen-xl m-0 sm:m-2 bg-white shadow sm:rounded-lg flex justify-center flex-1">
           <div className="lg:w-1/2 xl:w-6/12 p-6 sm:p-8">
             <div>
@@ -93,12 +121,78 @@ function Login() {
                     />
                     <input
                       ref={pass}
+                      value={password}
+                      onChange={handlePasswordChange}
                       className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                       type="password"
                       placeholder="Password"
                     />
+                    <div
+                      style={{
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        marginTop: "10px",
+                      }}
+                    >
+                      <button
+                        onClick={handleInfoButtonClick}
+                        style={{
+                          backgroundColor: "#007bff",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: "50%",
+                          width: "24px",
+                          height: "24px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          outline: "none",
+                          marginRight: "10px",
+                        }}
+                      >
+                        i
+                      </button>
+                      {isMessageVisible && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "35px",
+                            left: "0",
+                            backgroundColor: "#f0f0f0",
+                            padding: "10px",
+                            borderRadius: "5px",
+                            boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                          }}
+                        >
+                          <p>
+                          The password must be 8-15 characters long and include at least one number, one lowercase letter, one uppercase letter, and one special character from !@#$%^&*(). {" "}
+                            <a href="#">Learn more</a>
+                          </p>
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "-10px",
+                              left: "10px",
+                              width: "0",
+                              height: "0",
+                              borderLeft: "10px solid transparent",
+                              borderRight: "10px solid transparent",
+                              borderBottom: "10px solid #f0f0f0",
+                            }}
+                          ></div>
+                        </div>
+                      )}
+                    </div>
                     {/* Sign Up Button */}
-                    <Link to="/dashboard" className="block w-full">
+                    {/* {passworderrorMessage && (
+                      <div className="error-message mt-2 text-red-500">
+                        {passworderrorMessage}
+                      </div>
+                    )} */}
+                    <p className="errorMessage">{errorMessage}</p>
+
                     <button
                       onClick={handleButtonClick}
                       className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
@@ -115,19 +209,16 @@ function Login() {
                         <circle cx="8.5" cy="7" r="4" />
                         <path d="M20 8v6M23 11h-6" />
                       </svg>
-                      <span className="ml-3">
-                         Login
-                      </span>
+                      <span className="ml-3">Login</span>
                     </button>
-                    </Link>
- 
+
                     {/* Terms of Service and Privacy Policy */}
                     {/* <Link to="/forgot-password">
                     <p className="mt-6 text-xs text-gray-600 text-center">
                      Forgot Password?
                     </p>
                     </Link> */}
-                     <p onClick={handleOpenForgotPassword}>Forgot password</p>
+                    <p onClick={handleOpenForgotPassword}>Forgot password</p>
                   </div>
                 </form>
               </div>
@@ -143,7 +234,7 @@ function Login() {
             ></div>
           </div>
         </div>
- 
+
         {/* Footer */}
         <footer className="bg-gray-200 text-gray-600 py-4">
           <div className="max-w-screen-xl mx-auto px-4">
@@ -161,8 +252,8 @@ function Login() {
       >
         <Box sx={style}>
           <ForgotPassword />
-          </Box>
-          </Modal>
+        </Box>
+      </Modal>
     </>
   );
 }

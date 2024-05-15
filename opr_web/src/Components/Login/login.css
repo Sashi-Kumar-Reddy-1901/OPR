@@ -2,4 +2,9 @@
     width: 40px;
     height: auto;
   }
+
+  .errorMessage{
+    color: red;
+    font-size: 12px;
+  }
   
