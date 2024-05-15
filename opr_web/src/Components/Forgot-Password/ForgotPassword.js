@@ -8,7 +8,7 @@ import Modal from '@mui/material/Modal';
 import OTPValidation from '../OTP/OTPValidation';
 
 
-const ForgotPassword = () => {
+const ForgotPassword = ({onForgotPasswordValidate}) => {
   const el = useRef(null);
   const [openOTPScreen, setopenOTPScreen] = useState(false);
   const [ErrorMessage, setErrorMessage] = useState('');
@@ -44,6 +44,7 @@ const ForgotPassword = () => {
       console.log(response?.data?.data?.messageCode );
       if(response?.data?.data?.messageCode === 110201 || response?.data?.data?.messageCode === 110203 ){
          setopenOTPScreen(true);
+         onForgotPasswordValidate();
       }else{
         setErrorMessage(response?.data?.data?.message);
       }
@@ -119,7 +120,7 @@ const ForgotPassword = () => {
         aria-describedby="keep-mounted-modal-description"
       >
         <Box sx={style}>
-         <OTPValidation />
+         <OTPValidation onOTPValidate={handleCloseOTPScreen} />
           </Box>
           </Modal>
   </>

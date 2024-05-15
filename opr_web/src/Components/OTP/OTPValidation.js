@@ -1,13 +1,33 @@
 import React, { useState } from "react";
 import OtpInput from "react-otp-input";
 import axios from '../../api/axios';
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
+import ResetPassword from "../ResetPassword/ResetPassword";
 
-const OTPValidation = () => {
+const OTPValidation = ({onOTPValidate}) => {
   const [otp, setOtp] = useState("");
+  const [openResetScreen, setopenResetScreen] = useState(false);
+
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    height:350,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+
+
+  const handleCloseResetScreen = () => setopenResetScreen(false);
 
   const handleButtonClick = async () => {
 
-    const email = "pratik.raj@smartgig.tech"
+    const email = "pratik.raj@smartgig.tech";
   
     const LOGIN_URL = `/users/validate-otp?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`;
   
@@ -19,14 +39,14 @@ const OTPValidation = () => {
   
           }
       );
-      console.log(JSON.stringify(response?.data));
-      console.log(response?.data?.data?.messageCode );
-  
-      const accessToken = response?.data?.accessToken;
-      const roles = response?.data?.roles;
-  
-      console.log(accessToken);
-      console.log(roles);
+      console.log(response?.data?.data?.data);  
+      const token = response?.data?.data?.data;
+      sessionStorage.setItem("token",token)
+      if(token){
+        setopenResetScreen(true);
+        onOTPValidate();
+      }
+
   } catch(error){
 
   }
@@ -62,6 +82,18 @@ const OTPValidation = () => {
           </div>
         </div>
       </div>
+
+      <Modal
+        keepMounted
+        open={openResetScreen}
+        onClose={handleCloseResetScreen}
+        aria-labelledby="keep-mounted-modal-title"
+        aria-describedby="keep-mounted-modal-description"
+      >
+        <Box sx={style}>
+         <ResetPassword onResetValidate={handleCloseResetScreen} />
+          </Box>
+          </Modal>
     </>
   );
 };

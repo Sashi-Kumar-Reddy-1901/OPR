@@ -261,7 +261,7 @@ function Login() {
         aria-describedby="keep-mounted-modal-description"
       >
         <Box sx={style}>
-          <ForgotPassword />
+          <ForgotPassword  onForgotPasswordValidate={handleCloseForgotPassword}/>
         </Box>
       </Modal>
     </>
