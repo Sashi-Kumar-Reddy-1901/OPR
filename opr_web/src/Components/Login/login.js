@@ -11,6 +11,8 @@ import Zoom from "@mui/material/Zoom";
 import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 function Login() {
   const email = useRef(null);
@@ -22,6 +24,17 @@ function Login() {
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [severity, setSeverity] = useState('success');
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
 
   const passwordRegex =
     /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,15}$/;
@@ -78,10 +91,16 @@ function Login() {
       const roles = response?.data?.roles;
       console.log(response?.data?.data?.data);
       if (response?.data?.data?.data !== null) {
+        setMessage('Login successful 👍');
+        setSeverity('success');
+        setOpen(true);
         navigate("/dashboard");
       } else {
+        setMessage(response?.data?.data?.message);
         seterrorMessage(response?.data?.data?.message);
         console.log(errorMessage);
+        setSeverity('error');
+        setOpen(true);
       }
 
       console.log(accessToken);
@@ -112,7 +131,7 @@ function Login() {
                 Finakon
               </p>
             </div>
-            <div className="mt-12 flex flex-col items-center">
+            <div className="mt-8 flex flex-col items-center">
               <h1 className="text-2xl xl:text-3xl font-extrabold">Login</h1>
               <div className="w-full flex-1 mt-8">
                 {/* Email and Password Inputs */}
@@ -160,6 +179,7 @@ function Login() {
                         position: "relative",
                         left: "21rem",
                         top: "-2.2rem",
+                        width: "0",
                       }}
                     >
                       <Tooltip
@@ -177,7 +197,7 @@ function Login() {
                       >
                         <button
                           style={{
-                            backgroundColor: "#007bff",
+                            backgroundColor: "grey",
                             color: "#fff",
                             border: "none",
                             borderRadius: "50%",
@@ -215,13 +235,6 @@ function Login() {
                       </svg>
                       <span className="ml-3">Login</span>
                     </button>
-
-                    {/* Terms of Service and Privacy Policy */}
-                    {/* <Link to="/forgot-password">
-                    <p className="mt-6 text-xs text-gray-600 text-center">
-                     Forgot Password?
-                    </p>
-                    </Link> */}
                     <p
                       className="mt-2"
                       style={{ cursor: "pointer" }}
@@ -235,13 +248,7 @@ function Login() {
             </div>
           </div>
           <div className="flex-1 bg-gray-100 text-center hidden lg:flex">
-            <div
-              className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat bg-Image"
-              // style={{
-              //   backgroundImage:
-              //     "url('../../Images/opsriskbg_adobe_express.svg')",
-              // }}
-            ></div>
+            <div className="w-full bg-cover bg-center bg-no-repeat bg-Image"></div>
           </div>
         </div>
 
@@ -264,6 +271,20 @@ function Login() {
           <ForgotPassword  onForgotPasswordValidate={handleCloseForgotPassword}/>
         </Box>
       </Modal>
+
+      <Snackbar open={open} autoHideDuration={5000} onClose={handleClose} anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}>
+        <Alert
+          onClose={handleClose}
+          severity={severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
