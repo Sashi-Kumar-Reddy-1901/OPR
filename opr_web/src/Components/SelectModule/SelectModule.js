@@ -1,26 +1,52 @@
-import React from 'react'
+import {useState} from 'react'
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
-const SelectModule = () => {
-    const top100Films = [
-        { label: 'The Shawshank Redemption', year: 1994 },
-        { label: 'The Godfather', year: 1972 },
-        { label: 'The Godfather: Part II', year: 1974 },
-        { label: 'The Dark Knight', year: 2008 },
-        { label: '12 Angry Men', year: 1957 },
-        { label: "Schindler's List", year: 1993 },
-        { label: 'Pulp Fiction', year: 1994 },
-    ]
+const SelectModule = ({ModuleData}) => {
+    const [selectedModule, setSelectedModule] = useState(null);
+    const [selectedRole, setSelectedRole] = useState(null);
+    console.log(ModuleData);
+
+    const moduleDescriptions = Array.isArray(ModuleData) ? ModuleData : [];
+
+   const handleChange = (event, value) => {
+    setSelectedModule(value);
+    setSelectedRole(null);
+    console.log(selectedModule);
+  };
+
+  
+  const handleRoleChange = (event, value) => {
+    setSelectedRole(value);
+  };
+  
+  //const moduleData = ModuleData.map(item => item.moduleDescription);
   return (
    <>
        <Autocomplete
       disablePortal
       id="combo-box-demo"
-      options={top100Films}
+      options={moduleDescriptions}
+      getOptionLabel={(option) => option.moduleDescription}
       sx={{ width: 300 }}
-      renderInput={(params) => <TextField {...params} label="Movie" />}
+      onChange={handleChange}
+      renderInput={(params) => <TextField {...params} label="Modules" />}
     />
+
+{selectedModule && (
+        <Autocomplete
+          disablePortal
+          id="role-combo-box"
+          options={selectedModule.roles}
+          getOptionLabel={(option) => option.role}
+          sx={{ width: 300,marginTop:6, marginBottom: 2 }}
+          onChange={handleRoleChange}
+          renderInput={(params) => <TextField {...params} label="Roles" />}
+        />
+      )}
+
+<Button variant="contained">Submit</Button>
    </>
   )
 }

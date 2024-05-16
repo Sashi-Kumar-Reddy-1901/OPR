@@ -13,6 +13,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import SelectModule from "../SelectModule/SelectModule";
 
 function Login() {
   const email = useRef(null);
@@ -20,8 +21,10 @@ function Login() {
   const [password, setPassword] = useState("");
 
   const [errorMessage, seterrorMessage] = useState(false);
+  const [ModuleData,setModuleData] = useState('');
   const [passworderrorMessage, setpassworderrorMessage] = useState("");
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
+  const [openSelectModule, setopenSelectModule] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
@@ -89,9 +92,8 @@ function Login() {
         const token = response1.data?.data?.data;
         console.log(token);
         const url = 'users/get_user_modules_and_roles';
-        return axios.post(
+        return axios.get(
           url,
-          {},
           {
             headers :{
               "Content-Type": "application/json",
@@ -101,7 +103,7 @@ function Login() {
         )
         .then(response2 => {
           console.log('Second API response:', response2.data?.data?.data);
-           
+           setModuleData(response2.data?.data?.data);
         })
       });
       console.log(JSON.stringify(response?.data));
@@ -112,7 +114,8 @@ function Login() {
         setMessage('Login successful 👍');
         setSeverity('success');
         setOpen(true);
-        navigate("/dashboard");
+        setopenSelectModule(true);
+       // navigate("/dashboard");
       } else {
         setMessage(response?.data?.data?.message);
         seterrorMessage(response?.data?.data?.message);
@@ -287,6 +290,18 @@ function Login() {
       >
         <Box sx={style}>
           <ForgotPassword  onForgotPasswordValidate={handleCloseForgotPassword}/>
+        </Box>
+      </Modal>
+
+      <Modal
+        keepMounted
+        open={openSelectModule}
+        onClose={handleCloseForgotPassword}
+        aria-labelledby="keep-mounted-modal-title"
+        aria-describedby="keep-mounted-modal-description"
+      >
+        <Box sx={style}>
+          <SelectModule  ModuleData={ModuleData}/>
         </Box>
       </Modal>
 
