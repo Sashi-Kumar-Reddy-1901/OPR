@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import ResetPassword from "../ResetPassword/ResetPassword";
 
-const OTPValidation = ({onOTPValidate}) => {
+const OTPValidation = ({onOTPValidate,userEmail}) => {
   const [otp, setOtp] = useState("");
   const [openResetScreen, setopenResetScreen] = useState(false);
 
@@ -27,7 +27,7 @@ const OTPValidation = ({onOTPValidate}) => {
 
   const handleButtonClick = async () => {
 
-    const email = "pratik.raj@smartgig.tech";
+    const email = userEmail;
   
     const LOGIN_URL = `/users/validate-otp?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`;
   

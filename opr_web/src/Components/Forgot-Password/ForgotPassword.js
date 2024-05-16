@@ -10,6 +10,7 @@ import OTPValidation from '../OTP/OTPValidation';
 
 const ForgotPassword = ({onForgotPasswordValidate}) => {
   const el = useRef(null);
+  const [userEmail, setuserEmail] = useState('');
   const [openOTPScreen, setopenOTPScreen] = useState(false);
   const [ErrorMessage, setErrorMessage] = useState('');
   const style = {
@@ -30,6 +31,7 @@ const ForgotPassword = ({onForgotPasswordValidate}) => {
   const handleButtonClick = async () => {
     console.log(el.current.value);
     const email = el.current.value;
+    setuserEmail(email);
     const LOGIN_URL = `/users/forgot-password?email=${encodeURIComponent(email)}`;
   
     try {
@@ -120,7 +122,7 @@ const ForgotPassword = ({onForgotPasswordValidate}) => {
         aria-describedby="keep-mounted-modal-description"
       >
         <Box sx={style}>
-         <OTPValidation onOTPValidate={handleCloseOTPScreen} />
+         <OTPValidation onOTPValidate={handleCloseOTPScreen} userEmail = {userEmail} />
           </Box>
           </Modal>
   </>

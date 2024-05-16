@@ -85,7 +85,25 @@ function Login() {
         {
           headers: { "Content-Type": "application/json" },
         }
-      );
+      ).then(response1 =>{
+        const token = response1.data?.data?.data;
+        console.log(token);
+        const url = 'users/get_user_modules_and_roles';
+        return axios.post(
+          url,
+          {},
+          {
+            headers :{
+              "Content-Type": "application/json",
+              'Authorization': `Bearer ${token}` 
+            }
+          }
+        )
+        .then(response2 => {
+          console.log('Second API response:', response2.data?.data?.data);
+           
+        })
+      });
       console.log(JSON.stringify(response?.data));
       const accessToken = response?.data?.accessToken;
       const roles = response?.data?.roles;
