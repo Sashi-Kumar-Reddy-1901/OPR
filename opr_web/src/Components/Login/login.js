@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Logo from "../../logo.svg";
 import axios from "../../api/axios";
 import Box from "@mui/material/Box";
@@ -14,6 +14,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import SelectModule from "../SelectModule/SelectModule";
+import { GoogleReCaptchaProvider} from 'react-google-recaptcha-v3';
 
 function Login() {
   const email = useRef(null);
@@ -31,6 +32,25 @@ function Login() {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [severity, setSeverity] = useState('success');
+  const [isCaptchaEnabled, setIsCaptchaEnabled] = useState(false);
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      const configUrl = `/common-utils/get_config_details`;
+      try {
+        const response = await axios.get(configUrl);
+        console.log(response.data?.data);
+        const isCaptchaEnabled = response.data?.data?.data?.isCaptchaEnabled;
+        setIsCaptchaEnabled(isCaptchaEnabled)
+      } catch (error) {
+        console.error("Error fetching config:", error);
+        setMessage(error.response?.data?.error);
+        setSeverity('error');
+        setOpen(true);
+      }
+    };
+    fetchConfig();
+  }, []);
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -78,9 +98,7 @@ function Login() {
     const password = pass.current.value;
     const isLogout = true;
     // const LOGIN_URL = '/users/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&isLogout=${isLogout}';
-    const LOGIN_URL = `/users/login?username=${encodeURIComponent(
-      username
-    )}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
+    const LOGIN_URL = `/users/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
     try {
       const response = await axios.post(
         LOGIN_URL,
@@ -126,7 +144,12 @@ function Login() {
 
       console.log(accessToken);
       console.log(roles);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error.response?.data?.error);
+      setMessage(error.response?.data?.error);
+      setSeverity('error');
+      setOpen(true);
+    }
   };
 
   const handleOpenForgotPassword = () => setOpenForgotPassword(true);
@@ -144,7 +167,6 @@ function Login() {
             <img src={Logo} alt="5" className="header-image" />
           </div>
         </header>
-
         <div className="max-w-screen-xl m-0 sm:m-2 bg-white shadow sm:rounded-lg flex justify-center flex-1">
           <div className="lg:w-1/2 xl:w-6/12 p-6 sm:p-8">
             <div>
@@ -289,7 +311,9 @@ function Login() {
         aria-describedby="keep-mounted-modal-description"
       >
         <Box sx={style}>
-          <ForgotPassword  onForgotPasswordValidate={handleCloseForgotPassword}/>
+          <ForgotPassword
+            onForgotPasswordValidate={handleCloseForgotPassword}
+          />
         </Box>
       </Modal>
 
@@ -301,23 +325,32 @@ function Login() {
         aria-describedby="keep-mounted-modal-description"
       >
         <Box sx={style}>
-          <SelectModule  ModuleData={ModuleData}/>
+          <SelectModule ModuleData={ModuleData} />
         </Box>
       </Modal>
 
-      <Snackbar open={open} autoHideDuration={5000} onClose={handleClose} anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}>
+      <Snackbar
+        open={open}
+        autoHideDuration={5000}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
         <Alert
           onClose={handleClose}
           severity={severity}
           variant="filled"
-          sx={{ width: '100%' }}
+          sx={{ width: "100%" }}
         >
           {message}
         </Alert>
       </Snackbar>
+
+      {isCaptchaEnabled && (
+        <GoogleReCaptchaProvider reCaptchaKey="6LcMd94pAAAAAINUGy7ryI2evYPunp4mqYghKCxZ" />
+      )}
     </>
   );
 }
