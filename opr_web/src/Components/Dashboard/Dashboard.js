@@ -17,6 +17,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Sidenav from '../Sidenav/Sidenav';
+import { useSelector } from 'react-redux';
 
 const drawerWidth = 140;
 
@@ -69,6 +70,8 @@ export default function Dashboard() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
   const [menuItem, setmenuItem] = useState('');
+  const roles = useSelector((state) => state.user.roles);
+  console.log(roles);
 
   console.log(menuItem);
 

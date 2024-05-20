@@ -2,16 +2,23 @@ import {useState} from 'react'
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import { setRoles, setModules} from '../../Data/userSlice'
 
 const SelectModule = ({ModuleData}) => {
     const [selectedModule, setSelectedModule] = useState(null);
     const [selectedRole, setSelectedRole] = useState(null);
     console.log(ModuleData);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const moduleDescriptions = Array.isArray(ModuleData) ? ModuleData : [];
 
    const handleChange = (event, value) => {
     setSelectedModule(value);
+    dispatch(setModules(value));
+    dispatch(setRoles(null));
     setSelectedRole(null);
     console.log(selectedModule);
   };
@@ -19,7 +26,12 @@ const SelectModule = ({ModuleData}) => {
   
   const handleRoleChange = (event, value) => {
     setSelectedRole(value);
+    dispatch(setRoles(value));
   };
+
+  const handleButtonClick = () =>{
+    navigate('./dashboard')
+  }
   
   //const moduleData = ModuleData.map(item => item.moduleDescription);
   return (
@@ -46,7 +58,7 @@ const SelectModule = ({ModuleData}) => {
         />
       )}
 
-<Button variant="contained">Submit</Button>
+<Button    onClick={handleButtonClick}  variant="contained">Submit</Button>
    </>
   )
 }
