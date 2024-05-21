@@ -87,7 +87,7 @@ export default function Dashboard() {
     <>
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" elevation={4}  sx={{backgroundColor:"#6366f1"}}>
+      <AppBar position="fixed" elevation={4}  sx={{backgroundColor:"black"}}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -97,7 +97,7 @@ export default function Dashboard() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Persistent drawer
+            Dashboard
           </Typography>
         </Toolbar>
       </AppBar>

@@ -158,19 +158,19 @@ function Login() {
     <>
       <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col">
         {/* Header */}
-        <header className="bg-gray-200 py-4">
+        <header className="bg-black py-4">
           <div className="max-w-screen-xl mx-auto px-4 flex justify-between items-center">
             <img src={Logo} alt="1" className="header-image" />
-            <img src={Logo} alt="2" className="header-image" />
+            {/* <img src={Logo} alt="2" className="header-image" />
             <img src={Logo} alt="3" className="header-image" />
             <img src={Logo} alt="4" className="header-image" />
-            <img src={Logo} alt="5" className="header-image" />
+            <img src={Logo} alt="5" className="header-image" /> */}
           </div>
         </header>
         <div className="max-w-screen-xl m-0 sm:m-2 bg-white shadow sm:rounded-lg flex justify-center flex-1">
           <div className="lg:w-1/2 xl:w-6/12 p-6 sm:p-8">
             <div>
-              <p className="text-xl font-serif font-semibold text-blue-500">
+              <p className="text-xl font-serif font-semibold text-black">
                 Finakon
               </p>
             </div>
@@ -262,7 +262,7 @@ function Login() {
 
                     <button
                       onClick={handleButtonClick}
-                      className="mt-3 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                      className="mt-3 tracking-wide font-semibold bg-black text-gray-100 w-full py-4 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                     >
                       <svg
                         className="w-6 h-6 -ml-2"
@@ -296,7 +296,7 @@ function Login() {
         </div>
 
         {/* Footer */}
-        <footer className="bg-gray-200 text-gray-600 py-4">
+        <footer className="bg-black text-white py-4">
           <div className="max-w-screen-xl mx-auto px-4">
             <p style={{ margin: "0" }}>Powered by Finakon ®</p>
           </div>
