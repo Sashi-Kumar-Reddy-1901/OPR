@@ -33,6 +33,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   };
 
   const handleButtonClick = async () => {
+
     const storedprocedureUrl = "/common-utils/call-stored-procedure";
     const token = sessionStorage.getItem("token");
     console.log(token);
@@ -88,6 +89,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
       <button
         onClick={handleButtonClick}
         className="mt-8 bg-black text-gray-100 w-full py-2 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+        disabled = {!selectedRole}
       > Submit
       </button>
     </>
