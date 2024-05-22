@@ -1,7 +1,5 @@
 import { useState } from "react";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
+import Select from 'react-select';
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setRoles, setModules } from "../../Data/userSlice";
@@ -15,19 +13,23 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const moduleDescriptions = Array.isArray(ModuleData) ? ModuleData : [];
+  const moduleOptions = Array.isArray(ModuleData) ? ModuleData.map(module => ({
+    value: module.moduleDescription,
+    label: module.moduleDescription,
+    roles: module.roles
+  })) : [];
 
-  const handleChange = (event, value) => {
-    setSelectedModule(value);
-    dispatch(setModules(value));
+  const handleModuleChange = (selectedOption) => {
+    setSelectedModule(selectedOption);
+    dispatch(setModules(selectedOption));
     dispatch(setRoles(null));
     setSelectedRole(null);
-    console.log(selectedModule);
+    console.log(selectedOption);
   };
 
-  const handleRoleChange = (event, value) => {
-    setSelectedRole(value);
-    dispatch(setRoles(value));
+  const handleRoleChange = (selectedOption) => {
+    setSelectedRole(selectedOption);
+    dispatch(setRoles(selectedOption));
   };
 
   const handleButtonClick = async () => {
@@ -37,27 +39,10 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
     try {
       const response = await axios.post(
         storedprocedureUrl,
-        // {
-        //   procedure: "set_product_params",
-        //   param1: "user5",
-        // },
         {
           "procedure": "set_product_params",
-          "le_code": 4,
-          "info": [
-            {
-              "name": "Pratik",
-              "email": "pdp@dms.com",
-              "state": "jharkhand"
-            },
-            {
-              "name": "Sashi",
-              "email": "pdp@dms.com",
-              "state": "Andhra"
-            }
-          ]
+          "param1":"user5"
         },
-        
         {
           headers: {
             "Content-Type": "application/json",
@@ -66,41 +51,47 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
         }
       );
       console.log(response);
-    } catch {}
+    } catch (error) {
+      console.error("Error:", error);
+    }
     onCloseSelectModule();
     navigate("./dashboard");
   };
 
-  //const moduleData = ModuleData.map(item => item.moduleDescription);
+  const roleOptions = selectedModule ? selectedModule.roles.map(role => ({
+    value: role.role,
+    label: role.role
+  })) : [];
+
   return (
     <>
-      <Autocomplete
-        disablePortal
-        id="combo-box-demo"
-        options={moduleDescriptions}
-        getOptionLabel={(option) => option.moduleDescription}
-        sx={{ width: 300}}
-        onChange={handleChange}
-        renderInput={(params) => <TextField {...params} label="Modules" />}
+      <Select
+        value={selectedModule}
+        onChange={handleModuleChange}
+        options={moduleOptions}
+        placeholder="Select Module"
+        isClearable
+        isSearchable
       />
 
-      {selectedModule && (
-        <Autocomplete
-          disablePortal
-          id="role-combo-box"
-          options={selectedModule.roles}
-          getOptionLabel={(option) => option.role}
-          sx={{ width: 300, marginTop: 6, marginBottom: 2 }}
+      <div className="mt-8">
+        <Select
+          value={selectedRole}
           onChange={handleRoleChange}
-          renderInput={(params) => <TextField {...params} label="Roles" />}
+          options={roleOptions}
+          placeholder="Select Role"
+          isClearable
+          isSearchable
         />
-      )}
+      </div>
 
-      <Button onClick={handleButtonClick} variant="contained">Submit</Button>
+      <button
+        onClick={handleButtonClick}
+        className="mt-8 bg-black text-gray-100 w-full py-2 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+      > Submit
+      </button>
     </>
   );
 };
 
 export default SelectModule;
-
-
