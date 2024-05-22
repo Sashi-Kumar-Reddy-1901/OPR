@@ -1,37 +1,26 @@
-import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import Logo from "../../logo.svg";
 import axios from "../../api/axios";
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
 import "./login.css";
-import ForgotPassword from "../Forgot-Password/ForgotPassword";
-import Tooltip from "@mui/material/Tooltip";
-import Zoom from "@mui/material/Zoom";
-import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
 import SelectModule from "../SelectModule/SelectModule";
-import { GoogleReCaptchaProvider} from 'react-google-recaptcha-v3';
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
+import CloseIcon from '@mui/icons-material/Close';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography ,Zoom ,Tooltip} from '@mui/material';
+import ForgotPassword from "../Forgot-Password/ForgotPassword";
+import OTPValidation from "../OTP/OTPValidation";
+import ResetPassword from "../ResetPassword/ResetPassword";
 
 function Login() {
   const email = useRef(null);
   const pass = useRef(null);
   const [password, setPassword] = useState("");
-
   const [errorMessage, seterrorMessage] = useState(false);
-  const [ModuleData,setModuleData] = useState('');
+  const [ModuleData, setModuleData] = useState("");
   const [passworderrorMessage, setpassworderrorMessage] = useState("");
-  const [openForgotPassword, setOpenForgotPassword] = useState(false);
-  const [openSelectModule, setopenSelectModule] = useState(false);
+  const [openSelectModule, setOpenSelectModule] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
-
-  const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState('');
-  const [severity, setSeverity] = useState('success');
   const [isCaptchaEnabled, setIsCaptchaEnabled] = useState(false);
 
   useEffect(() => {
@@ -41,26 +30,16 @@ function Login() {
         const response = await axios.get(configUrl);
         console.log(response.data?.data);
         const isCaptchaEnabled = response.data?.data?.data?.isCaptchaEnabled;
-        setIsCaptchaEnabled(isCaptchaEnabled)
+        setIsCaptchaEnabled(isCaptchaEnabled);
       } catch (error) {
         console.error("Error fetching config:", error);
-        setMessage(error.response?.data?.error);
-        setSeverity('error');
-        setOpen(true);
       }
     };
     fetchConfig();
   }, []);
 
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpen(false);
-  };
 
-  const passwordRegex =
-    /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,15}$/;
+  const passwordRegex =/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,15}$/;
 
   const style = {
     position: "absolute",
@@ -100,60 +79,71 @@ function Login() {
     // const LOGIN_URL = '/users/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&isLogout=${isLogout}';
     const LOGIN_URL = `/users/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
     try {
-      const response = await axios.post(
-        LOGIN_URL,
-        {}, // Ensuring JSON body
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      ).then(response1 =>{
-        const token = response1.data?.data?.data;
-        console.log(token);
-        const url = 'users/get_user_modules_and_roles';
-        return axios.get(
-          url,
+      const response = await axios.post(LOGIN_URL,{}, // Ensuring JSON body
           {
-            headers :{
-              "Content-Type": "application/json",
-              'Authorization': `Bearer ${token}` 
-            }
+            headers: { "Content-Type": "application/json" },
           }
         )
-        .then(response2 => {
-          console.log('Second API response:', response2.data?.data?.data);
-           setModuleData(response2.data?.data?.data);
-        })
-      });
+        .then(async (response1) => {
+          const token = response1.data?.data?.data;
+          console.log(token);
+          const url = "users/get_user_modules_and_roles";
+          const response2 = await axios.get(url, {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            });
+          console.log("Second API response:", response2.data?.data?.data);
+          setModuleData(response2.data?.data?.data);
+        });
       console.log(JSON.stringify(response?.data));
       const accessToken = response?.data?.accessToken;
       const roles = response?.data?.roles;
       console.log(response?.data?.data?.data);
       if (response?.data?.data?.data !== null) {
-        setMessage('Login successful 👍');
-        setSeverity('success');
-        setOpen(true);
-        setopenSelectModule(true);
-       // navigate("/dashboard");
+        setOpenSelectModule(true);
       } else {
-        setMessage(response?.data?.data?.message);
         seterrorMessage(response?.data?.data?.message);
-        console.log(errorMessage);
-        setSeverity('error');
-        setOpen(true);
       }
-
       console.log(accessToken);
       console.log(roles);
     } catch (error) {
       console.log(error.response?.data?.error);
-      setMessage(error.response?.data?.error);
-      setSeverity('error');
-      setOpen(true);
     }
   };
 
-  const handleOpenForgotPassword = () => setOpenForgotPassword(true);
-  const handleCloseForgotPassword = () => setOpenForgotPassword(false);
+  const [openForgotPassword, setOpenForgotPassword] = useState(false);
+  const handleOpenForgotPassword = () => {
+    setOpenForgotPassword(true);
+  };
+  const handleCloseForgotPassword = () => {
+    setOpenForgotPassword(false);
+  };
+
+  const [userEmail, setUserEmail] = useState("");
+
+  const [openOTPDialog, setOpenOTPDialog] = useState(false);
+  const handleOpenOTPDialog = (email) => {
+    setUserEmail(email);
+    setOpenOTPDialog(true);
+  };
+  const handleCloseOTPDialog = () => {
+    setOpenOTPDialog(false);
+  };
+
+  const [openResetPassword, setOpenResetPassword] = useState(false);
+  const handleOpenResetPassword = () => {
+    setOpenResetPassword(true);
+  };
+  const handleCloseResetPassword = () => {
+    setOpenResetPassword(false);
+  };
+
+  const handleCloseSelectModule = () => {
+    setOpenSelectModule(false);
+  };
+
   return (
     <>
       <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col">
@@ -212,6 +202,7 @@ function Login() {
                           right: "15px",
                           top: "2.8rem",
                           transform: "translateY(-50%)",
+                          color: "#000",
                         }}
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
@@ -240,7 +231,7 @@ function Login() {
                       >
                         <button
                           style={{
-                            backgroundColor: "grey",
+                            backgroundColor: "#000",
                             color: "#fff",
                             border: "none",
                             borderRadius: "50%",
@@ -283,7 +274,8 @@ function Login() {
                       style={{ cursor: "pointer" }}
                       onClick={handleOpenForgotPassword}
                     >
-                      Reset / Forgot password
+                      {" "}
+                      Forgot / Reset Password?
                     </p>
                   </div>
                 </form>
@@ -303,50 +295,167 @@ function Login() {
         </footer>
       </div>
 
-      <Modal
-        keepMounted
+      {/* Forgot Password */}
+      <Dialog
+        onClose={handleCloseForgotPassword}
+        aria-labelledby="customized-dialog-title"
         open={openForgotPassword}
-        onClose={handleCloseForgotPassword}
-        aria-labelledby="keep-mounted-modal-title"
-        aria-describedby="keep-mounted-modal-description"
-      >
-        <Box sx={style}>
-          <ForgotPassword
-            onForgotPasswordValidate={handleCloseForgotPassword}
-          />
-        </Box>
-      </Modal>
-
-      <Modal
-        keepMounted
-        open={openSelectModule}
-        onClose={handleCloseForgotPassword}
-        aria-labelledby="keep-mounted-modal-title"
-        aria-describedby="keep-mounted-modal-description"
-      >
-        <Box sx={style}>
-          <SelectModule ModuleData={ModuleData} />
-        </Box>
-      </Modal>
-
-      <Snackbar
-        open={open}
-        autoHideDuration={5000}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
+        fullWidth
+        maxWidth="sm"
+        sx={{
+          "& .MuiDialog-paper": {
+            maxWidth: "400px",
+            width: "100%",
+            maxHeight: "300px",
+            height: "100%",
+          },
         }}
       >
-        <Alert
-          onClose={handleClose}
-          severity={severity}
-          variant="filled"
-          sx={{ width: "100%" }}
+        <DialogTitle sx={{ m: 0, p: 2, textAlign: "center" }}>
+          Forgot / Reset Password
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={handleCloseForgotPassword}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
         >
-          {message}
-        </Alert>
-      </Snackbar>
+          <CloseIcon />
+        </IconButton>
+        <DialogContent>
+          <Typography gutterBottom component="div">
+            <ForgotPassword
+              onForgotPasswordClose={handleCloseForgotPassword}
+              onOpenOtp={handleOpenOTPDialog}
+            />
+          </Typography>
+        </DialogContent>
+      </Dialog>
+
+      {/* OTP Screen */}
+      <Dialog
+        onClose={handleCloseOTPDialog}
+        aria-labelledby="customized-dialog-title"
+        open={openOTPDialog}
+        fullWidth
+        maxWidth="sm"
+        sx={{
+          "& .MuiDialog-paper": {
+            maxWidth: "400px",
+            width: "100%",
+            maxHeight: "300px",
+            height: "100%",
+          },
+        }}
+      >
+        <DialogTitle sx={{ m: 0, p: 2, textAlign: "center" }}>
+          Enter OTP
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={handleCloseOTPDialog}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent>
+          <Typography gutterBottom component="div">
+            <OTPValidation
+              userEmail={userEmail}
+              onOtpClose={handleCloseOTPDialog}
+              onResetPasswordOpen={handleOpenResetPassword}
+            />
+          </Typography>
+        </DialogContent>
+      </Dialog>
+
+      {/*Reset Password Screen */}
+      <Dialog
+        onClose={handleCloseResetPassword}
+        aria-labelledby="customized-dialog-title"
+        open={openResetPassword}
+        fullWidth
+        maxWidth="sm"
+        sx={{
+          "& .MuiDialog-paper": {
+            maxWidth: "400px",
+            width: "100%",
+            maxHeight: "300px",
+            height: "100%",
+          },
+        }}
+      >
+        <DialogTitle sx={{ m: 0, p: 2, textAlign: "center" }}>
+          Reset Password
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={handleCloseResetPassword}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent>
+          <Typography gutterBottom component="div">
+            <ResetPassword onOTPValidate={handleCloseResetPassword} />
+          </Typography>
+        </DialogContent>
+      </Dialog>
+
+      {/*Select Module and Roles */}
+      <Dialog
+        onClose={handleCloseSelectModule}
+        aria-labelledby="customized-dialog-title"
+        open={openSelectModule}
+        fullWidth
+        maxWidth="sm"
+        sx={{
+          "& .MuiDialog-paper": {
+            maxWidth: "400px",
+            width: "100%",
+            maxHeight: "300px",
+            height: "100%",
+          },
+        }}
+      >
+        <DialogTitle sx={{ m: 0, p: 2, textAlign: "center" }}>
+          Select Module and Role
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={handleCloseSelectModule}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent>
+          <Typography gutterBottom component="div">
+            <SelectModule
+              ModuleData={ModuleData}
+              onCloseSelectModule={handleCloseSelectModule}
+            />
+          </Typography>
+        </DialogContent>
+      </Dialog>
 
       {isCaptchaEnabled && (
         <GoogleReCaptchaProvider reCaptchaKey="6LcMd94pAAAAAINUGy7ryI2evYPunp4mqYghKCxZ" />

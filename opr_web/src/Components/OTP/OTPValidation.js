@@ -1,89 +1,58 @@
 import React, { useState } from "react";
 import OtpInput from "react-otp-input";
-import axios from '../../api/axios';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
-import ResetPassword from "../ResetPassword/ResetPassword";
+import axios from "../../api/axios";
+import './OTPValidation.css'
 
-const OTPValidation = ({onOTPValidate,userEmail}) => {
+const OTPValidation = ({ onOtpClose, userEmail ,onResetPasswordOpen}) => {
+  console.log(userEmail);
   const [otp, setOtp] = useState("");
-  const [openResetScreen, setopenResetScreen] = useState(false);
-
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    height:350,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-  };
-
-
-  const handleCloseResetScreen = () => setopenResetScreen(false);
 
   const handleButtonClick = async () => {
-
     const email = userEmail;
-  
+    console.log(email);
     const LOGIN_URL = `/users/validate-otp?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`;
-  
     try {
       const response = await axios.post(
-          LOGIN_URL,{}, // Ensuring JSON body
-          {
-              headers: { 'Content-Type': 'application/json' },
-  
-          }
+        LOGIN_URL,
+        {}, // Ensuring JSON body
+        {
+          headers: { "Content-Type": "application/json" },
+        }
       );
-      console.log(response?.data?.data?.data);  
+      console.log(response?.data?.data?.data);
       const token = response?.data?.data?.data;
-      sessionStorage.setItem("token",token)
-      if(token){
-        setopenResetScreen(true);
-        onOTPValidate();
+      sessionStorage.setItem("token", token);
+      if (token) {
+        onOtpClose();
+        onResetPasswordOpen()
       }
-
-  } catch(error){
-
-  }
+    } catch (error) {}
   };
 
   return (
     <>
-      <div className="bg-gray-100 text-gray-900 flex flex-col">
-        <div className="max-w-screen-xl m-0 sm:m-2 bg-white shadow sm:rounded-lg flex justify-center flex-1">
-          <div className=" p-6 sm:p-8">
-            <div className="flex flex-col items-center">
-              <h1 className="text-2xl xl:text-3xl font-extrabold">
-                OTP
-              </h1>
-              <div className="w-full flex-1 mt-8">
-                {/* Email and Password Inputs */}
-                <form onSubmit={(e) => e.preventDefault()}>
-                  <OtpInput
-                    value={otp}
-                    onChange={setOtp}
-                    numInputs={6}
-                    renderSeparator={<span>-</span>}
-                    renderInput={(props) => <input {...props} />}
-                  />
-                  <button 
-                    onClick={handleButtonClick}
-                   className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
-                    Submit
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
+      <div className="flex flex-col items-center">
+        <div className="w-full flex-1">
+          <form onSubmit={(e) => e.preventDefault()}>
+            <OtpInput
+              value={otp}
+              onChange={setOtp}
+              numInputs={6}
+              renderInput={(props) => <input {...props} />}
+              inputStyle="otp-input"
+              containerStyle="otp-container"
+            />
+            <button
+              onClick={handleButtonClick}
+              className="mt-8 bg-black text-gray-100 w-full py-2 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+            >
+              Submit
+            </button>
+          </form>
         </div>
       </div>
 
-      <Modal
+      {/* <Modal
         keepMounted
         open={openResetScreen}
         onClose={handleCloseResetScreen}
@@ -91,9 +60,9 @@ const OTPValidation = ({onOTPValidate,userEmail}) => {
         aria-describedby="keep-mounted-modal-description"
       >
         <Box sx={style}>
-         <ResetPassword onResetValidate={handleCloseResetScreen} />
-          </Box>
-          </Modal>
+          <ResetPassword onResetValidate={handleCloseResetScreen} />
+        </Box>
+      </Modal> */}
     </>
   );
 };
