@@ -75,6 +75,7 @@ function Login() {
         .then(async (response1) => {
           const token = response1.data?.data?.data;
           console.log(token);
+          sessionStorage.setItem("token", token);
           const url = "users/get_user_modules_and_roles";
           const response2 = await axios.get(url, {
               headers: {

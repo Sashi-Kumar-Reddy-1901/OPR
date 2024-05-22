@@ -10,6 +10,7 @@ import axios from "../../api/axios";
 const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedRole, setSelectedRole] = useState(null);
+
   console.log(ModuleData);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -32,13 +33,31 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const handleButtonClick = async () => {
     const storedprocedureUrl = "/common-utils/call-stored-procedure";
     const token = sessionStorage.getItem("token");
+    console.log(token);
     try {
       const response = await axios.post(
         storedprocedureUrl,
+        // {
+        //   procedure: "set_product_params",
+        //   param1: "user5",
+        // },
         {
-          procedure: "GetUserById",
-          param1: "user5",
+          "procedure": "set_product_params",
+          "le_code": 4,
+          "info": [
+            {
+              "name": "Pratik",
+              "email": "pdp@dms.com",
+              "state": "jharkhand"
+            },
+            {
+              "name": "Sashi",
+              "email": "pdp@dms.com",
+              "state": "Andhra"
+            }
+          ]
         },
+        
         {
           headers: {
             "Content-Type": "application/json",
@@ -83,3 +102,5 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
 };
 
 export default SelectModule;
+
+
