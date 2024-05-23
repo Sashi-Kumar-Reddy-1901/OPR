@@ -4,7 +4,8 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { DataGrid } from "@mui/x-data-grid";
 import { CSVLink } from "react-csv";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
+import './Set-upTable.css'
 
 const columns = [
   { field: "id", headerName: "ID", width: 70 },
@@ -89,15 +90,24 @@ const SetupTable = () => {
     const file = fileInput.files[0];
     if (file) {
       if (file.type !== "text/csv") {
-        toast.warn("Please upload a valid CSV file.");
+        toast.warn("Please upload a valid CSV file.", {
+          style: {
+            background: "black",
+            color: "white",
+          },
+        });
       } else {
-        toast.success("File uploaded successfully.");
+        toast.success("File uploaded successfully.", {
+          style: {
+            background: "black",
+            color: "white",
+          },
+        });
         console.log("File uploaded:", file);
         fileInput.value = "";
       }
     }
   };
-  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
@@ -123,7 +133,18 @@ const SetupTable = () => {
               onChange={handleFileUpload}
               style={{ display: "none" }}
             />
-            <ToastContainer />
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              closeButton
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
           </div>
           <div style={{ height: "60vh", width: "100%" }}>
             <DataGrid
