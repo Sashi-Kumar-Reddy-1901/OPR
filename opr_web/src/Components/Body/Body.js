@@ -6,6 +6,7 @@ import Dashboard from '../Dashboard/Dashboard';
 import Sidenav from '../Sidenav/Sidenav';
 import ForgotPassword from '../Forgot-Password/ForgotPassword';
 import OTPValidation from '../OTP/OTPValidation';
+import SetupTable from '../Set-up Table/Set-upTable';
 
 const Body = () => {
     const appRouter = createBrowserRouter([
@@ -28,6 +29,10 @@ const Body = () => {
       {
         path: "/otp-validation",
         element: <OTPValidation />
+      },
+      {
+        path: "/setup-table",
+        element: <SetupTable />
       }
     ]);
   return (

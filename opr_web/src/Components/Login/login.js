@@ -162,7 +162,7 @@ function Login() {
                     <input
                       ref={email}
                       className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                      type="email"
+                      type="text"
                       placeholder="User Id / Email"
                     />
                     <div
@@ -279,7 +279,7 @@ function Login() {
         {/* Footer */}
         <footer className="bg-black text-white py-4">
           <div className="max-w-screen-xl mx-auto px-4">
-            <p style={{ margin: "0" }}>Powered by Finakon ®</p>
+            <p style={{ margin: "0" }}>Powered by Finakon®</p>
           </div>
         </footer>
       </div>
@@ -297,6 +297,7 @@ function Login() {
             width: "100%",
             maxHeight: "300px",
             height: "100%",
+            borderRadius:"10px"
           },
         }}
       >
@@ -338,6 +339,7 @@ function Login() {
             width: "100%",
             maxHeight: "300px",
             height: "100%",
+            borderRadius:"10px"
           },
         }}
       >
@@ -380,6 +382,7 @@ function Login() {
             width: "100%",
             maxHeight: "300px",
             height: "100%",
+            borderRadius:"10px"
           },
         }}
       >
@@ -418,6 +421,7 @@ function Login() {
             width: "100%",
             maxHeight: "300px",
             height: "100%",
+            borderRadius:"10px"
           },
         }}
       >

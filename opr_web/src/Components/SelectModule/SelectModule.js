@@ -3,7 +3,6 @@ import Select from 'react-select';
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setRoles, setModules } from "../../Data/userSlice";
-import axios from "../../api/axios";
 
 const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const [selectedModule, setSelectedModule] = useState(null);
@@ -32,35 +31,17 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
     dispatch(setRoles(selectedOption));
   };
 
-  const handleButtonClick = async () => {
-
-    const storedprocedureUrl = "/common-utils/call-stored-procedure";
-    const token = sessionStorage.getItem("token");
-    console.log(token);
-    try {
-      const response = await axios.post(
-        storedprocedureUrl,
-        {
-          "procedure": "set_product_params",
-          "param1":"user5"
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(response);
-    } catch (error) {
-      console.error("Error:", error);
-    }
+  const handleButtonClick = () => {
     onCloseSelectModule();
-    navigate("./dashboard");
+    if (selectedRole && selectedRole.value === 99) {
+      navigate("./setup-table")
+    } else {
+      navigate("./dashboard");
+    }
   };
 
   const roleOptions = selectedModule ? selectedModule.roles.map(role => ({
-    value: role.role,
+    value: role.roleCode,
     label: role.role
   })) : [];
 
