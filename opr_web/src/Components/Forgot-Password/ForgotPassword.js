@@ -1,14 +1,16 @@
-import React ,{ useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import axios from "../../api/axios";
 
-const ForgotPassword = ({ onForgotPasswordClose , onOpenOtp }) => {
+const ForgotPassword = ({ onForgotPasswordClose, onOpenOtp }) => {
   const emailRef = useRef(null);
-  const [ErrorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleButtonClick = async () => {
     console.log(emailRef.current.value);
     const email = emailRef.current.value;
-    const LOGIN_URL = `/users/forgot-password?email=${encodeURIComponent(email)}`;
+    const LOGIN_URL = `/users/forgot-password?email=${encodeURIComponent(
+      email
+    )}`;
     try {
       const response = await axios.post(
         LOGIN_URL,
@@ -21,11 +23,10 @@ const ForgotPassword = ({ onForgotPasswordClose , onOpenOtp }) => {
       console.log(response?.data?.data?.messageCode);
       if (
         response?.data?.data?.messageCode === 110201 ||
-        response?.data?.data?.messageCode === 110203 ||
-        response?.data?.data?.messageCode === 110202
+        response?.data?.data?.messageCode === 110203
       ) {
-        onForgotPasswordClose();
-        onOpenOtp(email)
+        onForgotPasswordClose(response?.data?.data?.message);
+        onOpenOtp(email);
       } else {
         setErrorMessage(response?.data?.data?.message);
       }
@@ -43,7 +44,7 @@ const ForgotPassword = ({ onForgotPasswordClose , onOpenOtp }) => {
         <div className="w-full flex-1">
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="mx-auto max-w-xs">
-              <div className="mb-6">
+              <div className="mb-4">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-dark">
                   Email Id*
                 </label>
@@ -54,13 +55,19 @@ const ForgotPassword = ({ onForgotPasswordClose , onOpenOtp }) => {
                   placeholder="Enter Email Id"
                 />
               </div>
+
+              {errorMessage && (
+                <p className="text-red-500 text-xs text-center max-h-0">
+                  {errorMessage}
+                </p>
+              )}
+              
               <button
                 onClick={handleButtonClick}
                 className="mt-8 bg-black text-gray-100 w-full py-2 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
               >
                 Reset
               </button>
-              <p className="error-class">{ErrorMessage}</p>
             </div>
           </form>
         </div>

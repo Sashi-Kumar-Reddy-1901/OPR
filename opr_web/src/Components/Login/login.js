@@ -6,17 +6,26 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import SelectModule from "../SelectModule/SelectModule";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
-import CloseIcon from '@mui/icons-material/Close';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography ,Zoom ,Tooltip} from '@mui/material';
+import CloseIcon from "@mui/icons-material/Close";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Typography,
+  Zoom,
+  Tooltip,
+} from "@mui/material";
 import ForgotPassword from "../Forgot-Password/ForgotPassword";
 import OTPValidation from "../OTP/OTPValidation";
 import ResetPassword from "../ResetPassword/ResetPassword";
+import { ToastContainer, toast } from "react-toastify";
 
 function Login() {
   const email = useRef(null);
   const pass = useRef(null);
   const [password, setPassword] = useState("");
-  const [errorMessage, seterrorMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(false);
   const [ModuleData, setModuleData] = useState("");
   const [passworderrorMessage, setpassworderrorMessage] = useState("");
   const [openSelectModule, setOpenSelectModule] = useState(false);
@@ -38,8 +47,8 @@ function Login() {
     fetchConfig();
   }, []);
 
-
-  const passwordRegex =/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,15}$/;
+  const passwordRegex =
+    /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,15}$/;
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
@@ -59,46 +68,48 @@ function Login() {
   };
 
   const handleButtonClick = async () => {
-    console.log(email.current.value);
-    console.log(pass.current.value);
-    const username = email.current.value;
-    const password = pass.current.value;
-    const isLogout = true;
-    // const LOGIN_URL = '/users/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&isLogout=${isLogout}';
-    const LOGIN_URL = `/users/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
     try {
-      const response = await axios.post(LOGIN_URL,{}, // Ensuring JSON body
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        )
-        .then(async (response1) => {
-          const token = response1.data?.data?.data;
-          console.log(token);
-          sessionStorage.setItem("token", token);
-          const url = "users/get_user_modules_and_roles";
-          const response2 = await axios.get(url, {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            });
-          console.log("Second API response:", response2.data?.data?.data);
-          setModuleData(response2.data?.data?.data);
+      const username = email.current.value;
+      const password = pass.current.value;
+      const isLogout = true;
+      const LOGIN_URL = `/users/login?username=${encodeURIComponent(
+        username
+      )}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
+
+      const loginResponse = await axios.post(
+        LOGIN_URL,
+        {},
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      const token = loginResponse.data?.data?.data;
+      sessionStorage.setItem("token", token);
+
+      if (token) {
+        const url = "users/get_user_modules_and_roles";
+        const moduleResponse = await axios.get(url, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         });
-      console.log(JSON.stringify(response?.data));
-      const accessToken = response?.data?.accessToken;
-      const roles = response?.data?.roles;
-      console.log(response?.data?.data?.data);
-      if (response?.data?.data?.data !== null) {
-        setOpenSelectModule(true);
+
+        const modulesData = moduleResponse.data?.data?.data;
+        console.log("Modules and roles:", modulesData);
+        setModuleData(modulesData);
+        if (modulesData !== null) {
+          setOpenSelectModule(true);
+        } else {
+          setErrorMessage("No modules data found.");
+        }
       } else {
-        seterrorMessage(response?.data?.data?.message);
+        setErrorMessage(loginResponse?.data?.data?.message);
       }
-      console.log(accessToken);
-      console.log(roles);
     } catch (error) {
-      console.log(error.response?.data?.error);
+      console.log("Error:", error.response?.data?.error);
+      setErrorMessage("An error occurred while processing your request.");
     }
   };
 
@@ -106,8 +117,13 @@ function Login() {
   const handleOpenForgotPassword = () => {
     setOpenForgotPassword(true);
   };
-  const handleCloseForgotPassword = () => {
+  const handleCloseForgotPassword = (otpSentSuccess) => {
     setOpenForgotPassword(false);
+    if (otpSentSuccess) {
+      toast.success(otpSentSuccess, {
+        className: "custom-toast",
+      });
+    }
   };
 
   const [userEmail, setUserEmail] = useState("");
@@ -117,16 +133,27 @@ function Login() {
     setUserEmail(email);
     setOpenOTPDialog(true);
   };
-  const handleCloseOTPDialog = () => {
+  const handleCloseOTPDialog = (otpSuccess) => {
     setOpenOTPDialog(false);
+    if (otpSuccess) {
+      toast.success(otpSuccess, {
+        className: "custom-toast",
+      });
+    }
   };
 
   const [openResetPassword, setOpenResetPassword] = useState(false);
   const handleOpenResetPassword = () => {
     setOpenResetPassword(true);
   };
-  const handleCloseResetPassword = () => {
+
+  const handleCloseResetPassword = (resetSuccess) => {
     setOpenResetPassword(false);
+    if (resetSuccess) {
+      toast.success(resetSuccess, {
+        className: "custom-toast",
+      });
+    }
   };
 
   const handleCloseSelectModule = () => {
@@ -238,11 +265,15 @@ function Login() {
                         </button>
                       </Tooltip>
                     </div>
-                    <p className="errorMessage">{errorMessage}</p>
+                    {errorMessage && (
+                      <p className="text-red-500 text-xs text-center max-h-0">
+                        {errorMessage}
+                      </p>
+                    )}
 
                     <button
                       onClick={handleButtonClick}
-                      className="mt-3 tracking-wide font-semibold bg-black text-gray-100 w-full py-4 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                      className="mt-6 tracking-wide font-semibold bg-black text-gray-100 w-full py-4 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                     >
                       <svg
                         className="w-6 h-6 -ml-2"
@@ -284,6 +315,19 @@ function Login() {
         </footer>
       </div>
 
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        closeButton
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+
       {/* Forgot Password */}
       <Dialog
         onClose={handleCloseForgotPassword}
@@ -297,7 +341,7 @@ function Login() {
             width: "100%",
             maxHeight: "300px",
             height: "100%",
-            borderRadius:"10px"
+            borderRadius: "10px",
           },
         }}
       >
@@ -339,7 +383,7 @@ function Login() {
             width: "100%",
             maxHeight: "300px",
             height: "100%",
-            borderRadius:"10px"
+            borderRadius: "10px",
           },
         }}
       >
@@ -380,9 +424,9 @@ function Login() {
           "& .MuiDialog-paper": {
             maxWidth: "400px",
             width: "100%",
-            maxHeight: "300px",
+            maxHeight: "350px",
             height: "100%",
-            borderRadius:"10px"
+            borderRadius: "10px",
           },
         }}
       >
@@ -403,7 +447,7 @@ function Login() {
         </IconButton>
         <DialogContent>
           <Typography gutterBottom component="div">
-            <ResetPassword onOTPValidate={handleCloseResetPassword} />
+            <ResetPassword onResetPasswordClose={handleCloseResetPassword} />
           </Typography>
         </DialogContent>
       </Dialog>
@@ -421,7 +465,7 @@ function Login() {
             width: "100%",
             maxHeight: "300px",
             height: "100%",
-            borderRadius:"10px"
+            borderRadius: "10px",
           },
         }}
       >

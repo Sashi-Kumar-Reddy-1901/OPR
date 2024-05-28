@@ -1,0 +1,35 @@
+.custom-select__menu {
+  margin-top: 0 !important;
+  max-height: 200px !important;
+}
+
+.custom-select__menu-list {
+  max-height: 104px !important;
+  padding: 0 !important;
+}
+
+.custom-select__option,
+.custom-select__single-value,
+.custom-select__placeholder {
+  font-size: 12px !important;
+}
+
+.custom-select__option {
+  background-color: transparent !important;
+  cursor: pointer !important;
+}
+
+.custom-select__option--is-focused{
+  background-color: #ccc !important;
+  color: black !important;
+}
+.custom-select__option--is-selected {
+  color: black !important;
+  background-color: transparent !important;
+}
+
+.custom-select__control,
+.custom-select__control--is-focused {
+  border-color: #000 !important;
+  box-shadow: none !important;
+}

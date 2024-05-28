@@ -5,35 +5,14 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { DataGrid } from "@mui/x-data-grid";
 import { CSVLink } from "react-csv";
 import { ToastContainer, toast } from "react-toastify";
-import './Set-upTable.css'
-
-const columns = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "firstName", headerName: "First name", width: 130 },
-  { field: "lastName", headerName: "Last name", width: 130 },
-  {
-    field: "age",
-    headerName: "Age",
-    type: "number",
-    width: 90,
-  },
-];
-
-const rows = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-  { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-  { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-  { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-  { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-];
+import { Tooltip, Zoom } from "@mui/material";
+import { BounceLoader } from "react-spinners";
+import "./Set-upTable.css";
 
 const SetupTable = () => {
   const [data, setData] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStoredProcedure = async () => {
@@ -55,7 +34,15 @@ const SetupTable = () => {
         );
         console.log(response.data?.data?.data);
         setData(response.data?.data?.data || []);
+        setLoading(false);
       } catch (error) {
+        setLoading(false);
+        toast.error(error, {
+          style: {
+            background: "black",
+            color: "white",
+          },
+        });
         console.error("Error:", error);
       }
     };
@@ -77,13 +64,6 @@ const SetupTable = () => {
   const handleDone = () => {
     console.log("Done button clicked");
   };
-
-  const csvData = rows.map((row) => ({
-    id: row.id,
-    firstName: row.firstName,
-    lastName: row.lastName,
-    age: row.age,
-  }));
 
   const handleFileUpload = (event) => {
     const fileInput = event.target;
@@ -109,22 +89,48 @@ const SetupTable = () => {
     }
   };
 
+  let columns = [];
+  if (data.length > 0) {
+    const currentData = data[currentIndex];
+    for (let i = 1; i <= currentData.col_count; i++) {
+      columns.push({
+        field: `Column ${i}`,
+        headerName: `Column ${i}`,
+        width: 150,
+      });
+    }
+  }
+
+  const csvData = data.map((item) => {
+    return {
+      ...item,
+    };
+  });
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
-      {data.length > 0 ? (
-        <div className="w-full max-w-4xl">
-          <div className="flex items-center mb-4">
+      {loading ? (
+        <div className="flex items-center justify-center h-full">
+          <BounceLoader color="#000" />
+        </div>
+      ) : (
+        <div className="w-full max-w-6xl">
+          <div className="flex items-center mb-2">
             <input
               type="text"
-              value={data[currentIndex].details}
+              value={data[currentIndex]?.details}
               readOnly
               className="w-full p-2 border border-gray-300 rounded"
             />
             <CSVLink data={csvData} filename="data.csv" className="ml-2">
-              <FileDownloadIcon className="cursor-pointer" />
+              <Tooltip title="Download File" arrow TransitionComponent={Zoom}>
+                <FileDownloadIcon className="cursor-pointer" />
+              </Tooltip>
             </CSVLink>
             <label htmlFor="file-upload" className="ml-2 cursor-pointer">
-              <FileUploadIcon />
+              <Tooltip title="Upload File" arrow TransitionComponent={Zoom}>
+                <FileUploadIcon />
+              </Tooltip>
             </label>
             <input
               id="file-upload"
@@ -133,31 +139,28 @@ const SetupTable = () => {
               onChange={handleFileUpload}
               style={{ display: "none" }}
             />
-            <ToastContainer
-              position="top-right"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              closeButton
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
+          </div>
+
+          <div>
+            <textarea
+              placeholder="Paste text here ..."
+              style={{ width: "100%" }}
             />
           </div>
-          <div style={{ height: "60vh", width: "100%" }}>
+
+          <div style={{ height: "65vh", width: "100%" }}>
             <DataGrid
-              rows={rows}
+              rows={[]}
               columns={columns}
               initialState={{
                 pagination: {
-                  paginationModel: { page: 0, pageSize: 5 },
+                  paginationModel: { page: 0, pageSize: 10 },
                 },
               }}
-              pageSizeOptions={[5, 10]}
+              pageSizeOptions={[10, 25, 50, 100]}
             />
           </div>
+
           <div className="flex justify-between mt-4">
             <div>
               <button
@@ -187,9 +190,19 @@ const SetupTable = () => {
             </div>
           </div>
         </div>
-      ) : (
-        <p>Loading data...</p>
       )}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        closeButton
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

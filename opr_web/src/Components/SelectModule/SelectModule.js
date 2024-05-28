@@ -1,8 +1,9 @@
 import { useState } from "react";
-import Select from 'react-select';
+import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setRoles, setModules } from "../../Data/userSlice";
+import "./SelectModule.css";
 
 const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const [selectedModule, setSelectedModule] = useState(null);
@@ -54,6 +55,9 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
         placeholder="Select Module"
         isClearable
         isSearchable
+        className="custom-select-container"
+        classNamePrefix="custom-select"
+        noOptionsMessage={() => "No modules available"}
       />
 
       <div className="mt-8">
@@ -64,6 +68,9 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
           placeholder="Select Role"
           isClearable
           isSearchable
+          className="custom-select-container"
+          classNamePrefix="custom-select"
+          noOptionsMessage={() => "No roles available"}
         />
       </div>
 
