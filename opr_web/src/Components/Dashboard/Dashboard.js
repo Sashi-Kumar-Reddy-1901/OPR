@@ -18,6 +18,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Sidenav from '../Sidenav/Sidenav';
 import { useSelector } from 'react-redux';
+import Entity from '../Entity/Entity';
 
 const drawerWidth = 140;
 
@@ -121,7 +122,7 @@ export default function Dashboard() {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+          {['Inbox', 'Entity', 'Send email', 'Drafts'].map((text, index) => (
             <ListItem key={text} disablePadding onClick={()=> setmenuItem(text)}>
               <ListItemButton>
                 {/* <ListItemIcon>
@@ -136,6 +137,7 @@ export default function Dashboard() {
       </Drawer>
       <Main open={open}>
         {menuItem === "Inbox" && <Sidenav />}
+        {menuItem === "Entity" && <Entity />}
       </Main>
     </Box>
     </>

@@ -7,6 +7,7 @@ import Sidenav from '../Sidenav/Sidenav';
 import ForgotPassword from '../Forgot-Password/ForgotPassword';
 import OTPValidation from '../OTP/OTPValidation';
 import SetupTable from '../Set-up Table/Set-upTable';
+import Entity from '../Entity/Entity';
 
 const Body = () => {
     const appRouter = createBrowserRouter([
@@ -33,6 +34,10 @@ const Body = () => {
       {
         path: "/setup-table",
         element: <SetupTable />
+      },
+      {
+        path: "/entity",
+        element: <Entity />
       }
     ]);
   return (
