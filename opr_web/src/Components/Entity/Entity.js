@@ -34,8 +34,12 @@ const Entity = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
+      let searchT = "";
       console.log(filterModel.quickFilterValues);
-      const searchT =  (filterModel.quickFilterValues).toString();
+      if(filterModel.quickFilterValues){
+         searchT =  (filterModel.quickFilterValues).toString() ;
+      }
+     
       const sort = sortModel.length > 0 ? sortModel.map((sort) => ({ field: sort.field, order: sort.sort })) : [{ field: "ulevel", order: "asc" }];
       const response = await axios.post('/entity/get_entities', {
         "pagination": {
@@ -55,8 +59,10 @@ const Entity = () => {
         }
       });
       const resData = response.data?.data?.data;
+      const length = (response.data?.data?.data).length;
+      console.log("length", length)
       setData(resData);
-      setRowCount(50);
+      setRowCount(100);
     } catch (error) {
       setError(error);
     } finally {
