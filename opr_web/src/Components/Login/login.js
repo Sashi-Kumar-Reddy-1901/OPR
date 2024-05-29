@@ -72,8 +72,9 @@ function Login() {
       const username = emailRef.current.value;
       const password = passwordRef.current.value;
       const isLogout = true;
-      const LOGIN_URL = `/users/login?username=${encodeURIComponent(username)}
-      &password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
+      const LOGIN_URL = `/users/login?username=${encodeURIComponent(
+        username
+      )}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
       const loginResponse = await axios.post(
         LOGIN_URL,
         {},
@@ -271,7 +272,9 @@ function Login() {
                     <button
                       onClick={handleButtonClick}
                       className="mt-6 tracking-wide font-semibold bg-black text-gray-100 w-full py-4 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
-                    >Login </button>
+                    >
+                      Login{" "}
+                    </button>
                     <p
                       className="mt-2"
                       style={{ cursor: "pointer" }}
