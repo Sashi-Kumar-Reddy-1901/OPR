@@ -16,6 +16,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const moduleOptions = Array.isArray(ModuleData) ? ModuleData.map(module => ({
     value: module.moduleDescription,
     label: module.moduleDescription,
+    moduleCode: module.moduleCode,
     roles: module.roles
   })) : [];
 
@@ -34,7 +35,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
 
   const handleButtonClick = () => {
     onCloseSelectModule();
-    if (selectedRole && selectedRole.value === 99) {
+    if (selectedModule?.moduleCode === -1 && selectedRole?.value === -1) {
       navigate("./setup-table")
     } else {
       navigate("./dashboard");

@@ -88,7 +88,7 @@ const ResetPassword = ({ onResetPasswordClose }) => {
                     onClick={togglePasswordVisibility}
                     edge="end"
                   >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                    {showPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </div>
               </div>
@@ -112,7 +112,7 @@ const ResetPassword = ({ onResetPasswordClose }) => {
                     onClick={toggleConfirmPasswordVisibility}
                     edge="end"
                   >
-                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </div>
               </div>

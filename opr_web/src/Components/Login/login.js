@@ -20,14 +20,13 @@ import ForgotPassword from "../Forgot-Password/ForgotPassword";
 import OTPValidation from "../OTP/OTPValidation";
 import ResetPassword from "../ResetPassword/ResetPassword";
 import { ToastContainer, toast } from "react-toastify";
+import InfoSharpIcon from "@mui/icons-material/InfoSharp";
 
 function Login() {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(false);
   const [ModuleData, setModuleData] = useState("");
-  const [passworderrorMessage, setpassworderrorMessage] = useState("");
   const [openSelectModule, setOpenSelectModule] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isCaptchaEnabled, setIsCaptchaEnabled] = useState(false);
@@ -47,22 +46,6 @@ function Login() {
     fetchConfig();
   }, []);
 
-  const passwordRegex =
-    /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,15}$/;
-
-  const handlePasswordChange = (e) => {
-    const newPassword = e.target.value;
-    setPassword(newPassword);
-
-    if (passwordRegex.test(newPassword)) {
-      setpassworderrorMessage("");
-    } else {
-      setpassworderrorMessage(
-        "Password must be 8-15 characters long and include at least one number, one lowercase letter, one uppercase letter, and one special character."
-      );
-    }
-  };
-
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -71,6 +54,9 @@ function Login() {
     try {
       const username = emailRef.current.value;
       const password = passwordRef.current.value;
+      if (password === "Welcome01") {
+        setErrorMessage("Please Change / Reset Your Password.");
+      } else {
       const isLogout = true;
       const LOGIN_URL = `/users/login?username=${encodeURIComponent(
         username
@@ -82,10 +68,8 @@ function Login() {
           headers: { "Content-Type": "application/json" },
         }
       );
-
       const token = loginResponse.data?.data?.data;
       sessionStorage.setItem("token", token);
-
       if (token) {
         const url = "users/get_user_modules_and_roles";
         const moduleResponse = await axios.get(url, {
@@ -94,11 +78,11 @@ function Login() {
             Authorization: `Bearer ${token}`,
           },
         });
-
         const modulesData = moduleResponse.data?.data?.data;
         console.log("Modules and roles:", modulesData);
         setModuleData(modulesData);
         if (modulesData !== null) {
+          setErrorMessage("");
           setOpenSelectModule(true);
         } else {
           setErrorMessage("No modules data found.");
@@ -106,9 +90,9 @@ function Login() {
       } else {
         setErrorMessage(loginResponse?.data?.data?.message);
       }
+      }
     } catch (error) {
-      console.log("Error:", error.response?.data?.error);
-      setErrorMessage("An error occurred while processing your request.");
+      setErrorMessage(error.response?.data?.error);
     }
   };
 
@@ -175,9 +159,7 @@ function Login() {
         <div className="max-w-screen-xl m-0 sm:m-2 bg-white shadow sm:rounded-lg flex justify-center flex-1">
           <div className="lg:w-1/2 xl:w-6/12 p-6 sm:p-8">
             <div>
-              <p className="text-xl font-serif font-semibold text-black">
-                Finakon
-              </p>
+              <h1 className="text-4xl">Finakon</h1>
             </div>
             <div className="mt-8 flex flex-col items-center">
               <div className="w-full flex-1 mt-8">
@@ -199,8 +181,6 @@ function Login() {
                     >
                       <input
                         ref={passwordRef}
-                        value={password}
-                        onChange={handlePasswordChange}
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
@@ -219,14 +199,15 @@ function Login() {
                           color: "#000",
                         }}
                       >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
                       </IconButton>
                     </div>
+
                     <div
                       style={{
                         position: "relative",
                         left: "21rem",
-                        top: "-2.2rem",
+                        top: "-2.5rem",
                         width: "0",
                       }}
                     >
@@ -243,26 +224,14 @@ function Login() {
                         arrow
                         TransitionComponent={Zoom}
                       >
-                        <button
+                        <InfoSharpIcon
                           style={{
-                            backgroundColor: "#000",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "50%",
-                            width: "15px",
-                            height: "15px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
                             cursor: "pointer",
-                            outline: "none",
-                            fontSize: "12px",
                           }}
-                        >
-                          i
-                        </button>
+                        />
                       </Tooltip>
                     </div>
+
                     {errorMessage && (
                       <p className="text-red-500 text-xs text-center max-h-0">
                         {errorMessage}

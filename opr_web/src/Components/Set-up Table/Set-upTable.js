@@ -23,10 +23,21 @@ const SetupTable = () => {
           storedProcedureUrl,
           {
             procedure: "set_product_params",
-            le_code:4,
-            seq:0,
-            get_put:0,
-            data:{}
+            le_code: 4,
+            seq: 0,
+            get_put: 0,
+            data: [
+              {
+                name: "qwerty",
+                age: 21,
+                gender: "male",
+              },
+              {
+                name: "qwerty",
+                age: 21,
+                gender: "male",
+              },
+            ],
           },
           {
             headers: {
@@ -74,17 +85,11 @@ const SetupTable = () => {
     if (file) {
       if (file.type !== "text/csv") {
         toast.warn("Please upload a valid CSV file.", {
-          style: {
-            background: "black",
-            color: "white",
-          },
+          className: "custom-toast",
         });
       } else {
         toast.success("File uploaded successfully.", {
-          style: {
-            background: "black",
-            color: "white",
-          },
+          className: "custom-toast",
         });
         console.log("File uploaded:", file);
         fileInput.value = "";
@@ -118,7 +123,7 @@ const SetupTable = () => {
           <BounceLoader color="#000" />
         </div>
       ) : (
-        <div className="w-full max-w-6xl">
+        <div className="w-full max-w-6xl mt-2">
           <div className="flex items-center mb-2">
             <input
               type="text"
@@ -145,14 +150,14 @@ const SetupTable = () => {
             />
           </div>
 
-          <div>
+          {/* <div>
             <textarea
               placeholder="Paste text here ..."
               style={{ width: "100%" }}
             />
-          </div>
+          </div> */}
 
-          <div style={{ height: "60vh", width: "100%" }}>
+          <div style={{ height: "68vh", width: "100%" }}>
             <DataGrid
               rows={[]}
               columns={columns}
