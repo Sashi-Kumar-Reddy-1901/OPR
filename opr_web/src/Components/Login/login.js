@@ -57,39 +57,39 @@ function Login() {
       if (password === "Welcome01") {
         setErrorMessage("Please Change / Reset Your Password.");
       } else {
-      const isLogout = true;
-      const LOGIN_URL = `/users/login?username=${encodeURIComponent(
-        username
-      )}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
-      const loginResponse = await axios.post(
-        LOGIN_URL,
-        {},
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      const token = loginResponse.data?.data?.data;
-      sessionStorage.setItem("token", token);
-      if (token) {
-        const url = "users/get_user_modules_and_roles";
-        const moduleResponse = await axios.get(url, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const modulesData = moduleResponse.data?.data?.data;
-        console.log("Modules and roles:", modulesData);
-        setModuleData(modulesData);
-        if (modulesData !== null) {
-          setErrorMessage("");
-          setOpenSelectModule(true);
+        const isLogout = true;
+        const LOGIN_URL = `/users/login?username=${encodeURIComponent(
+          username
+        )}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
+        const loginResponse = await axios.post(
+          LOGIN_URL,
+          {},
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        const token = loginResponse.data?.data?.data;
+        sessionStorage.setItem("token", token);
+        if (token) {
+          const url = "users/get_user_modules_and_roles";
+          const moduleResponse = await axios.get(url, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const modulesData = moduleResponse.data?.data?.data;
+          console.log("Modules and roles:", modulesData);
+          setModuleData(modulesData);
+          if (modulesData !== null) {
+            setErrorMessage("");
+            setOpenSelectModule(true);
+          } else {
+            setErrorMessage("No modules data found.");
+          }
         } else {
-          setErrorMessage("No modules data found.");
+          setErrorMessage(loginResponse?.data?.data?.message);
         }
-      } else {
-        setErrorMessage(loginResponse?.data?.data?.message);
-      }
       }
     } catch (error) {
       setErrorMessage(error.response?.data?.error);
@@ -172,7 +172,7 @@ function Login() {
                       type="text"
                       placeholder="User Id / Email"
                     />
-                    <div
+                    <div className="mb-2"
                       style={{
                         position: "relative",
                         display: "flex",
@@ -201,16 +201,6 @@ function Login() {
                       >
                         {showPassword ? <Visibility /> : <VisibilityOff />}
                       </IconButton>
-                    </div>
-
-                    <div
-                      style={{
-                        position: "relative",
-                        left: "21rem",
-                        top: "-2.5rem",
-                        width: "0",
-                      }}
-                    >
                       <Tooltip
                         title={
                           <span style={{ fontSize: "14px" }}>
@@ -226,6 +216,10 @@ function Login() {
                       >
                         <InfoSharpIcon
                           style={{
+                            position: "absolute",
+                            right: "-30px",
+                            top: "2.8rem",
+                            transform: "translateY(-50%)",
                             cursor: "pointer",
                           }}
                         />
