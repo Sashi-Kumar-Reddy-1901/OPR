@@ -33,9 +33,11 @@ const OTPValidation = ({ onOtpClose, userEmail, onResetPasswordOpen }) => {
         setErrorMessage(response?.data?.data?.message);
       } else if (response?.data?.data?.messageCode === 110406) {
         setErrorMessage(response?.data?.data?.message);
-      } else {
+      } else if (response?.data?.data?.messageCode === 110405){
         onOtpClose(response?.data?.data?.message);
         onResetPasswordOpen()
+      }else{
+        setErrorMessage(response?.data?.data?.message);
       }
     } catch (error) {}
   };

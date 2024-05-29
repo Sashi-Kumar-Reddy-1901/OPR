@@ -22,8 +22,8 @@ import ResetPassword from "../ResetPassword/ResetPassword";
 import { ToastContainer, toast } from "react-toastify";
 
 function Login() {
-  const email = useRef(null);
-  const pass = useRef(null);
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(false);
   const [ModuleData, setModuleData] = useState("");
@@ -69,13 +69,11 @@ function Login() {
 
   const handleButtonClick = async () => {
     try {
-      const username = email.current.value;
-      const password = pass.current.value;
+      const username = emailRef.current.value;
+      const password = passwordRef.current.value;
       const isLogout = true;
-      const LOGIN_URL = `/users/login?username=${encodeURIComponent(
-        username
-      )}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
-
+      const LOGIN_URL = `/users/login?username=${encodeURIComponent(username)}
+      &password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
       const loginResponse = await axios.post(
         LOGIN_URL,
         {},
@@ -181,13 +179,12 @@ function Login() {
               </p>
             </div>
             <div className="mt-8 flex flex-col items-center">
-              <h1 className="text-2xl xl:text-3xl font-extrabold">Login</h1>
               <div className="w-full flex-1 mt-8">
                 {/* Email and Password Inputs */}
                 <form onSubmit={(e) => e.preventDefault()}>
                   <div className="mx-auto max-w-xs">
                     <input
-                      ref={email}
+                      ref={emailRef}
                       className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="text"
                       placeholder="User Id / Email"
@@ -200,7 +197,7 @@ function Login() {
                       }}
                     >
                       <input
-                        ref={pass}
+                        ref={passwordRef}
                         value={password}
                         onChange={handlePasswordChange}
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
@@ -274,21 +271,7 @@ function Login() {
                     <button
                       onClick={handleButtonClick}
                       className="mt-6 tracking-wide font-semibold bg-black text-gray-100 w-full py-4 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
-                    >
-                      <svg
-                        className="w-6 h-6 -ml-2"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                        <circle cx="8.5" cy="7" r="4" />
-                        <path d="M20 8v6M23 11h-6" />
-                      </svg>
-                      <span className="ml-3">Login</span>
-                    </button>
+                    >Login </button>
                     <p
                       className="mt-2"
                       style={{ cursor: "pointer" }}

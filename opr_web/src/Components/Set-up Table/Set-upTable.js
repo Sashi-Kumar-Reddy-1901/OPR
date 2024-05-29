@@ -23,7 +23,10 @@ const SetupTable = () => {
           storedProcedureUrl,
           {
             procedure: "set_product_params",
-            param1: "user5",
+            le_code:4,
+            seq:0,
+            get_put:0,
+            data:{}
           },
           {
             headers: {
@@ -109,6 +112,7 @@ const SetupTable = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
+      <h1 className="text-4xl">Hello 👋 Welcome To Product Set-up</h1>
       {loading ? (
         <div className="flex items-center justify-center h-full">
           <BounceLoader color="#000" />
@@ -148,7 +152,7 @@ const SetupTable = () => {
             />
           </div>
 
-          <div style={{ height: "65vh", width: "100%" }}>
+          <div style={{ height: "60vh", width: "100%" }}>
             <DataGrid
               rows={[]}
               columns={columns}

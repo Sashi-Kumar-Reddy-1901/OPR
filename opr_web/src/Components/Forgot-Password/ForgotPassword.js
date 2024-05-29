@@ -21,10 +21,7 @@ const ForgotPassword = ({ onForgotPasswordClose, onOpenOtp }) => {
       );
       console.log(JSON.stringify(response?.data));
       console.log(response?.data?.data?.messageCode);
-      if (
-        response?.data?.data?.messageCode === 110201 ||
-        response?.data?.data?.messageCode === 110203
-      ) {
+      if (response?.data?.data?.messageCode === 110201 || response?.data?.data?.messageCode === 110203) {
         onForgotPasswordClose(response?.data?.data?.message);
         onOpenOtp(email);
       } else {
