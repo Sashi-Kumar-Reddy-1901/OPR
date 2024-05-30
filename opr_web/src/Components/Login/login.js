@@ -55,7 +55,7 @@ function Login() {
       const username = emailRef.current.value;
       const password = passwordRef.current.value;
       if (password === "Welcome01") {
-        setErrorMessage("Please Change / Reset Your Password.");
+        setErrorMessage("Please change the default password.");
       } else {
         const isLogout = true;
         const LOGIN_URL = `/users/login?username=${encodeURIComponent(
