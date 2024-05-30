@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -8,24 +8,38 @@ import "./SelectModule.css";
 const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedRole, setSelectedRole] = useState(null);
-
-  console.log(ModuleData);
+  const [roleOptions, setRoleOptions] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const moduleOptions = Array.isArray(ModuleData) ? ModuleData.map(module => ({
-    value: module.moduleDescription,
-    label: module.moduleDescription,
-    moduleCode: module.moduleCode,
-    roles: module.roles
-  })) : [];
+  useEffect(() => {
+    // If there's only one module available, automatically select it
+    if (Array.isArray(ModuleData) && ModuleData.length === 1) {
+      setSelectedModule({
+        value: ModuleData[0].moduleDescription,
+        label: ModuleData[0].moduleDescription,
+        moduleCode: ModuleData[0].moduleCode,
+        roles: ModuleData[0].roles
+      });
+      dispatch(setModules(ModuleData[0]));
+    }
+  }, [ModuleData, dispatch]);
+
+  useEffect(() => {
+    // If there's only one role for the selected module, automatically select it
+    if (selectedModule && selectedModule.roles.length === 1) {
+      setSelectedRole({
+        value: selectedModule.roles[0].roleCode,
+        label: selectedModule.roles[0].role
+      });
+      dispatch(setRoles(selectedModule.roles[0]));
+    }
+  }, [selectedModule, dispatch]);
 
   const handleModuleChange = (selectedOption) => {
     setSelectedModule(selectedOption);
     dispatch(setModules(selectedOption));
-    dispatch(setRoles(null));
     setSelectedRole(null);
-    console.log(selectedOption);
   };
 
   const handleRoleChange = (selectedOption) => {
@@ -36,23 +50,36 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const handleButtonClick = () => {
     onCloseSelectModule();
     if (selectedModule?.moduleCode === -1 && selectedRole?.value === -1) {
-      navigate("./setup-table")
+      navigate("./setup-table");
     } else {
       navigate("./dashboard");
     }
   };
 
-  const roleOptions = selectedModule ? selectedModule.roles.map(role => ({
-    value: role.roleCode,
-    label: role.role
-  })) : [];
+  useEffect(() => {
+    // Update role options when selectedModule changes
+    if (selectedModule) {
+      const updatedRoleOptions = selectedModule.roles.map((role) => ({
+        value: role.roleCode,
+        label: role.role
+      }));
+      setRoleOptions(updatedRoleOptions);
+    } else {
+      setRoleOptions([]);
+    }
+  }, [selectedModule]);
 
   return (
     <>
       <Select
         value={selectedModule}
         onChange={handleModuleChange}
-        options={moduleOptions}
+        options={ModuleData.map((module) => ({
+          value: module.moduleDescription,
+          label: module.moduleDescription,
+          moduleCode: module.moduleCode,
+          roles: module.roles
+        }))}
         placeholder="Select Module"
         isClearable
         isSearchable
@@ -78,8 +105,9 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
       <button
         onClick={handleButtonClick}
         className="mt-8 bg-black text-gray-100 w-full py-2 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
-        disabled = {!selectedRole}
-      > Submit
+        disabled={!selectedRole}
+      >
+        Submit
       </button>
     </>
   );

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Logo from "../../logo.svg";
 import axios from "../../api/axios";
 import "./login.css";
@@ -35,6 +36,7 @@ function Login() {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [isAlertError, setIsAlertError] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -64,39 +66,49 @@ function Login() {
         setIsAlertError("Please change the default password.");
         setIsAlertOpen(true);
       } else {
-        const isLogout = true;
-        const LOGIN_URL = `/users/login?username=${encodeURIComponent(
-          username
-        )}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
-        const loginResponse = await axios.post(
-          LOGIN_URL,
-          {},
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        const token = loginResponse.data?.data?.data;
-        sessionStorage.setItem("token", token);
-        if (token) {
-          const url = "users/get_user_modules_and_roles";
-          const moduleResponse = await axios.get(url, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const modulesData = moduleResponse.data?.data?.data;
-          console.log("Modules and roles:", modulesData);
-          setModuleData(modulesData);
-          if (modulesData !== null) {
-            setErrorMessage("");
-            setOpenSelectModule(true);
+      const isLogout = true;
+      const LOGIN_URL = `/users/login?username=${encodeURIComponent(
+        username
+      )}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
+      const loginResponse = await axios.post(
+        LOGIN_URL,
+        {},
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      const token = loginResponse.data?.data?.data;
+      sessionStorage.setItem("token", token);
+      if (token) {
+        const url = "users/get_user_modules_and_roles";
+        const moduleResponse = await axios.get(url, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const modulesData = moduleResponse.data?.data?.data;
+        console.log("Modules and roles:", modulesData);
+        setModuleData(modulesData);
+        if (modulesData !== null) {
+          setErrorMessage("");
+          if (modulesData.length === 1 && modulesData[0].roles.length === 1) {
+            const { moduleCode } = modulesData[0];
+            const { roleCode } = modulesData[0].roles[0];
+            if (moduleCode === -1 && roleCode === -1) {
+              navigate("./setup-table");
+            } else {
+              navigate("./dashboard");
+            }
           } else {
-            setErrorMessage("No modules data found.");
+            setOpenSelectModule(true);
           }
         } else {
-          setErrorMessage(loginResponse?.data?.data?.message);
+          setErrorMessage("No modules data found.");
         }
+      } else {
+        setErrorMessage(loginResponse?.data?.data?.message);
+      }
       }
     } catch (error) {
       setErrorMessage(error.response?.data?.error);

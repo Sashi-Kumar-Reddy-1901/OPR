@@ -24,7 +24,7 @@ const SetupTable = () => {
           {
             procedure: "set_product_params",
             le_code: 4,
-            seq: 0,
+            seq: 1,
             get_put: 0,
             data: [
               {
@@ -37,7 +37,7 @@ const SetupTable = () => {
                 age: 21,
                 gender: "male",
               },
-            ],
+            ]
           },
           {
             headers: {
