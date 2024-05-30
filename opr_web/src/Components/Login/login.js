@@ -15,6 +15,8 @@ import {
   Typography,
   Zoom,
   Tooltip,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import ForgotPassword from "../Forgot-Password/ForgotPassword";
 import OTPValidation from "../OTP/OTPValidation";
@@ -25,11 +27,14 @@ import InfoSharpIcon from "@mui/icons-material/InfoSharp";
 function Login() {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-  const [errorMessage, setErrorMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [ModuleData, setModuleData] = useState("");
   const [openSelectModule, setOpenSelectModule] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isCaptchaEnabled, setIsCaptchaEnabled] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [isAlertError, setIsAlertError] = useState("");
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -55,7 +60,9 @@ function Login() {
       const username = emailRef.current.value;
       const password = passwordRef.current.value;
       if (password === "Welcome01") {
-        setErrorMessage("Please change the default password.");
+        setErrorMessage("");
+        setIsAlertError("Please change the default password.");
+        setIsAlertOpen(true);
       } else {
         const isLogout = true;
         const LOGIN_URL = `/users/login?username=${encodeURIComponent(
@@ -143,6 +150,17 @@ function Login() {
     setOpenSelectModule(false);
   };
 
+  const handleCloseAlert = () => {
+    setIsAlertOpen(false);
+    setOpenForgotPassword(true);
+  };
+
+  const handleInputChange = () => {
+    const username = emailRef.current?.value;
+    const password = passwordRef.current?.value;
+    setIsButtonDisabled(!username || !password);
+  };
+
   return (
     <>
       <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col">
@@ -150,10 +168,6 @@ function Login() {
         <header className="bg-black py-4">
           <div className="max-w-screen-xl mx-auto px-4 flex justify-between items-center">
             <img src={Logo} alt="1" className="header-image" />
-            {/* <img src={Logo} alt="2" className="header-image" />
-            <img src={Logo} alt="3" className="header-image" />
-            <img src={Logo} alt="4" className="header-image" />
-            <img src={Logo} alt="5" className="header-image" /> */}
           </div>
         </header>
         <div className="max-w-screen-xl m-0 sm:m-2 bg-white shadow sm:rounded-lg flex justify-center flex-1">
@@ -168,11 +182,13 @@ function Login() {
                   <div className="mx-auto max-w-xs">
                     <input
                       ref={emailRef}
+                      onChange={handleInputChange}
                       className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="text"
                       placeholder="User Id / Email"
                     />
-                    <div className="mb-2"
+                    <div
+                      className="mb-2"
                       style={{
                         position: "relative",
                         display: "flex",
@@ -181,6 +197,7 @@ function Login() {
                     >
                       <input
                         ref={passwordRef}
+                        onChange={handleInputChange}
                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
@@ -234,6 +251,7 @@ function Login() {
 
                     <button
                       onClick={handleButtonClick}
+                      disabled={isButtonDisabled}
                       className="mt-6 tracking-wide font-semibold bg-black text-gray-100 w-full py-4 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                     >
                       Login{" "}
@@ -279,7 +297,6 @@ function Login() {
 
       {/* Forgot Password */}
       <Dialog
-        onClose={handleCloseForgotPassword}
         aria-labelledby="customized-dialog-title"
         open={openForgotPassword}
         fullWidth
@@ -321,7 +338,6 @@ function Login() {
 
       {/* OTP Screen */}
       <Dialog
-        onClose={handleCloseOTPDialog}
         aria-labelledby="customized-dialog-title"
         open={openOTPDialog}
         fullWidth
@@ -364,7 +380,6 @@ function Login() {
 
       {/*Reset Password Screen */}
       <Dialog
-        onClose={handleCloseResetPassword}
         aria-labelledby="customized-dialog-title"
         open={openResetPassword}
         fullWidth
@@ -403,7 +418,6 @@ function Login() {
 
       {/*Select Module and Roles */}
       <Dialog
-        onClose={handleCloseSelectModule}
         aria-labelledby="customized-dialog-title"
         open={openSelectModule}
         fullWidth
@@ -441,6 +455,27 @@ function Login() {
             />
           </Typography>
         </DialogContent>
+      </Dialog>
+
+      {/* Change default password */}
+      <Dialog open={isAlertOpen}>
+        <DialogTitle>
+          <p className="text-red-500 text-2xl text-center">Alert</p>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <p className="text-black">{isAlertError}</p>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions style={{ justifyContent: "center" }}>
+          <button
+            type="button"
+            onClick={handleCloseAlert}
+            className="font-semibold bg-black text-gray-100 rounded-lg hover:bg-gray-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none px-4 py-2"
+          >
+            OK
+          </button>
+        </DialogActions>
       </Dialog>
 
       {isCaptchaEnabled && (
