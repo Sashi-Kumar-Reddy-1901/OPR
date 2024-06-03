@@ -6,6 +6,9 @@ import { Provider } from 'react-redux';
 import reportWebVitals from "./reportWebVitals";
 import { store } from "./Store/store";
 import 'react-toastify/dist/ReactToastify.css';
+import 'primereact/resources/themes/saga-blue/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

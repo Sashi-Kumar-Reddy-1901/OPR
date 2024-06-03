@@ -4,8 +4,6 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Login from '../Login/login';
 import Dashboard from '../Dashboard/Dashboard';
 import Sidenav from '../Sidenav/Sidenav';
-import ForgotPassword from '../Forgot-Password/ForgotPassword';
-import OTPValidation from '../OTP/OTPValidation';
 import SetupTable from '../Set-up Table/Set-upTable';
 import Entity from '../Entity/Entity';
 import { checkAuthLoader } from '../../utils/auth';

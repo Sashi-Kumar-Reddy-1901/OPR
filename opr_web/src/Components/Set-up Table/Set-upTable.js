@@ -3,16 +3,17 @@ import axios from "../../api/axios";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { DataGrid } from "@mui/x-data-grid";
-import { CSVLink } from "react-csv";
 import { ToastContainer, toast } from "react-toastify";
-import { Tooltip, Zoom } from "@mui/material";
+import { IconButton, Tooltip, Zoom } from "@mui/material";
 import { BounceLoader } from "react-spinners";
 import "./Set-upTable.css";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 const SetupTable = () => {
-  const [data, setData] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [rows, setRows] = useState([]);
+  const [columns, setColumns] = useState([]);
+  const [updatedRows, setUpdatedRows] = useState([]);
 
   useEffect(() => {
     const fetchStoredProcedure = async () => {
@@ -23,21 +24,12 @@ const SetupTable = () => {
           storedProcedureUrl,
           {
             procedure: "set_product_params",
-            le_code: 4,
-            seq: 1,
-            get_put: 0,
-            data: [
-              {
-                name: "qwerty",
-                age: 21,
-                gender: "male",
-              },
-              {
-                name: "qwerty",
-                age: 21,
-                gender: "male",
-              },
-            ]
+            data: {
+              le_code: 77,
+              seq: 1,
+              get_put: 0,
+              data: {},
+            },
           },
           {
             headers: {
@@ -46,12 +38,35 @@ const SetupTable = () => {
             },
           }
         );
-        console.log(response.data?.data?.data);
-        setData(response.data?.data?.data || []);
+        const responseData = response.data?.data?.data;
+        console.log(responseData);
+
+        if (responseData && responseData.length > 1 && responseData[1].data2) {
+          const data2 = responseData[1].data2;
+
+          // Prepare columns
+          const cols = Object.keys(data2[0]).map((key) => ({
+            field: key,
+            headerName: key,
+            width: 150,
+            editable: true, // Enable editing
+          }));
+
+          // Prepare rows
+          const rowsData = data2.map((item, index) => ({
+            id: index,
+            ...item,
+          }));
+
+          setColumns(cols);
+          setRows(rowsData);
+          setUpdatedRows(rowsData); // Initialize updated rows
+        }
         setLoading(false);
       } catch (error) {
+        console.log(error);
         setLoading(false);
-        toast.error(error, {
+        toast.error(error.response?.data?.message, {
           style: {
             background: "black",
             color: "white",
@@ -63,20 +78,64 @@ const SetupTable = () => {
     fetchStoredProcedure();
   }, []);
 
-  const handleNext = () => {
-    if (currentIndex < data.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
+  // Function to add empty row
+  const addEmptyRow = () => {
+    const newRow = {
+      id: rows.length,
+    };
+    setRows([...rows, newRow]);
+    setUpdatedRows([...updatedRows, newRow]);
   };
 
-  const handleBack = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
+  const handleProcessRowUpdate = (newRow) => {
+    setUpdatedRows((prevRows) =>
+      prevRows.map((row) => (row.id === newRow.id ? newRow : row))
+    );
+    return newRow;
   };
 
-  const handleDone = () => {
-    console.log("Done button clicked");
+  const handleNext = () => {};
+
+  const handleBack = () => {};
+
+  const handleDone = async () => {
+    const storedProcedureUrl = "/common-utils/call-stored-procedure";
+    const token = sessionStorage.getItem("token");
+    try {
+      const response = await axios.post(
+        storedProcedureUrl,
+        {
+          procedure: "set_product_params",
+          data: {
+            le_code: 77,
+            seq: 1,
+            get_put: 1, // Assuming 1 is for put/update operation
+            data: updatedRows,
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Data saved successfully 👍", {
+        style: {
+          background: "black",
+          color: "white",
+        },
+      });
+      console.log("Response:", response.data);
+    } catch (error) {
+      toast.error("Failed to save data", {
+        style: {
+          background: "black",
+          color: "white",
+        },
+      });
+      console.error("Error:", error);
+    }
   };
 
   const handleFileUpload = (event) => {
@@ -97,24 +156,6 @@ const SetupTable = () => {
     }
   };
 
-  let columns = [];
-  if (data.length > 0) {
-    const currentData = data[currentIndex];
-    for (let i = 1; i <= currentData.col_count; i++) {
-      columns.push({
-        field: `Column ${i}`,
-        headerName: `Column ${i}`,
-        width: 150,
-      });
-    }
-  }
-
-  const csvData = data.map((item) => {
-    return {
-      ...item,
-    };
-  });
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
       <h1 className="text-4xl">Hello 👋 Welcome To Product Set-up</h1>
@@ -127,18 +168,20 @@ const SetupTable = () => {
           <div className="flex items-center mb-2">
             <input
               type="text"
-              value={data[currentIndex]?.details}
               readOnly
               className="w-full p-2 border border-gray-300 rounded"
             />
-            <CSVLink data={csvData} filename="data.csv" className="ml-2">
-              <Tooltip title="Download File" arrow TransitionComponent={Zoom}>
-                <FileDownloadIcon className="cursor-pointer" />
-              </Tooltip>
-            </CSVLink>
-            <label htmlFor="file-upload" className="ml-2 cursor-pointer">
+            <Tooltip title="Add" arrow TransitionComponent={Zoom}>
+              <IconButton onClick={addEmptyRow}>
+                <AddCircleOutlineIcon style={{ color: "#000" }} />
+              </IconButton>
+            </Tooltip>
+            
+            <label htmlFor="file-upload">
               <Tooltip title="Upload File" arrow TransitionComponent={Zoom}>
-                <FileUploadIcon />
+                <IconButton>
+                  <FileUploadIcon style={{ color: "#000" }} />
+                </IconButton>
               </Tooltip>
             </label>
             <input
@@ -148,19 +191,19 @@ const SetupTable = () => {
               onChange={handleFileUpload}
               style={{ display: "none" }}
             />
-          </div>
 
-          {/* <div>
-            <textarea
-              placeholder="Paste text here ..."
-              style={{ width: "100%" }}
-            />
-          </div> */}
+            <Tooltip title="Download File" arrow TransitionComponent={Zoom}>
+              <IconButton>
+                <FileDownloadIcon style={{ color: "#000" }} />
+              </IconButton>
+            </Tooltip>
+          </div>
 
           <div style={{ height: "68vh", width: "100%" }}>
             <DataGrid
-              rows={[]}
+              rows={rows}
               columns={columns}
+              processRowUpdate={handleProcessRowUpdate}
               initialState={{
                 pagination: {
                   paginationModel: { page: 0, pageSize: 10 },
@@ -174,28 +217,24 @@ const SetupTable = () => {
             <div>
               <button
                 onClick={handleBack}
-                disabled={currentIndex === 0}
                 className="px-4 py-2 text-black bg-white border border-black rounded disabled:bg-gray-200"
               >
                 Back
               </button>
               <button
                 onClick={handleNext}
-                disabled={currentIndex === data.length - 1}
                 className="px-4 py-2 ml-2 text-black bg-white border border-black rounded disabled:bg-gray-200"
               >
                 Next
               </button>
             </div>
             <div>
-              {currentIndex === data.length - 1 && (
-                <button
-                  onClick={handleDone}
-                  className="px-4 py-2 text-white bg-black rounded"
-                >
-                  Done
-                </button>
-              )}
+              <button
+                onClick={handleDone}
+                className="px-4 py-2 text-white bg-black rounded"
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>

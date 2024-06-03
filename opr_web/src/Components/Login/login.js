@@ -58,14 +58,10 @@ function Login() {
   };
 
   const handleButtonClick = async () => {
+    setErrorMessage("")
     try {
       const username = emailRef.current.value;
       const password = passwordRef.current.value;
-      if (password === "Welcome01") {
-        setErrorMessage("");
-        setIsAlertError("Please change the default password.");
-        setIsAlertOpen(true);
-      } else {
       const isLogout = true;
       const LOGIN_URL = `/users/login?username=${encodeURIComponent(
         username
@@ -79,7 +75,11 @@ function Login() {
       );
       const token = loginResponse.data?.data?.data;
       sessionStorage.setItem("token", token);
-      if (token) {
+      if (loginResponse.data?.data?.messageCode === 110105) {
+        setErrorMessage("");
+        setIsAlertError(loginResponse.data?.data?.message);
+        setIsAlertOpen(true);
+      } else if (token && loginResponse.data?.data?.messageCode === 110101) {
         const url = "users/get_user_modules_and_roles";
         const moduleResponse = await axios.get(url, {
           headers: {
@@ -98,7 +98,7 @@ function Login() {
             if (moduleCode === -1 && roleCode === -1) {
               navigate("./setup-table");
             } else {
-              navigate("./dashboard");
+              navigate("./dashboard", { state: { ModuleData: modulesData } });
             }
           } else {
             setOpenSelectModule(true);
@@ -108,7 +108,6 @@ function Login() {
         }
       } else {
         setErrorMessage(loginResponse?.data?.data?.message);
-      }
       }
     } catch (error) {
       setErrorMessage(error.response?.data?.error);
