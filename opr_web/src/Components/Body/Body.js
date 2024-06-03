@@ -8,8 +8,12 @@ import ForgotPassword from '../Forgot-Password/ForgotPassword';
 import OTPValidation from '../OTP/OTPValidation';
 import SetupTable from '../Set-up Table/Set-upTable';
 import Entity from '../Entity/Entity';
+import { checkAuthLoader } from '../../utils/auth';
 
 const Body = () => {
+
+ 
+
     const appRouter = createBrowserRouter([
       {
         path: "/",
@@ -17,27 +21,23 @@ const Body = () => {
       },
       {
         path: "/dashboard",
-        element: <Dashboard />
+        element: <Dashboard />,
+        loader: checkAuthLoader
       },
       {
         path: "/inbox",
         element: <Sidenav />
       },
-      {
-        path: "/forgot-password",
-        element: <ForgotPassword />
-      },
-      {
-        path: "/otp-validation",
-        element: <OTPValidation />
-      },
+  
       {
         path: "/setup-table",
-        element: <SetupTable />
+        element: <SetupTable />,
+        loader: checkAuthLoader
       },
       {
         path: "/entity",
-        element: <Entity />
+        element: <Entity />,
+        loader: checkAuthLoader
       }
     ]);
   return (
