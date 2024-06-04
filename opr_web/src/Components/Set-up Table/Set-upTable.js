@@ -7,7 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { IconButton, Tooltip, Zoom } from "@mui/material";
 import { BounceLoader } from "react-spinners";
 import "./Set-upTable.css";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { CSVLink } from "react-csv";
 
 const SetupTable = () => {
   const [loading, setLoading] = useState(true);
@@ -24,11 +24,11 @@ const SetupTable = () => {
           storedProcedureUrl,
           {
             procedure: "set_product_params",
-            data: {
+            data1: {
               le_code: 77,
               seq: 1,
               get_put: 0,
-              data: {},
+              data2: {},
             },
           },
           {
@@ -67,25 +67,12 @@ const SetupTable = () => {
         console.log(error);
         setLoading(false);
         toast.error(error.response?.data?.message, {
-          style: {
-            background: "black",
-            color: "white",
-          },
+          className: "custom-toast",
         });
-        console.error("Error:", error);
       }
     };
     fetchStoredProcedure();
   }, []);
-
-  // Function to add empty row
-  const addEmptyRow = () => {
-    const newRow = {
-      id: rows.length,
-    };
-    setRows([...rows, newRow]);
-    setUpdatedRows([...updatedRows, newRow]);
-  };
 
   const handleProcessRowUpdate = (newRow) => {
     setUpdatedRows((prevRows) =>
@@ -99,6 +86,15 @@ const SetupTable = () => {
   const handleBack = () => {};
 
   const handleDone = async () => {
+    const isValid = updatedRows.every((row) =>
+      Object.values(row).every((value) => value !== null && value !== "")
+    );
+    if (!isValid) {
+      toast.error("Please fill out all fields before submitting.", {
+        className: "custom-toast",
+      });
+      return;
+    }
     const storedProcedureUrl = "/common-utils/call-stored-procedure";
     const token = sessionStorage.getItem("token");
     try {
@@ -106,11 +102,11 @@ const SetupTable = () => {
         storedProcedureUrl,
         {
           procedure: "set_product_params",
-          data: {
+          data1: {
             le_code: 77,
             seq: 1,
-            get_put: 1, // Assuming 1 is for put/update operation
-            data: updatedRows,
+            get_put: 1,
+            data2: updatedRows,
           },
         },
         {
@@ -121,18 +117,12 @@ const SetupTable = () => {
         }
       );
       toast.success("Data saved successfully 👍", {
-        style: {
-          background: "black",
-          color: "white",
-        },
+        className: "custom-toast",
       });
       console.log("Response:", response.data);
     } catch (error) {
       toast.error("Failed to save data", {
-        style: {
-          background: "black",
-          color: "white",
-        },
+        className: "custom-toast",
       });
       console.error("Error:", error);
     }
@@ -156,6 +146,12 @@ const SetupTable = () => {
     }
   };
 
+  const csvData = updatedRows.map(({ id, ...rest }) => {
+    return {
+      ...rest,
+    };
+  });
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
       <h1 className="text-4xl">Hello 👋 Welcome To Product Set-up</h1>
@@ -164,42 +160,41 @@ const SetupTable = () => {
           <BounceLoader color="#000" />
         </div>
       ) : (
-        <div className="w-full max-w-6xl mt-2">
+        <div className="w-full max-w-7xl mt-2">
           <div className="flex items-center mb-2">
-            <input
-              type="text"
-              readOnly
+            <textarea
+              placeholder="Paste text here ..."
               className="w-full p-2 border border-gray-300 rounded"
             />
-            <Tooltip title="Add" arrow TransitionComponent={Zoom}>
-              <IconButton onClick={addEmptyRow}>
-                <AddCircleOutlineIcon style={{ color: "#000" }} />
-              </IconButton>
-            </Tooltip>
-            
-            <label htmlFor="file-upload">
+
+            <label
+              htmlFor="file-upload"
+              style={{ display: "flex", alignItems: "center" }}
+            >
               <Tooltip title="Upload File" arrow TransitionComponent={Zoom}>
-                <IconButton>
+                <IconButton component="span">
                   <FileUploadIcon style={{ color: "#000" }} />
                 </IconButton>
               </Tooltip>
+              <input
+                id="file-upload"
+                type="file"
+                accept=".csv"
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
+              />
             </label>
-            <input
-              id="file-upload"
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              style={{ display: "none" }}
-            />
 
-            <Tooltip title="Download File" arrow TransitionComponent={Zoom}>
-              <IconButton>
-                <FileDownloadIcon style={{ color: "#000" }} />
-              </IconButton>
-            </Tooltip>
+            <CSVLink data={csvData} filename="data.csv">
+              <Tooltip title="Download File" arrow TransitionComponent={Zoom}>
+                <IconButton>
+                  <FileDownloadIcon style={{ color: "#000" }} />
+                </IconButton>
+              </Tooltip>
+            </CSVLink>
           </div>
 
-          <div style={{ height: "68vh", width: "100%" }}>
+          <div style={{ height: "64vh", width: "100%" }}>
             <DataGrid
               rows={rows}
               columns={columns}

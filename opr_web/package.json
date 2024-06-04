@@ -10,6 +10,7 @@
     "@mui/icons-material": "^5.15.16",
     "@mui/material": "^5.15.16",
     "@mui/x-data-grid": "^7.5.0",
+    "@mui/x-tree-view": "^7.6.1",
     "@reduxjs/toolkit": "^2.2.5",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -33,7 +34,7 @@
     "xlsx": "^0.18.5"
   },
   "scripts": {
-    "start": "cross-env PORT=3003 react-scripts start",
+    "start": "cross-env PORT=3002 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "../../api/axios";
 import { styled } from "@mui/material/styles";
 import {
   Box,
@@ -6,11 +7,7 @@ import {
   Drawer,
   AppBar as MuiAppBar,
   Toolbar,
-  List,
   Typography,
-  ListItem,
-  ListItemButton,
-  ListItemText,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -23,16 +20,18 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import PersonIcon from "@mui/icons-material/Person";
 import { useSelector } from "react-redux";
-import Sidenav from "../Sidenav/Sidenav";
-import Entity from "../Entity/Entity";
 import CloseIcon from "@mui/icons-material/Close";
 import SelectModule from "../SelectModule/SelectModule";
 import { useLocation } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { useNavigate } from "react-router-dom";
+import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
+import { TreeItem } from "@mui/x-tree-view/TreeItem";
+import { Link, Outlet } from "react-router-dom";
+import "./Dashboard.css";
 
-const drawerWidth = 120;
+const drawerWidth = 150;
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
     flexGrow: 1,
@@ -81,19 +80,48 @@ const Footer = styled("footer")({
   color: "white",
 });
 
-const CustomListItemText = styled(ListItemText)({
-  "& .MuiTypography-root": {
-    fontSize: "14px",
-  },
-});
-
 export default function Dashboard() {
+  const [menuData, setMenuData] = useState([]);
+
+  useEffect(() => {
+    const fetchMenu_Languages = async () => {
+      const getMenuUrl = `/users/get_menu`;
+      const getLanguagesUrl = `/users/get_languages`;
+      const token = sessionStorage.getItem("token");
+      try {
+        // Fetch menu
+        const menuResponse = await axios.post(
+          getMenuUrl,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setMenuData(menuResponse.data?.data?.data?.menuTree);
+        console.log(menuResponse.data?.data?.data?.menuTree);
+
+        // Fetch languages
+        const languagesResponse = await axios.get(getLanguagesUrl, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log(languagesResponse?.data);
+      } catch (error) {
+        console.log(error?.response?.data?.message);
+      }
+    };
+    fetchMenu_Languages();
+  }, []);
+
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
-  const [menuItem, setmenuItem] = useState("");
   const roles = useSelector((state) => state.user.roles);
   console.log(roles);
-  console.log(menuItem);
 
   const location = useLocation();
   const ModuleData = location.state?.ModuleData;
@@ -122,6 +150,19 @@ export default function Dashboard() {
     setOpenLogout(false);
     sessionStorage.clear();
     navigate("/");
+  };
+
+  const handleNavigateClick = (subNode) => {
+    const navigateLabelcode = subNode.labelCode;
+    if (navigateLabelcode === "MENU101_2") {
+      navigate("/entity");
+    } else if (navigateLabelcode === "MENU102_2") {
+      navigate("");
+    } else if (navigateLabelcode === "MENU201_2") {
+      navigate("");
+    } else if (navigateLabelcode === "MENU202_2") {
+      navigate("");
+    }
   };
 
   return (
@@ -174,29 +215,37 @@ export default function Dashboard() {
               width: drawerWidth,
               marginTop: "44px",
               boxSizing: "border-box",
+              backgroundColor: "#000",
+              color: "white",
             },
           }}
           variant="persistent"
           anchor="left"
           open={open}
         >
-          <List>
-            {["Inbox", "Entity"].map((text) => (
-              <ListItem
-                key={text}
-                disablePadding
-                onClick={() => setmenuItem(text)}
+          <SimpleTreeView>
+            {menuData.map((node) => (
+              <TreeItem
+                key={node.labelCode}
+                itemId={node.labelCode}
+                label={node.label}
+                className="parent-node"
               >
-                <ListItemButton>
-                  <CustomListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
+                {node.nodes.map((subNode) => (
+                  <TreeItem
+                    key={subNode.labelCode}
+                    itemId={subNode.labelCode}
+                    label={subNode.label}
+                    className="child-node"
+                    onClick={() => handleNavigateClick(subNode)}
+                  />
+                ))}
+              </TreeItem>
             ))}
-          </List>
+          </SimpleTreeView>
         </Drawer>
         <Main open={open}>
-          {menuItem === "Inbox" && <Sidenav />}
-          {menuItem === "Entity" && <Entity />}
+          <Outlet />
         </Main>
         <Footer>
           <Typography variant="body2">

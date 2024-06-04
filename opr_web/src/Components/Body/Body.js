@@ -1,9 +1,7 @@
 import React from 'react';
-
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Login from '../Login/login';
 import Dashboard from '../Dashboard/Dashboard';
-import Sidenav from '../Sidenav/Sidenav';
 import SetupTable from '../Set-up Table/Set-upTable';
 import Entity from '../Entity/Entity';
 import { checkAuthLoader } from '../../utils/auth';
@@ -20,13 +18,14 @@ const Body = () => {
       {
         path: "/dashboard",
         element: <Dashboard />,
+        children: [
+          {
+            path: "entity",
+            element: <Entity />
+          }
+        ],
         loader: checkAuthLoader
       },
-      {
-        path: "/inbox",
-        element: <Sidenav />
-      },
-  
       {
         path: "/setup-table",
         element: <SetupTable />,
