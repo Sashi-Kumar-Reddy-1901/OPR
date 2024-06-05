@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "../../api/axios";
+import axiosInstance from "../../api/axios";
 import { styled } from "@mui/material/styles";
 import {
   Box,
@@ -28,7 +28,7 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { useNavigate } from "react-router-dom";
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import "./Dashboard.css";
 
 const drawerWidth = 150;
@@ -48,6 +48,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
       }),
       marginLeft: 0,
     }),
+    overflowY: "auto",
   })
 );
 
@@ -84,38 +85,34 @@ export default function Dashboard() {
   const [menuData, setMenuData] = useState([]);
 
   useEffect(() => {
-    const fetchMenu_Languages = async () => {
+    const fetch_Token_Menu_Languages_Entitlements = async () => {
       const getMenuUrl = `/users/get_menu`;
       const getLanguagesUrl = `/users/get_languages`;
-      const token = sessionStorage.getItem("token");
+      const getEntitlementsUrl = `/users/get_entitlements`;
+      const getTokenDetailsUrl = `/users/get_token_details`;
       try {
+        // Fetch Token Details
+        const tokenDetailsResponse = await axiosInstance.get(getTokenDetailsUrl);
+        console.log(tokenDetailsResponse?.data);
+
         // Fetch menu
-        const menuResponse = await axios.post(
-          getMenuUrl,
-          {},
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setMenuData(menuResponse.data?.data?.data?.menuTree);
+        const menuResponse = await axiosInstance.post(getMenuUrl, {});
+        setMenuData(menuResponse.data?.data?.data?.menuTree || []);
         console.log(menuResponse.data?.data?.data?.menuTree);
 
         // Fetch languages
-        const languagesResponse = await axios.get(getLanguagesUrl, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const languagesResponse = await axiosInstance.get(getLanguagesUrl);
         console.log(languagesResponse?.data);
+
+        // Fetch Entitlements
+        const entitlementsResponse = await axiosInstance.get(getEntitlementsUrl);
+        console.log(entitlementsResponse?.data);
+
       } catch (error) {
         console.log(error?.response?.data?.message);
       }
     };
-    fetchMenu_Languages();
+    fetch_Token_Menu_Languages_Entitlements();
   }, []);
 
   const navigate = useNavigate();
@@ -155,7 +152,7 @@ export default function Dashboard() {
   const handleNavigateClick = (subNode) => {
     const navigateLabelcode = subNode.labelCode;
     if (navigateLabelcode === "MENU101_2") {
-      navigate("/entity");
+      navigate("/dashboard/entity");
     } else if (navigateLabelcode === "MENU102_2") {
       navigate("");
     } else if (navigateLabelcode === "MENU201_2") {
@@ -215,8 +212,7 @@ export default function Dashboard() {
               width: drawerWidth,
               marginTop: "44px",
               boxSizing: "border-box",
-              backgroundColor: "#000",
-              color: "white",
+              overflowY: "auto",
             },
           }}
           variant="persistent"

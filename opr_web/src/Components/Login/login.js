@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../logo.svg";
-import axios from "../../api/axios";
+import axiosInstance from "../../api/axios"; 
 import "./login.css";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -33,6 +33,7 @@ function Login() {
   const [openSelectModule, setOpenSelectModule] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isCaptchaEnabled, setIsCaptchaEnabled] = useState(false);
+  const [isSiteKey, setIsSiteKey] = useState("");
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [isAlertError, setIsAlertError] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -42,10 +43,12 @@ function Login() {
     const fetchConfig = async () => {
       const configUrl = `/common-utils/get_config_details`;
       try {
-        const response = await axios.get(configUrl);
+        const response = await axiosInstance.get(configUrl);
         console.log(response.data?.data);
         const isCaptchaEnabled = response.data?.data?.data?.isCaptchaEnabled;
+        const isSiteKey = response.data?.data?.data?.siteKey;
         setIsCaptchaEnabled(isCaptchaEnabled);
+        setIsSiteKey(isSiteKey)
       } catch (error) {
         console.error("Error fetching config:", error);
       }
@@ -66,13 +69,7 @@ function Login() {
       const LOGIN_URL = `/users/login?username=${encodeURIComponent(
         username
       )}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
-      const loginResponse = await axios.post(
-        LOGIN_URL,
-        {},
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const loginResponse = await axiosInstance.post(LOGIN_URL,{});
       const token = loginResponse.data?.data?.data;
       sessionStorage.setItem("token", token);
       if (loginResponse.data?.data?.messageCode === 110105) {
@@ -80,13 +77,8 @@ function Login() {
         setIsAlertError(loginResponse.data?.data?.message);
         setIsAlertOpen(true);
       } else if (token && loginResponse.data?.data?.messageCode === 110101) {
-        const url = "users/get_user_modules_and_roles";
-        const moduleResponse = await axios.get(url, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const modules_roles_Url = "users/get_user_modules_and_roles";
+        const moduleResponse = await axiosInstance.get(modules_roles_Url);
         const modulesData = moduleResponse.data?.data?.data;
         console.log("Modules and roles:", modulesData);
         setModuleData(modulesData);
@@ -490,8 +482,8 @@ function Login() {
       </Dialog>
 
       {isCaptchaEnabled && (
-        <GoogleReCaptchaProvider reCaptchaKey="6LcMd94pAAAAAINUGy7ryI2evYPunp4mqYghKCxZ" />
-      )}
+        <GoogleReCaptchaProvider reCaptchaKey={isSiteKey} />
+     )}
     </>
   );
 }

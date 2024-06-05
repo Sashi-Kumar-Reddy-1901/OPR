@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import axios from "../../api/axios";
+import axiosInstance from "../../api/axios";
 
 const ForgotPassword = ({ onForgotPasswordClose, onOpenOtp }) => {
   const emailRef = useRef(null);
@@ -8,20 +8,17 @@ const ForgotPassword = ({ onForgotPasswordClose, onOpenOtp }) => {
   const handleButtonClick = async () => {
     console.log(emailRef.current.value);
     const email = emailRef.current.value;
-    const LOGIN_URL = `/users/forgot-password?email=${encodeURIComponent(
+    const forgotPasswordUrl = `/users/forgot-password?email=${encodeURIComponent(
       email
     )}`;
     try {
-      const response = await axios.post(
-        LOGIN_URL,
-        {}, // Ensuring JSON body
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await axiosInstance.post(forgotPasswordUrl, {});
       console.log(JSON.stringify(response?.data));
       console.log(response?.data?.data?.messageCode);
-      if (response?.data?.data?.messageCode === 110201 || response?.data?.data?.messageCode === 110203) {
+      if (
+        response?.data?.data?.messageCode === 110201 ||
+        response?.data?.data?.messageCode === 110203
+      ) {
         onForgotPasswordClose(response?.data?.data?.message);
         onOpenOtp(email);
       } else {
@@ -58,7 +55,7 @@ const ForgotPassword = ({ onForgotPasswordClose, onOpenOtp }) => {
                   {errorMessage}
                 </p>
               )}
-              
+
               <button
                 onClick={handleButtonClick}
                 className="mt-8 bg-black text-gray-100 w-full py-2 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"

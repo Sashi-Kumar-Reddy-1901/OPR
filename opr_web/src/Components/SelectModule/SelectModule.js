@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setRoles, setModules } from "../../Data/userSlice";
 import "./SelectModule.css";
+import axiosInstance from "../../api/axios"; 
 
 const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const [selectedModule, setSelectedModule] = useState(null);
@@ -19,7 +20,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
         value: ModuleData[0].moduleDescription,
         label: ModuleData[0].moduleDescription,
         moduleCode: ModuleData[0].moduleCode,
-        roles: ModuleData[0].roles
+        roles: ModuleData[0].roles,
       });
       dispatch(setModules(ModuleData[0]));
     }
@@ -30,7 +31,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
     if (selectedModule && selectedModule.roles.length === 1) {
       setSelectedRole({
         value: selectedModule.roles[0].roleCode,
-        label: selectedModule.roles[0].role
+        label: selectedModule.roles[0].role,
       });
       dispatch(setRoles(selectedModule.roles[0]));
     }
@@ -47,12 +48,22 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
     dispatch(setRoles(selectedOption));
   };
 
-  const handleButtonClick = () => {
-    onCloseSelectModule();
-    if (selectedModule?.moduleCode === -1 && selectedRole?.value === -1) {
-      navigate("./setup-table");
-    } else {
-      navigate("./dashboard");
+  const handleButtonClick = async () => {
+    try {
+      const moduleCode = selectedModule?.moduleCode;
+      const roleCode = selectedRole?.value;
+      const select_module_role_Url = `/users/select_module_role?moduleCode=${moduleCode}&roleCode=${roleCode}`;
+      const module_role_response = await axiosInstance.post(select_module_role_Url,{});
+      const settoken = module_role_response.data?.data?.data;
+      sessionStorage.setItem("token", settoken);
+      onCloseSelectModule();
+      if (selectedModule?.moduleCode === -1 && selectedRole?.value === -1) {
+        navigate("./setup-table");
+      } else {
+        navigate("./dashboard");
+      }
+    } catch (error) {
+      console.error("Error selecting module and role:", error);
     }
   };
 
@@ -61,7 +72,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
     if (selectedModule) {
       const updatedRoleOptions = selectedModule.roles.map((role) => ({
         value: role.roleCode,
-        label: role.role
+        label: role.role,
       }));
       setRoleOptions(updatedRoleOptions);
     } else {
@@ -78,7 +89,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
           value: module.moduleDescription,
           label: module.moduleDescription,
           moduleCode: module.moduleCode,
-          roles: module.roles
+          roles: module.roles,
         }))}
         placeholder="Select Module"
         isClearable

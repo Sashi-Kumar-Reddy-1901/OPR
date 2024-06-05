@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import OtpInput from "react-otp-input";
-import axios from "../../api/axios";
+import axiosInstance from "../../api/axios"; 
 import "./OTPValidation.css";
 
 const OTPValidation = ({ onOtpClose, userEmail, onResetPasswordOpen }) => {
@@ -15,13 +15,7 @@ const OTPValidation = ({ onOtpClose, userEmail, onResetPasswordOpen }) => {
       email
     )}&otp=${encodeURIComponent(otp)}`;
     try {
-      const response = await axios.post(
-        LOGIN_URL,
-        {}, // Ensuring JSON body
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await axiosInstance.post(LOGIN_URL,{});
       console.log(response?.data?.data?.data);
       const token = response?.data?.data?.data;
       sessionStorage.setItem("token", token);

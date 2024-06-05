@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import axios from "../../api/axios";
+import axiosInstance from "../../api/axios"; 
 import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -31,21 +31,11 @@ const ResetPassword = ({ onResetPasswordClose }) => {
     } else {
       setPasswordsMatch(true);
       setErrorMessage("");
-      const token = sessionStorage.getItem("token");
       const LOGIN_URL = `/users/reset-password?password=${encodeURIComponent(
         password
       )}`;
       try {
-        const response = await axios.post(
-          LOGIN_URL,
-          {}, // Ensuring JSON body
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axiosInstance.post(LOGIN_URL,{});
         console.log(response?.data?.data?.messageCode);
         if (response?.data?.data?.messageCode === 110501) {
           onResetPasswordClose(response?.data?.data?.message);

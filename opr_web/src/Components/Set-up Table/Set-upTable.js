@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "../../api/axios";
+import axiosInstance from "../../api/axios"; 
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { DataGrid } from "@mui/x-data-grid";
@@ -18,9 +18,8 @@ const SetupTable = () => {
   useEffect(() => {
     const fetchStoredProcedure = async () => {
       const storedProcedureUrl = "/common-utils/call-stored-procedure";
-      const token = sessionStorage.getItem("token");
       try {
-        const response = await axios.post(
+        const response = await axiosInstance.post(
           storedProcedureUrl,
           {
             procedure: "set_product_params",
@@ -30,14 +29,7 @@ const SetupTable = () => {
               get_put: 0,
               data2: {},
             },
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+          });
         const responseData = response.data?.data?.data;
         console.log(responseData);
 
@@ -96,9 +88,8 @@ const SetupTable = () => {
       return;
     }
     const storedProcedureUrl = "/common-utils/call-stored-procedure";
-    const token = sessionStorage.getItem("token");
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         storedProcedureUrl,
         {
           procedure: "set_product_params",
@@ -107,12 +98,6 @@ const SetupTable = () => {
             seq: 1,
             get_put: 1,
             data2: updatedRows,
-          },
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         }
       );

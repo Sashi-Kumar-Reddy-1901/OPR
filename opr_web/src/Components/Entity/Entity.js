@@ -1,9 +1,6 @@
-
-
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import axios from "../../api/axios";
+import axiosInstance from "../../api/axios"; 
 import { DataGrid, useGridApiRef ,GridToolbar} from "@mui/x-data-grid";
-const VISIBLE_FIELDS = ['authRemarks', 'checker', 'checkerTime', 'emailid', 'ulevel', 'entityStatus', 'entityType', 'leCode'];
 
 const Entity = () => {
   const apiRef = useGridApiRef();
@@ -18,7 +15,6 @@ const Entity = () => {
   });
   const [sortModel, setSortModel] = useState([]);
   const [filterModel, setFilterModel] = useState({ items: [] });
-  const token = sessionStorage.getItem("token");
 
   const columns = [
     { field: "authRemarks", headerName: "Auth Remarks", width: 130 },
@@ -41,7 +37,7 @@ const Entity = () => {
       }
      
       const sort = sortModel.length > 0 ? sortModel.map((sort) => ({ field: sort.field, order: sort.sort })) : [{ field: "ulevel", order: "asc" }];
-      const response = await axios.post('/entity/get_entities', {
+      const response = await axiosInstance.post('/entity/get_entities', {
         "pagination": {
           "pageSize": paginationModel.pageSize,
           "pageNo": paginationModel.page + 1
@@ -52,11 +48,6 @@ const Entity = () => {
         },
    
         "sort" : sort
-      }, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        }
       });
       const resData = response.data?.data?.data;
       const length = (response.data?.data?.data).length;
@@ -91,7 +82,7 @@ const Entity = () => {
   };
 
   return (
-    <div style={{  height: "82vh", width: "100%" ,marginTop :"50px"}}>
+    <div style={{  height: "82vh", width: "100%" ,marginTop :"35px"}}>
       <DataGrid
         apiRef={apiRef}
         rows={data}
@@ -125,6 +116,9 @@ const Entity = () => {
             showQuickFilter: true,
           },
         }}
+        initialState={{
+          density: 'compact',
+        }}
       />
     </div>
   );
@@ -135,7 +129,7 @@ export default Entity;
 // import React, { useEffect, useState, useMemo } from 'react';
 // import Box from '@mui/material/Box';
 // import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-// import axios from "../../api/axios";
+// import axiosInstance from "../../api/axiosInstance"; 
 
 // const VISIBLE_FIELDS = ['authRemarks', 'checker', 'checkerTime', 'emailid', 'ulevel', 'entityStatus', 'entityType', 'leCode'];
 
@@ -166,7 +160,7 @@ export default Entity;
 //     try {
 //       setLoading(true);
 //       const sort = sortModel.length > 0 ? sortModel.map((sort) => ({ field: sort.field, order: sort.sort })) : [{ field: "ulevel", order: "asc" }];
-//       const response = await axios.post('/entity/get_entities', {
+//       const response = await axiosInstance.post('/entity/get_entities', {
 //         "pagination": {
 //           "pageSize": pageSize,
 //           "pageNo": page + 1 
