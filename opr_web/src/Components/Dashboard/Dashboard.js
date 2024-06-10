@@ -16,19 +16,18 @@ import {
   DialogActions,
   Tooltip,
   Zoom,
+  Menu,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import PersonIcon from "@mui/icons-material/Person";
 import { useSelector } from "react-redux";
-import CloseIcon from "@mui/icons-material/Close";
-import SelectModule from "../SelectModule/SelectModule";
-import { useLocation } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { useNavigate } from "react-router-dom";
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
 import { Outlet } from "react-router-dom";
+import Select from "react-select";
 import "./Dashboard.css";
 
 const drawerWidth = 150;
@@ -82,6 +81,24 @@ const Footer = styled("footer")({
 });
 
 export default function Dashboard() {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const options = [
+    { value: "profile", label: "Profile" },
+    { value: "account", label: "My account" },
+    { value: "logout", label: "Logout" },
+  ];
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSelectChange = (selectedOption) => {
+    console.log(`Selected: ${selectedOption.label}`);
+  };
   const [menuData, setMenuData] = useState([]);
 
   useEffect(() => {
@@ -92,7 +109,9 @@ export default function Dashboard() {
       const getTokenDetailsUrl = `/users/get_token_details`;
       try {
         // Fetch Token Details
-        const tokenDetailsResponse = await axiosInstance.get(getTokenDetailsUrl);
+        const tokenDetailsResponse = await axiosInstance.get(
+          getTokenDetailsUrl
+        );
         console.log(tokenDetailsResponse?.data);
 
         // Fetch menu
@@ -105,9 +124,10 @@ export default function Dashboard() {
         console.log(languagesResponse?.data);
 
         // Fetch Entitlements
-        const entitlementsResponse = await axiosInstance.get(getEntitlementsUrl);
+        const entitlementsResponse = await axiosInstance.get(
+          getEntitlementsUrl
+        );
         console.log(entitlementsResponse?.data);
-
       } catch (error) {
         console.log(error?.response?.data?.message);
       }
@@ -119,22 +139,6 @@ export default function Dashboard() {
   const [open, setOpen] = useState(true);
   const roles = useSelector((state) => state.user.roles);
   console.log(roles);
-
-  const location = useLocation();
-  const ModuleData = location.state?.ModuleData;
-  console.log(ModuleData);
-  const showModuleIcon =
-    ModuleData &&
-    (ModuleData.length > 1 ||
-      (ModuleData.length === 1 && ModuleData[0].roles.length > 1));
-
-  const [openSelectModule, setOpenSelectModule] = useState(false);
-  const handleCloseSelectModule = () => {
-    setOpenSelectModule(false);
-  };
-  const handleOpenSelectModule = () => {
-    setOpenSelectModule(true);
-  };
 
   const [openLogout, setOpenLogout] = useState(false);
   const handleLogout = () => {
@@ -245,55 +249,43 @@ export default function Dashboard() {
         </Main>
         <Footer>
           <Typography variant="body2">
-            {showModuleIcon && (
-              <IconButton onClick={handleOpenSelectModule} color="inherit">
+            <div>
+              <IconButton color="inherit" onClick={handleClick}>
                 <PersonIcon />
               </IconButton>
-            )}
+            </div>
           </Typography>
         </Footer>
       </Box>
 
-      {/*Select Module and Roles */}
-      <Dialog
-        aria-labelledby="customized-dialog-title"
-        open={openSelectModule}
-        fullWidth
-        maxWidth="sm"
-        sx={{
-          "& .MuiDialog-paper": {
-            maxWidth: "400px",
-            width: "100%",
-            maxHeight: "300px",
-            height: "100%",
-            borderRadius: "10px",
-          },
+      {/* Select Role */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
         }}
       >
-        <DialogTitle sx={{ m: 0, p: 2, textAlign: "center" }}>
-          Select Module and Role
-        </DialogTitle>
-        <IconButton
-          aria-label="close"
-          onClick={handleCloseSelectModule}
-          sx={{
-            position: "absolute",
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-        <DialogContent>
-          <Typography gutterBottom component="div">
-            <SelectModule
-              ModuleData={ModuleData}
-              onCloseSelectModule={handleCloseSelectModule}
-            />
-          </Typography>
-        </DialogContent>
-      </Dialog>
+        <div style={{ width: 200, padding: 16 }}>
+          <Select
+            options={options}
+            onChange={handleSelectChange}
+            placeholder="Select Role"
+            isClearable
+            isSearchable
+            className="custom-select-container"
+            classNamePrefix="custom-select"
+          />
+        </div>
+        <button className="px-4 py-2 text-white bg-black rounded">
+          Submit
+        </button>
+      </Menu>
 
       {/* Logout  */}
       <Dialog open={openLogout}>

@@ -77,7 +77,7 @@ function Login() {
         setIsAlertError(loginResponse.data?.data?.message);
         setIsAlertOpen(true);
       } else if (token && loginResponse.data?.data?.messageCode === 110101) {
-        const modules_roles_Url = "users/get_user_modules_and_roles";
+        const modules_roles_Url = `users/get_user_modules_and_roles?isChange=${false}`;
         const moduleResponse = await axiosInstance.get(modules_roles_Url);
         const modulesData = moduleResponse.data?.data?.data;
         console.log("Modules and roles:", modulesData);
@@ -90,7 +90,7 @@ function Login() {
             if (moduleCode === -1 && roleCode === -1) {
               navigate("./setup-table");
             } else {
-              navigate("./dashboard", { state: { ModuleData: modulesData } });
+              navigate("./dashboard");
             }
           } else {
             setOpenSelectModule(true);
