@@ -15,9 +15,10 @@ const SetupTable = () => {
   const [columns, setColumns] = useState([]);
   const [updatedRows, setUpdatedRows] = useState([]);
   const [showForm, setShowForm] = useState(true);
-  const [getLeCode,setLeCode] = useState(null)
-  const [getSeq,setSeq] = useState(1)
+  const [getLeCode, setLeCode] = useState(null);
+  const [getSeq, setSeq] = useState(1);
   const leCodeRef = useRef(null);
+  const [showCheckboxGrid, setShowCheckboxGrid] = useState(false);
 
   const handleSubmit = async () => {
     const leCode = leCodeRef.current.value;
@@ -66,7 +67,6 @@ const SetupTable = () => {
 
         setColumns(cols);
         setRows(rowsData);
-        setUpdatedRows(rowsData); // Initialize updated rows
       }
       setLoading(false);
       setShowForm(false); // Hide the input and submit button
@@ -115,23 +115,38 @@ const SetupTable = () => {
       const responseData = response.data?.data?.data;
       if (responseData && responseData.length > 1 && responseData[1].data2) {
         const data2 = responseData[1].data2;
-        // Prepare columns
-        const cols = Object.keys(data2[0]).map((key) => ({
-          field: key,
-          headerName: key,
-          width: 150,
-          editable: true,
-        }));
+        const data1 = responseData[0].data1[0]?.usechkbox;
+
+        if (data1 === 1) {
+          const cols = [
+            {
+              field: "Lang_Desc",
+              headerName: "Language",
+              width: 150,
+              editable: true,
+            },
+          ];
+          setColumns(cols);
+          setShowCheckboxGrid(true)
+        } else {
+          setShowCheckboxGrid(false)
+          const cols = Object.keys(data2[0]).map((key) => ({
+            field: key,
+            headerName: key,
+            width: 150,
+            editable: true,
+          }));
+          setColumns(cols);
+        }
         // Prepare rows
         const rowsData = data2.map((item, index) => ({
           id: index,
           ...item,
         }));
 
-        setColumns(cols);
         setRows(rowsData);
-        setUpdatedRows(rowsData);
-        setSeq(getSeq + 1)
+        setUpdatedRows(rows)
+        setSeq(getSeq + 1);
       }
       console.log("Response:", responseData[1].data2);
     } catch (error) {
@@ -238,18 +253,33 @@ const SetupTable = () => {
               </div>
 
               <div style={{ height: "64vh", width: "100%" }}>
-                <DataGrid
-                  rows={rows}
-                  columns={columns}
-                  density="compact"
-                  processRowUpdate={handleProcessRowUpdate}
-                  initialState={{
-                    pagination: {
-                      paginationModel: { page: 0, pageSize: 10 },
-                    },
-                  }}
-                  pageSizeOptions={[10, 25, 50, 100]}
-                />
+                {showCheckboxGrid ? (
+                  <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    density="compact"
+                    checkboxSelection
+                    initialState={{
+                      pagination: {
+                        paginationModel: { page: 0, pageSize: 10 },
+                      },
+                    }}
+                    pageSizeOptions={[10, 25, 50, 100]}
+                  />
+                ) : (
+                  <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    density="compact"
+                    processRowUpdate={handleProcessRowUpdate}
+                    initialState={{
+                      pagination: {
+                        paginationModel: { page: 0, pageSize: 10 },
+                      },
+                    }}
+                    pageSizeOptions={[10, 25, 50, 100]}
+                  />
+                )}
               </div>
 
               <div className="flex justify-between mt-4">
