@@ -67,6 +67,7 @@ const SetupTable = () => {
 
         setColumns(cols);
         setRows(rowsData);
+        setUpdatedRows(rowsData)
       }
       setLoading(false);
       setShowForm(false); // Hide the input and submit button
