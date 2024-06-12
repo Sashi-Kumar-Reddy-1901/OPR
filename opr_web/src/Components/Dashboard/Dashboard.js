@@ -106,7 +106,14 @@ export default function Dashboard() {
     { value: "logout", label: "Logout" },
   ];
 
-  const handleClick = (event) => {
+  const handleClick = async(event) => {
+    const isChange = true;
+    const getUserModuleUrl = `/users/get_user_modules_and_roles?isChange=${isChange}`;
+    try {
+      const response = await axiosInstance.get(getUserModuleUrl,{});
+      console.log(response);
+      setModuleData(response.data?.data?.data);
+    } catch (error) {}
     setOpenSelectModule(true);
     // setAnchorEl(event.currentTarget);
   };
