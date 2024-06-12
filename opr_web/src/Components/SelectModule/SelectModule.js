@@ -5,11 +5,13 @@ import { useDispatch } from "react-redux";
 import { setRoles, setModules } from "../../Data/userSlice";
 import "./SelectModule.css";
 import axiosInstance from "../../api/axios"; 
+import { useLocation } from 'react-router-dom'
 
 const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedRole, setSelectedRole] = useState(null);
   const [roleOptions, setRoleOptions] = useState([]);
+  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -49,6 +51,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   };
 
   const handleButtonClick = async () => {
+  
     try {
       const moduleCode = selectedModule?.moduleCode;
       const roleCode = selectedRole?.value;
@@ -56,6 +59,10 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
       const module_role_response = await axiosInstance.post(select_module_role_Url,{});
       const settoken = module_role_response.data?.data?.data;
       sessionStorage.setItem("token", settoken);
+      console.log("location",location.pathname);
+     if(location.pathname ==='/dashboard'){
+      navigate("./");
+     }
       onCloseSelectModule();
       if (selectedModule?.moduleCode === -1 && selectedRole?.value === -1) {
         navigate("./setup-table");

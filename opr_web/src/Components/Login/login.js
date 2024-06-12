@@ -80,8 +80,10 @@ function Login() {
         const modules_roles_Url = `users/get_user_modules_and_roles?isChange=${false}`;
         const moduleResponse = await axiosInstance.get(modules_roles_Url);
         const modulesData = moduleResponse.data?.data?.data;
-        console.log("Modules and roles:", modulesData);
+       
         setModuleData(modulesData);
+       
+        sessionStorage.setItem("moduleData", JSON.stringify(modulesData));
         if (modulesData !== null) {
           setErrorMessage("");
           if (modulesData.length === 1 && modulesData[0].roles.length === 1) {

@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "../../api/axios";
 import { styled } from "@mui/material/styles";
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
+import InboxIcon from '@mui/icons-material/Inbox';
+import DraftsIcon from '@mui/icons-material/Drafts';
+import CloseIcon from "@mui/icons-material/Close";
+import SelectModule from "../SelectModule/SelectModule";
+
 import {
   Box,
   CssBaseline,
@@ -25,6 +35,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { useNavigate } from "react-router-dom";
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
+import TranslateIcon from '@mui/icons-material/Translate';
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
 import { Outlet } from "react-router-dom";
 import Select from "react-select";
@@ -82,6 +93,13 @@ const Footer = styled("footer")({
 
 export default function Dashboard() {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [langMenu, setlangMenu] = useState(false);
+  const [langMenuDesc, setlangMenuDesc] = useState(null || []);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [languageSelected, setLanguageSelected] = useState(false);
+  const [languageLabelSelected, setLanguageLabelSelected] = useState("English");
+  const [ModuleData, setModuleData] = useState("");
+  const [openSelectModule, setOpenSelectModule] = useState(false);
   const options = [
     { value: "profile", label: "Profile" },
     { value: "account", label: "My account" },
@@ -89,19 +107,51 @@ export default function Dashboard() {
   ];
 
   const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+    setOpenSelectModule(true);
+    // setAnchorEl(event.currentTarget);
   };
 
+  const handleLanguageMenu = (event) => {
+    setlangMenu(event.currentTarget);
+    console.log(langMenu);
+  };
   const handleClose = () => {
     setAnchorEl(null);
   };
 
+  const handleCloseSelectModule = () => {
+    setOpenSelectModule(false);
+  };
+
+  const handleListItemClick = async(event, index) => {
+    setSelectedIndex(index);
+    const langCode = langMenuDesc[index].value;
+    const getSelectLanguageUrl = `/users/select_language?langCode=${langCode}`;
+    try {
+      if(langCode){
+        const response = await axiosInstance.post(getSelectLanguageUrl,{});
+      console.log(response);
+      }
+    } catch (error) {}
+    console.log("index",index);
+    console.log(langMenuDesc[index]);
+    setlangMenu(false);
+   setLanguageLabelSelected(langMenuDesc[index].label)
+    setLanguageSelected(prev => !prev); 
+  };
+
+  const closeLanguagePopup = () =>{
+    setlangMenu(false);
+  }
   const handleSelectChange = (selectedOption) => {
     console.log(`Selected: ${selectedOption.label}`);
   };
   const [menuData, setMenuData] = useState([]);
 
   useEffect(() => {
+    const module = JSON.parse(sessionStorage.getItem("moduleData"));
+    console.log(module);
+    setModuleData(module);
     const fetch_Token_Menu_Languages_Entitlements = async () => {
       const getMenuUrl = `/users/get_menu`;
       const getLanguagesUrl = `/users/get_languages`;
@@ -121,7 +171,15 @@ export default function Dashboard() {
 
         // Fetch languages
         const languagesResponse = await axiosInstance.get(getLanguagesUrl);
-        console.log(languagesResponse?.data);
+        console.log("langugae",languagesResponse?.data?.data?.data);
+        const langArray = languagesResponse?.data?.data?.data
+        const transformedArray = langArray.map(item => ({
+          value: item.langCode,
+          label: item.langDesc
+        }));
+        setlangMenuDesc(transformedArray);
+        console.log(transformedArray);
+        console.log(langMenuDesc);
 
         // Fetch Entitlements
         const entitlementsResponse = await axiosInstance.get(
@@ -133,7 +191,12 @@ export default function Dashboard() {
       }
     };
     fetch_Token_Menu_Languages_Entitlements();
-  }, []);
+   
+  }, [languageSelected]);
+
+  
+  const langOptions = langMenuDesc;
+
 
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
@@ -147,10 +210,19 @@ export default function Dashboard() {
   const handleCloseNoLogout = () => {
     setOpenLogout(false);
   };
-  const handleCloseYesLogout = () => {
-    setOpenLogout(false);
-    sessionStorage.clear();
-    navigate("/");
+  const handleCloseYesLogout = async () => {
+    try {
+      setOpenLogout(false);
+  
+      const getLogout = `/users/logout`;
+      await axiosInstance.post(getLogout);
+  
+      sessionStorage.clear();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Handle the error accordingly (e.g., show an error message to the user)
+    }
   };
 
   const handleNavigateClick = (subNode) => {
@@ -249,10 +321,16 @@ export default function Dashboard() {
         </Main>
         <Footer>
           <Typography variant="body2">
-            <div>
-              <IconButton color="inherit" onClick={handleClick}>
+            <div className="flex-footer">
+              <IconButton  color="inherit" onClick={handleClick}>
                 <PersonIcon />
               </IconButton>
+              <Tooltip title="Change Language" arrow TransitionComponent={Zoom}>
+              <p className="footer-text" onClick={handleLanguageMenu}> {languageLabelSelected}</p> 
+              </Tooltip>
+              {/* <IconButton className="footer-icon" color="inherit" onClick={handleLanguageMenu}>
+             English
+              </IconButton> */}
             </div>
           </Typography>
         </Footer>
@@ -286,6 +364,36 @@ export default function Dashboard() {
           Submit
         </button>
       </Menu>
+
+
+         {/* Select Language */}
+         {/* <Menu
+        anchorEl={langMenu}
+        open={Boolean(langMenu)}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+      >
+        <div style={{ width: 200, padding: 16 }}>
+          <Select
+            options={langOptions}
+            onChange={handleSelectChange}
+            placeholder="Select Language"
+            isClearable
+            isSearchable
+            className="custom-select-container"
+            classNamePrefix="custom-select"
+          />
+        </div>
+        <button className="px-4 py-2 text-white bg-black rounded">
+          Submit
+        </button>
+      </Menu> */}
 
       {/* Logout  */}
       <Dialog open={openLogout}>
@@ -321,6 +429,81 @@ export default function Dashboard() {
             YES
           </button>
         </DialogActions>
+      </Dialog>
+
+      {/* Language slide */}
+      <Menu
+        anchorEl={langMenu}
+        open={Boolean(langMenu)}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+      >
+        <div style={{ width: 250, padding: 16 }}>
+          <button className="button-lang" onClick={closeLanguagePopup}>X</button>
+      <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+      <List component="nav" aria-label="main mailbox folders">
+        {langMenuDesc.map((item, index) => (
+          <ListItemButton
+            key={item.value}
+            selected={selectedIndex === index}
+            onClick={(event) => handleListItemClick(event, index)}
+          >
+            <ListItemIcon>
+              {index % 2 === 0 ? <InboxIcon /> : <DraftsIcon />} {/* Example icons, customize as needed */}
+            </ListItemIcon>
+            <ListItemText primary={item.label} />
+          </ListItemButton>
+        ))}
+      </List>
+      </Box>
+      </div>
+      </Menu>
+
+      {/* Select Module */}
+      <Dialog
+        aria-labelledby="customized-dialog-title"
+        open={openSelectModule}
+        fullWidth
+        maxWidth="sm"
+        sx={{
+          "& .MuiDialog-paper": {
+            maxWidth: "400px",
+            width: "100%",
+            maxHeight: "300px",
+            height: "100%",
+            borderRadius: "10px",
+          },
+        }}
+      >
+        <DialogTitle sx={{ m: 0, p: 2, textAlign: "center" }}>
+          Select Module and Role
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={handleCloseSelectModule}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent>
+          <Typography gutterBottom component="div">
+            <SelectModule
+              ModuleData={ModuleData}
+              onCloseSelectModule={handleCloseSelectModule}
+            />
+          </Typography>
+        </DialogContent>
       </Dialog>
     </>
   );
