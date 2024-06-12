@@ -49,9 +49,10 @@ const Entity = () => {
    
         "sort" : sort
       });
-      const resData = response.data?.data?.data;
+      const resData = response.data?.data?.data?.entityDTOList;
       const length = (response.data?.data?.data).length;
-      console.log("length", length)
+      console.log("length", length);
+      console.log("resDaya", resData)
       setData(resData);
       setRowCount(100);
     } catch (error) {

@@ -60,8 +60,8 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
       const settoken = module_role_response.data?.data?.data;
       sessionStorage.setItem("token", settoken);
       console.log("location",location.pathname);
-     if(location.pathname ==='/dashboard'){
-      navigate("./");
+     if(location.pathname.includes('/dashboard')){
+      navigate("/");
      }
       onCloseSelectModule();
       if (selectedModule?.moduleCode === -1 && selectedRole?.value === -1) {
