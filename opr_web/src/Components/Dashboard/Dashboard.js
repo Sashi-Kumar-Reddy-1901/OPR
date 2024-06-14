@@ -93,7 +93,7 @@ export default function Dashboard() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [language, setLanguage] = useState("");
   const [menuData, setMenuData] = useState([]);
-  const [langMenuDesc, setlangMenuDesc] = useState([]);
+  const [langMenuDesc, setLangMenuDesc] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [languageSelected, setLanguageSelected] = useState("");
   const [loginTime, setLoginTime] = useState("");
@@ -169,9 +169,56 @@ export default function Dashboard() {
           value: item.langCode,
           label: item.langDesc,
         }));
-        setlangMenuDesc(transformedArray);
+        setLangMenuDesc(transformedArray);
 
         console.log(entitlementsResponse?.data);
+      } catch (error) {
+        console.log(error?.response?.data?.message);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
+
+  useEffect(() => {
+    const fetchUpdatedData = async () => {
+      try {
+        const [menuResponse, languagesResponse, entitlementsResponse] =
+          await Promise.all([
+            axiosInstance.post("/users/get_menu"),
+            axiosInstance.get("/users/get_languages"),
+            axiosInstance.get("/users/get_entitlements"),
+          ]);
+
+        setMenuData(menuResponse.data?.data?.data?.menuTree || []);
+
+        const langArray = languagesResponse?.data?.data?.data;
+        const transformedArray = langArray.map((item) => ({
+          value: item.langCode,
+          label: item.langDesc,
+        }));
+        setLangMenuDesc(transformedArray);
+
+        console.log(entitlementsResponse?.data);
+      } catch (error) {
+        console.log(error?.response?.data?.message);
+      }
+    };
+
+    if (languageSelected) {
+      fetchUpdatedData();
+    }
+  }, [languageSelected]);
+
+  useEffect(() => {
+    const fetchModuleData = async () => {
+      try {
+        const moduleResponse = await axiosInstance.get(
+          "/users/get_user_modules_and_roles?isChange=true"
+        );
+        const moduleData = moduleResponse.data?.data?.data || [];
+        console.log(moduleData);
+        setModuleData(moduleData);
       } catch (error) {
         console.log(error?.response?.data?.message);
       }
@@ -193,7 +240,7 @@ export default function Dashboard() {
           value: item.langCode,
           label: item.langDesc,
         }));
-        setlangMenuDesc(transformedArray);
+        setLangMenuDesc(transformedArray);
 
         console.log(entitlementsResponse?.data);
       } catch (error) {
@@ -201,28 +248,12 @@ export default function Dashboard() {
       }
     };
 
-    const fetchModuleData = async () => {
-      try {
-        const moduleResponse = await axiosInstance.get(
-          "/users/get_user_modules_and_roles?isChange=true"
-        );
-        const moduleData = moduleResponse.data?.data?.data || [];
-        console.log(moduleData);
-        setModuleData(moduleData);
-      } catch (error) {
-        console.log(error?.response?.data?.message);
-      }
-    };
-    if (languageSelected) {
-      fetchUpdatedData();
-    } else if (isSelected) {
+    if (isSelected) {
       fetchModuleData();
       fetchUpdatedData();
       setIsSelected(false);
-    } else {
-      fetchInitialData();
     }
-  }, [languageSelected, isSelected]);
+  }, [isSelected]);
 
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
