@@ -23,4 +23,35 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response) {
+      switch (error.response.status) {
+        case 401:
+          console.error("Unauthorized", error.response.data);
+          break;
+        case 403:
+          console.error("Forbidden", error.response.data);
+          break;
+        case 404:
+          console.error("Not Found", error.response.data);
+          break;
+        case 500:
+          console.error("Server Error", error.response.data);
+          break;
+        default:
+          console.error("Error response", error.response.data);
+      }
+    } else if (error.request) {
+      console.error("Error request", error.request);
+    } else {
+      console.error("Error message", error.message);
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default axiosInstance;

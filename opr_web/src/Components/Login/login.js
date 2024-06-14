@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../logo.svg";
-import axiosInstance from "../../api/axios"; 
+import axiosInstance from "../../api/axios";
 import "./login.css";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -14,8 +14,6 @@ import {
   DialogContent,
   IconButton,
   Typography,
-  Zoom,
-  Tooltip,
   DialogContentText,
   DialogActions,
 } from "@mui/material";
@@ -23,7 +21,8 @@ import ForgotPassword from "../Forgot-Password/ForgotPassword";
 import OTPValidation from "../OTP/OTPValidation";
 import ResetPassword from "../ResetPassword/ResetPassword";
 import { ToastContainer, toast } from "react-toastify";
-import InfoSharpIcon from "@mui/icons-material/InfoSharp";
+import { useDispatch } from "react-redux";
+import {setModulesRoles} from "../../Redux-Slices/userSlice"
 
 function Login() {
   const emailRef = useRef(null);
@@ -38,6 +37,7 @@ function Login() {
   const [isAlertError, setIsAlertError] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -48,7 +48,7 @@ function Login() {
         const isCaptchaEnabled = response.data?.data?.data?.isCaptchaEnabled;
         const isSiteKey = response.data?.data?.data?.siteKey;
         setIsCaptchaEnabled(isCaptchaEnabled);
-        setIsSiteKey(isSiteKey)
+        setIsSiteKey(isSiteKey);
       } catch (error) {
         console.error("Error fetching config:", error);
       }
@@ -61,7 +61,7 @@ function Login() {
   };
 
   const handleButtonClick = async () => {
-    setErrorMessage("")
+    setErrorMessage("");
     try {
       const username = emailRef.current.value;
       const password = passwordRef.current.value;
@@ -69,7 +69,7 @@ function Login() {
       const LOGIN_URL = `/users/login?username=${encodeURIComponent(
         username
       )}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
-      const loginResponse = await axiosInstance.post(LOGIN_URL,{});
+      const loginResponse = await axiosInstance.post(LOGIN_URL, {});
       const token = loginResponse.data?.data?.data;
       sessionStorage.setItem("token", token);
       if (loginResponse.data?.data?.messageCode === 110105) {
@@ -80,13 +80,12 @@ function Login() {
         const modules_roles_Url = `users/get_user_modules_and_roles?isChange=${false}`;
         const moduleResponse = await axiosInstance.get(modules_roles_Url);
         const modulesData = moduleResponse.data?.data?.data;
-       
         setModuleData(modulesData);
-       
-        sessionStorage.setItem("moduleData", JSON.stringify(modulesData));
+        console.log(modulesData);
         if (modulesData !== null) {
           setErrorMessage("");
           if (modulesData.length === 1 && modulesData[0].roles.length === 1) {
+            dispatch(setModulesRoles(modulesData))
             const { moduleCode } = modulesData[0];
             const { roleCode } = modulesData[0].roles[0];
             if (moduleCode === -1 && roleCode === -1) {
@@ -144,6 +143,7 @@ function Login() {
 
   const handleCloseResetPassword = (resetSuccess) => {
     setOpenResetPassword(false);
+    setErrorMessage("");
     if (resetSuccess) {
       toast.success(resetSuccess, {
         className: "custom-toast",
@@ -188,7 +188,7 @@ function Login() {
                     <input
                       ref={emailRef}
                       onChange={handleInputChange}
-                      className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                      className="w-full p-2 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="text"
                       placeholder="User Id / Email"
                     />
@@ -203,7 +203,7 @@ function Login() {
                       <input
                         ref={passwordRef}
                         onChange={handleInputChange}
-                        className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                        className="w-full p-2 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
                         maxLength={15}
@@ -216,36 +216,13 @@ function Login() {
                         style={{
                           position: "absolute",
                           right: "15px",
-                          top: "2.8rem",
+                          top: "2.4rem",
                           transform: "translateY(-50%)",
                           color: "#000",
                         }}
                       >
                         {showPassword ? <Visibility /> : <VisibilityOff />}
                       </IconButton>
-                      <Tooltip
-                        title={
-                          <span style={{ fontSize: "14px" }}>
-                            The password must be 8-15 characters long and
-                            include at least one number, one lowercase letter,
-                            one uppercase letter, and one special character from
-                            !@#$%^&*().
-                          </span>
-                        }
-                        placement="right"
-                        arrow
-                        TransitionComponent={Zoom}
-                      >
-                        <InfoSharpIcon
-                          style={{
-                            position: "absolute",
-                            right: "-30px",
-                            top: "2.8rem",
-                            transform: "translateY(-50%)",
-                            cursor: "pointer",
-                          }}
-                        />
-                      </Tooltip>
                     </div>
 
                     {errorMessage && (
@@ -257,7 +234,7 @@ function Login() {
                     <button
                       onClick={handleButtonClick}
                       disabled={isButtonDisabled}
-                      className="mt-6 tracking-wide font-semibold bg-black text-gray-100 w-full py-4 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                      className="mt-8 tracking-wide font-semibold bg-black text-gray-100 w-full p-2 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                     >
                       Login{" "}
                     </button>
@@ -483,9 +460,7 @@ function Login() {
         </DialogActions>
       </Dialog>
 
-      {isCaptchaEnabled && (
-        <GoogleReCaptchaProvider reCaptchaKey={isSiteKey} />
-     )}
+      {isCaptchaEnabled && <GoogleReCaptchaProvider reCaptchaKey={isSiteKey} />}
     </>
   );
 }

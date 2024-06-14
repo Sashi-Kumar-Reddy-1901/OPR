@@ -1,9 +1,11 @@
 import React, { useRef, useState } from "react";
-import axiosInstance from "../../api/axios"; 
+import axiosInstance from "../../api/axios";
 import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import "./ResetPassword.css";
+import { Zoom, Tooltip } from "@mui/material";
+import InfoSharpIcon from "@mui/icons-material/InfoSharp";
 
 const ResetPassword = ({ onResetPasswordClose }) => {
   const passwordRef = useRef(null);
@@ -35,7 +37,7 @@ const ResetPassword = ({ onResetPasswordClose }) => {
         password
       )}`;
       try {
-        const response = await axiosInstance.post(LOGIN_URL,{});
+        const response = await axiosInstance.post(LOGIN_URL, {});
         console.log(response?.data?.data?.messageCode);
         if (response?.data?.data?.messageCode === 110501) {
           onResetPasswordClose(response?.data?.data?.message);
@@ -43,11 +45,9 @@ const ResetPassword = ({ onResetPasswordClose }) => {
           setErrorMessage(response?.data?.data?.message);
         } else if (response?.data?.data?.messageCode === 110503) {
           setErrorMessage(response?.data?.data?.message);
-        }
-        else if (response?.data?.data?.messageCode === 110506) {
+        } else if (response?.data?.data?.messageCode === 110506) {
           setErrorMessage(response?.data?.data?.message);
-        }
-        else if (response?.data?.data?.messageCode === 110507) {
+        } else if (response?.data?.data?.messageCode === 110507) {
           setErrorMessage(response?.data?.data?.message);
         }
       } catch (error) {
@@ -80,6 +80,28 @@ const ResetPassword = ({ onResetPasswordClose }) => {
                   >
                     {showPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
+                  <Tooltip
+                    title={
+                      <span style={{ fontSize: "14px" }}>
+                        The password must be 8-15 characters long and include at
+                        least one number, one lowercase letter, one uppercase
+                        letter, and one special character from !@#$%^&*().
+                      </span>
+                    }
+                    placement="right"
+                    arrow
+                    TransitionComponent={Zoom}
+                  >
+                  <InfoSharpIcon
+                    style={{
+                      position: "absolute",
+                      right: "-30px",
+                      top: "1.4rem",
+                      transform: "translateY(-50%)",
+                      cursor: "pointer",
+                    }}
+                  />
+                  </Tooltip>
                 </div>
               </div>
             </div>
@@ -109,9 +131,9 @@ const ResetPassword = ({ onResetPasswordClose }) => {
             </div>
 
             {errorMessage && (
-                <p className="text-red-500 text-xs text-center max-h-0">
-                  {errorMessage}
-                </p>
+              <p className="text-red-500 text-xs text-center max-h-0">
+                {errorMessage}
+              </p>
             )}
 
             <button

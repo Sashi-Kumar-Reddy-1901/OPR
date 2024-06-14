@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Select from "react-select";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setRoles, setModules } from "../../Data/userSlice";
+import { useNavigate, useLocation } from "react-router-dom";
+import axiosInstance from "../../api/axios";
 import "./SelectModule.css";
-import axiosInstance from "../../api/axios"; 
-import { useLocation } from 'react-router-dom'
+import { useDispatch } from "react-redux";
+import { setModulesRoles } from "../../Redux-Slices/userSlice";
 
 const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const [selectedModule, setSelectedModule] = useState(null);
@@ -24,9 +23,8 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
         moduleCode: ModuleData[0].moduleCode,
         roles: ModuleData[0].roles,
       });
-      dispatch(setModules(ModuleData[0]));
     }
-  }, [ModuleData, dispatch]);
+  }, [ModuleData]);
 
   useEffect(() => {
     // If there's only one role for the selected module, automatically select it
@@ -35,34 +33,40 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
         value: selectedModule.roles[0].roleCode,
         label: selectedModule.roles[0].role,
       });
-      dispatch(setRoles(selectedModule.roles[0]));
     }
-  }, [selectedModule, dispatch]);
+  }, [selectedModule]);
 
   const handleModuleChange = (selectedOption) => {
     setSelectedModule(selectedOption);
-    dispatch(setModules(selectedOption));
     setSelectedRole(null);
   };
 
   const handleRoleChange = (selectedOption) => {
     setSelectedRole(selectedOption);
-    dispatch(setRoles(selectedOption));
   };
 
   const handleButtonClick = async () => {
-  
     try {
+      console.log(ModuleData);
       const moduleCode = selectedModule?.moduleCode;
       const roleCode = selectedRole?.value;
       const select_module_role_Url = `/users/select_module_role?moduleCode=${moduleCode}&roleCode=${roleCode}`;
-      const module_role_response = await axiosInstance.post(select_module_role_Url,{});
+      const module_role_response = await axiosInstance.post(
+        select_module_role_Url,
+        {}
+      );
+
+      const moduleLabel = selectedModule?.label;
+      const roleLabel = selectedRole?.label;
+      console.log(moduleLabel,roleLabel);
+      dispatch(setModulesRoles([{ moduleLabel, roleLabel }]));
+
       const settoken = module_role_response.data?.data?.data;
       sessionStorage.setItem("token", settoken);
-      console.log("location",location.pathname);
-     if(location.pathname.includes('/dashboard')){
-      navigate("/");
-     }
+      console.log("location", location.pathname);
+      if (location.pathname.includes("/dashboard")) {
+        navigate("/");
+      }
       onCloseSelectModule();
       if (selectedModule?.moduleCode === -1 && selectedRole?.value === -1) {
         navigate("./setup-table");
