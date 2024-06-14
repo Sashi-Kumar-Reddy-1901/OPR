@@ -101,92 +101,123 @@ export default function Dashboard() {
   const modulesRoles = useSelector((state) => state.user.modulesRoles);
   console.log(modulesRoles);
 
-  const isSingleObjectFormat = modulesRoles.length > 0 && modulesRoles[0].moduleLabel && modulesRoles[0].roleLabel;
-  const moduleDescription = isSingleObjectFormat ? modulesRoles[0].moduleLabel : modulesRoles[0]?.moduleDescription || "Loading...";
-  const role = isSingleObjectFormat ? modulesRoles[0].roleLabel : modulesRoles[0]?.roles[0]?.role || "Loading...";
+  const isSingleObjectFormat =
+    modulesRoles.length > 0 &&
+    modulesRoles[0].moduleLabel &&
+    modulesRoles[0].roleLabel;
+  const moduleDescription = isSingleObjectFormat
+    ? modulesRoles[0].moduleLabel
+    : modulesRoles[0]?.moduleDescription || "Loading...";
+  const role = isSingleObjectFormat
+    ? modulesRoles[0].roleLabel
+    : modulesRoles[0]?.roles[0]?.role || "Loading...";
 
   const handleOpenModule = () => {
     setOpenSelectModule(true);
   };
 
   const handleCloseSelectModule = () => {
-    setIsSelected(true)
+    setIsSelected(true);
     setOpenSelectModule(false);
   };
 
   useEffect(() => {
-    const fetchToken_Modules_Roles = async () => {
-      const getTokenDetailsUrl = `/users/get_token_details`;
-      const isChange = true;
-      const getUserModuleUrl = `/users/get_user_modules_and_roles?isChange=${isChange}`;
+    const fetchInitialData = async () => {
       try {
-        const response = await axiosInstance.get(getUserModuleUrl, {});
-        const moduleData = response.data?.data?.data || [];
-        console.log(moduleData);
-        setModuleData(moduleData);
+        const [
+          tokenDetailsResponse,
+          moduleResponse,
+          menuResponse,
+          languagesResponse,
+          entitlementsResponse,
+        ] = await Promise.all([
+          axiosInstance.get("/users/get_token_details"),
+          axiosInstance.get("/users/get_user_modules_and_roles?isChange=true"),
+          axiosInstance.post("/users/get_menu"),
+          axiosInstance.get("/users/get_languages"),
+          axiosInstance.get("/users/get_entitlements"),
+        ]);
 
-        const tokenDetailsResponse = await axiosInstance.get(
-          getTokenDetailsUrl
-        );
-        console.log(tokenDetailsResponse?.data?.data?.data);
         const { langName, loginTime, displayName } =
           tokenDetailsResponse?.data?.data?.data;
         setLanguage(langName);
         setDisplayName(displayName);
-        // Convert and format loginTime
+
         const date = new Date(loginTime);
-        // Format the date
         const day = date.getDate().toString().padStart(2, "0");
         const month = date.toLocaleString("default", { month: "short" });
         const year = date.getFullYear();
-        // Format the time
         let hours = date.getHours();
         const minutes = date.getMinutes().toString().padStart(2, "0");
         const ampm = hours >= 12 ? "PM" : "AM";
         hours = hours % 12;
-        hours = hours ? hours : 12; // the hour '0' should be '12'
+        hours = hours ? hours : 12;
         const formattedDate = `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
         setLoginTime(formattedDate);
-      } catch (error) {
-        console.error("Failed to fetch token details:", error);
-      }
-    };
-    fetchToken_Modules_Roles();
-  }, []);
 
-  useEffect(() => {
-    const fetch_Menu_Languages_Entitlements = async () => {
-      const getMenuUrl = `/users/get_menu`;
-      const getLanguagesUrl = `/users/get_languages`;
-      const getEntitlementsUrl = `/users/get_entitlements`;
-      try {
-        // Fetch menu
-        const menuResponse = await axiosInstance.post(getMenuUrl, {});
+        const moduleData = moduleResponse.data?.data?.data || [];
+        setModuleData(moduleData);
+
         setMenuData(menuResponse.data?.data?.data?.menuTree || []);
-        console.log(menuResponse.data?.data?.data?.menuTree);
 
-        // Fetch languages
-        const languagesResponse = await axiosInstance.get(getLanguagesUrl);
-        console.log("langugae", languagesResponse?.data?.data?.data);
         const langArray = languagesResponse?.data?.data?.data;
         const transformedArray = langArray.map((item) => ({
           value: item.langCode,
           label: item.langDesc,
         }));
         setlangMenuDesc(transformedArray);
-        console.log(transformedArray);
 
-        // Fetch Entitlements
-        const entitlementsResponse = await axiosInstance.get(
-          getEntitlementsUrl
-        );
         console.log(entitlementsResponse?.data);
       } catch (error) {
         console.log(error?.response?.data?.message);
       }
     };
-    fetch_Menu_Languages_Entitlements();
-  }, [languageSelected , isSelected]);
+
+    const fetchUpdatedData = async () => {
+      try {
+        const [menuResponse, languagesResponse, entitlementsResponse] =
+          await Promise.all([
+            axiosInstance.post("/users/get_menu"),
+            axiosInstance.get("/users/get_languages"),
+            axiosInstance.get("/users/get_entitlements"),
+          ]);
+
+        setMenuData(menuResponse.data?.data?.data?.menuTree || []);
+
+        const langArray = languagesResponse?.data?.data?.data;
+        const transformedArray = langArray.map((item) => ({
+          value: item.langCode,
+          label: item.langDesc,
+        }));
+        setlangMenuDesc(transformedArray);
+
+        console.log(entitlementsResponse?.data);
+      } catch (error) {
+        console.log(error?.response?.data?.message);
+      }
+    };
+
+    const fetchModuleData = async () => {
+      try {
+        const moduleResponse = await axiosInstance.get("/users/get_user_modules_and_roles?isChange=true");
+        const moduleData = moduleResponse.data?.data?.data || [];
+        console.log(moduleData);
+        setModuleData(moduleData);
+      } catch (error) {
+        console.log(error?.response?.data?.message);
+      }
+    };
+
+    if (languageSelected) {
+      fetchUpdatedData();
+    } else if (isSelected) {
+      fetchModuleData();
+      fetchUpdatedData();
+      setIsSelected(false)
+    } else {
+      fetchInitialData();
+    }
+  }, [languageSelected, isSelected]);
 
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
