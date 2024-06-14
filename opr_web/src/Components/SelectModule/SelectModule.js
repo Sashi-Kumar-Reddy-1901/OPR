@@ -14,6 +14,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+
   useEffect(() => {
     // If there's only one module available, automatically select it
     if (Array.isArray(ModuleData) && ModuleData.length === 1) {
@@ -105,7 +106,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
         placeholder="Select Module"
         isClearable
         isSearchable
-        className="custom-select-container"
+        className="custom-select-container rounded-3xl"
         classNamePrefix="custom-select"
         noOptionsMessage={() => "No modules available"}
       />
@@ -118,15 +119,16 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
           placeholder="Select Role"
           isClearable
           isSearchable
-          className="custom-select-container"
+          className="custom-select-container rounded-full"
           classNamePrefix="custom-select"
+          isDisabled={!selectedModule}
           noOptionsMessage={() => "No roles available"}
         />
       </div>
 
       <button
         onClick={handleButtonClick}
-        className="mt-8 bg-black text-gray-100 w-full py-2 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+        className="mt-8 bg-black text-gray-100 w-full py-2 rounded-lg hover:bg-slate-700 transition-all rounded-full duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
         disabled={!selectedRole}
       >
         Submit

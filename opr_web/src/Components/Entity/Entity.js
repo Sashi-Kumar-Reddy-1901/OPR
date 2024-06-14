@@ -1,9 +1,49 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import axiosInstance from "../../api/axios";
-import { DataGrid, useGridApiRef, GridToolbar } from "@mui/x-data-grid";
+import { alpha, styled } from '@mui/material/styles';
+import { DataGrid, useGridApiRef, GridToolbar,gridClasses } from "@mui/x-data-grid";
 import "./Entitty.css";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import { IconButton } from "@mui/material";
+
+
+
+
+const ODD_OPACITY = 0.1;
+
+const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
+  [`& .${gridClasses.row}.even`]: {
+    backgroundColor: theme.palette.grey[200],
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY),
+      '@media (hover: none)': {
+        backgroundColor: 'transparent',
+      },
+    },
+    '&.Mui-selected': {
+      backgroundColor: alpha(
+        theme.palette.primary.main,
+        ODD_OPACITY + theme.palette.action.selectedOpacity,
+      ),
+      '&:hover': {
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          ODD_OPACITY +
+            theme.palette.action.selectedOpacity +
+            theme.palette.action.hoverOpacity,
+        ),
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          backgroundColor: alpha(
+            theme.palette.primary.main,
+            ODD_OPACITY + theme.palette.action.selectedOpacity,
+          ),
+        },
+      },
+    },
+  },
+}));
+
 
 const Entity = () => {
   const apiRef = useGridApiRef();
@@ -19,14 +59,14 @@ const Entity = () => {
   const [filterModel, setFilterModel] = useState({ items: [] });
 
   const columns = [
-    { field: "authRemarks", headerName: "Auth Remarks", width: 130 },
-    { field: "checker", headerName: "Checker", width: 130 },
-    { field: "checkerTime", headerName: "Checker Time", width: 130 },
-    { field: "emailid", headerName: "Email Id", width: 130 },
-    { field: "ulevel", headerName: "ULevel", width: 130 },
-    { field: "entityStatus", headerName: "Entity Status", width: 130 },
-    { field: "entityType", headerName: "EntityType", width: 130 },
-    { field: "leCode", headerName: "LeCode", width: 130 },
+    { field: "authRemarks", headerName: "Auth Remarks", width: 130 , headerClassName: 'header-theme'},
+    { field: "checker", headerName: "Checker", width: 130, headerClassName: 'header-theme' },
+    { field: "checkerTime", headerName: "Checker Time", width: 130, headerClassName: 'header-theme' },
+    { field: "emailid", headerName: "Email Id", width: 130, headerClassName: 'header-theme' },
+    { field: "ulevel", headerName: "ULevel", width: 130, headerClassName: 'header-theme' },
+    { field: "entityStatus", headerName: "Entity Status", width: 130, headerClassName: 'header-theme' },
+    { field: "entityType", headerName: "EntityType", width: 130, headerClassName: 'header-theme' },
+    { field: "leCode", headerName: "LeCode", width: 200, headerClassName: 'header-theme' },
   ];
 
   const fetchData = async () => {
@@ -47,18 +87,20 @@ const Entity = () => {
           pageNo: paginationModel.page + 1,
         },
         search: {
-          fields: ["unit_name", "ucode", "emailid"],
+          fields: [ "emailid"],
           keyword: searchT,
         },
 
         sort: sort,
-      });
+      });  
       const resData = response.data?.data?.data?.entityDTOList;
-      const length = response.data?.data?.data?.entityDTOList?.length;
+      let length;
+      length = response.data?.data?.data?.entityDTOList?.length;
+   
       console.log("length", length);
       console.log("resDaya", resData);
       setData(resData);
-      setRowCount(length);
+      setRowCount(100);
     } catch (error) {
       setError(error);
     } finally {
@@ -83,15 +125,17 @@ const Entity = () => {
       <div style={{ width: "100%", marginTop: "50px" }}>
         <div className="sectionHeader"></div>
         <div className="mt-2" style={{ height: "72vh" }}>
-          <DataGrid
+          <StripedDataGrid
             apiRef={apiRef}
             rows={data}
+             getRowClassName={(params) =>
+          params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
             columns={columns}
             getRowId={(row) => `${row.ucode}_${row.checkerTime}`}
             loading={loading}
             pagination
             paginationMode="server"
-            pageSizeOptions={[10, 25, 50]}
+            pageSizeOptions={[5, 10, 25, 50]}
             paginationModel={paginationModel}
             paginationMeta={paginationMeta}
             onPaginationModelChange={setPaginationModel}

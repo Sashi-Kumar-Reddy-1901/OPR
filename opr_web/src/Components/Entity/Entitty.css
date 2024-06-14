@@ -9,3 +9,7 @@
     height: 20px !important;
     min-height: 35px !important;
 }
+.header-theme {
+    background-color: black; /* Change to your desired color */
+    color: white; /* Change text color if needed */
+  }
