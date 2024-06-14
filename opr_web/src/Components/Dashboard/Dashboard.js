@@ -31,6 +31,8 @@ import { TreeItem } from "@mui/x-tree-view/TreeItem";
 import { Outlet } from "react-router-dom";
 import "./Dashboard.css";
 import { useSelector } from "react-redux";
+import TranslateIcon from "@mui/icons-material/Translate";
+import WorkspacesIcon from "@mui/icons-material/Workspaces";
 
 const drawerWidth = 150;
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
@@ -96,6 +98,7 @@ export default function Dashboard() {
   const [languageSelected, setLanguageSelected] = useState("");
   const [loginTime, setLoginTime] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [userId, setUserId] = useState("");
   const [isSelected, setIsSelected] = useState(false);
 
   const modulesRoles = useSelector((state) => state.user.modulesRoles);
@@ -138,10 +141,11 @@ export default function Dashboard() {
           axiosInstance.get("/users/get_entitlements"),
         ]);
 
-        const { langName, loginTime, displayName } =
+        const { langName, loginTime, displayName, userId } =
           tokenDetailsResponse?.data?.data?.data;
         setLanguage(langName);
         setDisplayName(displayName);
+        setUserId(userId);
 
         const date = new Date(loginTime);
         const day = date.getDate().toString().padStart(2, "0");
@@ -199,7 +203,9 @@ export default function Dashboard() {
 
     const fetchModuleData = async () => {
       try {
-        const moduleResponse = await axiosInstance.get("/users/get_user_modules_and_roles?isChange=true");
+        const moduleResponse = await axiosInstance.get(
+          "/users/get_user_modules_and_roles?isChange=true"
+        );
         const moduleData = moduleResponse.data?.data?.data || [];
         console.log(moduleData);
         setModuleData(moduleData);
@@ -207,13 +213,12 @@ export default function Dashboard() {
         console.log(error?.response?.data?.message);
       }
     };
-
     if (languageSelected) {
       fetchUpdatedData();
     } else if (isSelected) {
       fetchModuleData();
       fetchUpdatedData();
-      setIsSelected(false)
+      setIsSelected(false);
     } else {
       fetchInitialData();
     }
@@ -363,16 +368,32 @@ export default function Dashboard() {
           <Outlet />
         </Main>
         <Footer variant="body2">
+          <div className="info-container">
+            <PersonIcon />
+            <span>{userId}</span>
+          </div>
           <p>{displayName}</p>
           <p>{moduleDescription}</p>
           <p>{role}</p>
           <p>{loginTime}</p>
           <Tooltip title="Change Language" arrow TransitionComponent={Zoom}>
-            <button onClick={handleChangeLanguage}>{language}</button>
+            <span
+              onClick={handleChangeLanguage}
+              className="language-button-container"
+            >
+              <TranslateIcon style={{ cursor: "pointer" }} />
+              <button>{language}</button>
+            </span>
           </Tooltip>
           {ModuleData && ModuleData.length > 0 && (
             <IconButton color="inherit" onClick={handleOpenModule}>
-              <PersonIcon />
+              <Tooltip
+                title="Change Module and Role"
+                arrow
+                TransitionComponent={Zoom}
+              >
+                <WorkspacesIcon />
+              </Tooltip>
             </IconButton>
           )}
         </Footer>

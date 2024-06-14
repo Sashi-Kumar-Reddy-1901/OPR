@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Logo from "../../logo.svg";
+import Logo from "../../Images/Finakon Svg.svg";
 import axiosInstance from "../../api/axios";
 import "./login.css";
 import Visibility from "@mui/icons-material/Visibility";
@@ -22,7 +22,7 @@ import OTPValidation from "../OTP/OTPValidation";
 import ResetPassword from "../ResetPassword/ResetPassword";
 import { ToastContainer, toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import {setModulesRoles} from "../../Redux-Slices/userSlice"
+import { setModulesRoles } from "../../Redux-Slices/userSlice";
 
 function Login() {
   const emailRef = useRef(null);
@@ -85,7 +85,7 @@ function Login() {
         if (modulesData !== null) {
           setErrorMessage("");
           if (modulesData.length === 1 && modulesData[0].roles.length === 1) {
-            dispatch(setModulesRoles(modulesData))
+            dispatch(setModulesRoles(modulesData));
             const { moduleCode } = modulesData[0];
             const { roleCode } = modulesData[0].roles[0];
             if (moduleCode === -1 && roleCode === -1) {
@@ -178,7 +178,7 @@ function Login() {
         <div className="max-w-screen-xl m-0 sm:m-2 bg-white shadow sm:rounded-lg flex justify-center flex-1">
           <div className="lg:w-1/2 xl:w-6/12 p-6 sm:p-8">
             <div>
-              <h1 className="text-4xl">Finakon</h1>
+              <h1 className="text-4xl font-bold">Finakon</h1>
             </div>
             <div className="mt-8 flex flex-col items-center">
               <div className="w-full flex-1 mt-8">
@@ -188,7 +188,7 @@ function Login() {
                     <input
                       ref={emailRef}
                       onChange={handleInputChange}
-                      className="w-full p-2 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                      className="w-full p-2 rounded-full font-medium bg-gray-100 border border-gray-500 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="text"
                       placeholder="User Id / Email"
                     />
@@ -203,7 +203,7 @@ function Login() {
                       <input
                         ref={passwordRef}
                         onChange={handleInputChange}
-                        className="w-full p-2 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                        className="w-full p-2 rounded-full font-medium bg-gray-100 border border-gray-500 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
                         maxLength={15}
@@ -234,18 +234,18 @@ function Login() {
                     <button
                       onClick={handleButtonClick}
                       disabled={isButtonDisabled}
-                      className="mt-8 tracking-wide font-semibold bg-black text-gray-100 w-full p-2 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                      className="rounded-full mt-8 tracking-wide font-semibold bg-black text-gray-100 w-full p-2 hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                     >
                       Login{" "}
                     </button>
-                    <p
-                      className="mt-2"
-                      style={{ cursor: "pointer" }}
-                      onClick={handleOpenForgotPassword}
-                    >
-                      {" "}
-                      Forgot / Reset Password?
-                    </p>
+                    <div className="mt-2">
+                      <span
+                        style={{ cursor: "pointer" }}
+                        onClick={handleOpenForgotPassword}
+                      >
+                        Forgot / Reset Password
+                      </span>
+                    </div>
                   </div>
                 </form>
               </div>
