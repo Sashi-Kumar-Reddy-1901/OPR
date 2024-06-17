@@ -57,11 +57,12 @@ const Entity = () => {
   });
   const [sortModel, setSortModel] = useState([]);
   const [filterModel, setFilterModel] = useState({ items: [] });
+  const [headerName, setheaderName] = useState({"auth_remarks": "Auth Remarks","checker_time": "Checker"});
 
   const columns = [
-    { field: "authRemarks", headerName: "Auth Remarks", width: 130 , headerClassName: 'header-theme'},
+    { field: "authRemarks", headerName: headerName.auth_remarks, width: 130 , headerClassName: 'header-theme'},
     { field: "checker", headerName: "Checker", width: 130, headerClassName: 'header-theme' },
-    { field: "checkerTime", headerName: "Checker Time", width: 130, headerClassName: 'header-theme' },
+    { field: "checkerTime", headerName: headerName.checker_time, width: 130, headerClassName: 'header-theme' },
     { field: "emailid", headerName: "Email Id", width: 130, headerClassName: 'header-theme' },
     { field: "ulevel", headerName: "ULevel", width: 130, headerClassName: 'header-theme' },
     { field: "entityStatus", headerName: "Entity Status", width: 130, headerClassName: 'header-theme' },
@@ -96,11 +97,14 @@ const Entity = () => {
       const resData = response.data?.data?.data?.entityDTOList;
       let length;
       length = response.data?.data?.data?.entityDTOList?.length;
-   
+      const totalRecords = response.data?.data?.data?.totalRecords;
+      const columnHeader = response.data?.data?.data?.columnnHeadersForEntities;
+      setheaderName(columnHeader);
+      console.log("totalreco",response.data?.data?.data?.totalRecords);
       console.log("length", length);
       console.log("resDaya", resData);
       setData(resData);
-      setRowCount(100);
+      setRowCount(totalRecords);
     } catch (error) {
       setError(error);
     } finally {
