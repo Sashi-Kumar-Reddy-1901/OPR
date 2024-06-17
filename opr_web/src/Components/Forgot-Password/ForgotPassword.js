@@ -45,8 +45,8 @@ const ForgotPassword = ({ onForgotPasswordClose, onOpenOtp }) => {
                 <input
                   ref={emailRef}
                   type="email"
-                  className="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-white placeholder-gray-500"
-                  placeholder="Enter Email Id"
+                  className="w-full p-2 rounded-full font-medium bg-gray-100 border border-gray-500 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                   placeholder="Enter Email Id"
                 />
               </div>
 
@@ -58,7 +58,7 @@ const ForgotPassword = ({ onForgotPasswordClose, onOpenOtp }) => {
 
               <button
                 onClick={handleButtonClick}
-                className="mt-8 bg-black text-gray-100 w-full py-2 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                className="mt-8 bg-black text-gray-100 w-full py-2 rounded-full hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
               >
                 Reset
               </button>

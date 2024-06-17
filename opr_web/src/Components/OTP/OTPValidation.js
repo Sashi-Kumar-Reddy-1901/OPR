@@ -60,7 +60,7 @@ const OTPValidation = ({ onOtpClose, userEmail, onResetPasswordOpen }) => {
 
             <button
               onClick={handleButtonClick}
-              className="mt-8 bg-black text-gray-100 w-full py-2 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+              className="mt-8 bg-black text-gray-100 w-full py-2 rounded-full hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
             >
               Submit
             </button>

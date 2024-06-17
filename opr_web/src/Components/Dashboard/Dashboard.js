@@ -30,7 +30,6 @@ import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
 import { Outlet } from "react-router-dom";
 import "./Dashboard.css";
-import { useSelector } from "react-redux";
 import TranslateIcon from "@mui/icons-material/Translate";
 import WorkspacesIcon from "@mui/icons-material/Workspaces";
 
@@ -99,21 +98,9 @@ export default function Dashboard() {
   const [loginTime, setLoginTime] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [userId, setUserId] = useState("");
+  const [roleName, setRoleName] = useState("");
+  const [moduleName, setModuleName] = useState("");
   const [isSelected, setIsSelected] = useState(false);
-
-  const modulesRoles = useSelector((state) => state.user.modulesRoles);
-  console.log(modulesRoles);
-
-  const isSingleObjectFormat =
-    modulesRoles.length > 0 &&
-    modulesRoles[0].moduleLabel &&
-    modulesRoles[0].roleLabel;
-  const moduleDescription = isSingleObjectFormat
-    ? modulesRoles[0].moduleLabel
-    : modulesRoles[0]?.moduleDescription || "Loading...";
-  const role = isSingleObjectFormat
-    ? modulesRoles[0].roleLabel
-    : modulesRoles[0]?.roles[0]?.role || "Loading...";
 
   const handleOpenModule = () => {
     setOpenSelectModule(true);
@@ -141,11 +128,13 @@ export default function Dashboard() {
           axiosInstance.get("/users/get_entitlements"),
         ]);
 
-        const { langName, loginTime, displayName, userId } =
+        const {langName,loginTime,displayName,userId,roleName,moduleName } =
           tokenDetailsResponse?.data?.data?.data;
         setLanguage(langName);
         setDisplayName(displayName);
         setUserId(userId);
+        setRoleName(roleName);
+        setModuleName(moduleName)
 
         const date = new Date(loginTime);
         const day = date.getDate().toString().padStart(2, "0");
@@ -178,82 +167,7 @@ export default function Dashboard() {
     };
 
     fetchInitialData();
-  }, []);
-
-  useEffect(() => {
-    const fetchUpdatedData = async () => {
-      try {
-        const [menuResponse, languagesResponse, entitlementsResponse] =
-          await Promise.all([
-            axiosInstance.post("/users/get_menu"),
-            axiosInstance.get("/users/get_languages"),
-            axiosInstance.get("/users/get_entitlements"),
-          ]);
-
-        setMenuData(menuResponse.data?.data?.data?.menuTree || []);
-
-        const langArray = languagesResponse?.data?.data?.data;
-        const transformedArray = langArray.map((item) => ({
-          value: item.langCode,
-          label: item.langDesc,
-        }));
-        setLangMenuDesc(transformedArray);
-
-        console.log(entitlementsResponse?.data);
-      } catch (error) {
-        console.log(error?.response?.data?.message);
-      }
-    };
-
-    if (languageSelected) {
-      fetchUpdatedData();
-    }
-  }, [languageSelected]);
-
-  useEffect(() => {
-    const fetchModuleData = async () => {
-      try {
-        const moduleResponse = await axiosInstance.get(
-          "/users/get_user_modules_and_roles?isChange=true"
-        );
-        const moduleData = moduleResponse.data?.data?.data || [];
-        console.log(moduleData);
-        setModuleData(moduleData);
-      } catch (error) {
-        console.log(error?.response?.data?.message);
-      }
-    };
-
-    const fetchUpdatedData = async () => {
-      try {
-        const [menuResponse, languagesResponse, entitlementsResponse] =
-          await Promise.all([
-            axiosInstance.post("/users/get_menu"),
-            axiosInstance.get("/users/get_languages"),
-            axiosInstance.get("/users/get_entitlements"),
-          ]);
-
-        setMenuData(menuResponse.data?.data?.data?.menuTree || []);
-
-        const langArray = languagesResponse?.data?.data?.data;
-        const transformedArray = langArray.map((item) => ({
-          value: item.langCode,
-          label: item.langDesc,
-        }));
-        setLangMenuDesc(transformedArray);
-
-        console.log(entitlementsResponse?.data);
-      } catch (error) {
-        console.log(error?.response?.data?.message);
-      }
-    };
-
-    if (isSelected) {
-      fetchModuleData();
-      fetchUpdatedData();
-      setIsSelected(false);
-    }
-  }, [isSelected]);
+  }, [isSelected, languageSelected]);
 
   const navigate = useNavigate();
   const [open, setOpen] = useState(true);
@@ -405,8 +319,8 @@ export default function Dashboard() {
             <span>{userId}</span>
           </div>
           <p>{displayName}</p>
-          <p>{moduleDescription}</p>
-          <p>{role}</p>
+          <p>{moduleName}</p>
+          <p>{roleName}</p>
           <p>{loginTime}</p>
           <Tooltip title="Change Language" arrow TransitionComponent={Zoom}>
             <span
@@ -432,35 +346,44 @@ export default function Dashboard() {
       </Box>
 
       {/* Logout  */}
-      <Dialog open={openLogout}>
+      <Dialog
+        open={openLogout}
+        PaperProps={{
+          sx: {
+            maxWidth: "350px",
+            width: "100%",
+            maxHeight: "200px",
+            height: "100%",
+            borderRadius: "10px",
+          },
+        }}
+      >
         <DialogTitle
           sx={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            width: "100%",
-            height: "100%",
           }}
         >
           <HelpOutlineIcon sx={{ fontSize: "3rem" }} />
         </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ textAlign: "center", fontSize: "1rem" }}>
-            <p className="text-black">Are you sure you want to Logout?</p>
+            <span className="text-black">Are you sure you want to Logout?</span>
           </DialogContentText>
         </DialogContent>
-        <DialogActions style={{ justifyContent: "space-evenly" }}>
+        <DialogActions sx={{ justifyContent: "space-evenly", mb: 2 }}>
           <button
             type="button"
             onClick={handleCloseNoLogout}
-            className="bg-black text-gray-100 text-sm rounded-lg hover:bg-gray-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none px-4 py-2"
+            className="bg-black text-gray-100 text-sm rounded-full hover:bg-gray-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none px-4 py-2"
           >
             NO
           </button>
           <button
             type="button"
             onClick={handleCloseYesLogout}
-            className="bg-black text-gray-100 text-sm rounded-lg hover:bg-gray-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none px-4 py-2"
+            className="bg-black text-gray-100 text-sm rounded-full hover:bg-gray-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none px-4 py-2"
           >
             YES
           </button>

@@ -21,8 +21,7 @@ import ForgotPassword from "../Forgot-Password/ForgotPassword";
 import OTPValidation from "../OTP/OTPValidation";
 import ResetPassword from "../ResetPassword/ResetPassword";
 import { ToastContainer, toast } from "react-toastify";
-import { useDispatch } from "react-redux";
-import { setModulesRoles } from "../../Redux-Slices/userSlice";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 function Login() {
   const emailRef = useRef(null);
@@ -35,9 +34,14 @@ function Login() {
   const [isSiteKey, setIsSiteKey] = useState("");
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [isAlertError, setIsAlertError] = useState("");
+  const [isLoggedInOpen, setIsLoggedInOpen] = useState(false);
+  const [isLoggedInError, setIsLoggedInError] = useState("");
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [openResetPassword, setOpenResetPassword] = useState(false);
+  const [openForgotPassword, setOpenForgotPassword] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [openOTPDialog, setOpenOTPDialog] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -60,54 +64,85 @@ function Login() {
     setShowPassword(!showPassword);
   };
 
-  const handleButtonClick = async () => {
-    setErrorMessage("");
+  const handleLogin = async (isLogout) => {
     try {
       const username = emailRef.current.value;
       const password = passwordRef.current.value;
-      const isLogout = true;
       const LOGIN_URL = `/users/login?username=${encodeURIComponent(
         username
       )}&password=${encodeURIComponent(password)}&isLogout=${isLogout}`;
       const loginResponse = await axiosInstance.post(LOGIN_URL, {});
-      const token = loginResponse.data?.data?.data;
-      sessionStorage.setItem("token", token);
-      if (loginResponse.data?.data?.messageCode === 110105) {
-        setErrorMessage("");
-        setIsAlertError(loginResponse.data?.data?.message);
-        setIsAlertOpen(true);
-      } else if (token && loginResponse.data?.data?.messageCode === 110101) {
-        const modules_roles_Url = `users/get_user_modules_and_roles?isChange=${false}`;
-        const moduleResponse = await axiosInstance.get(modules_roles_Url);
-        const modulesData = moduleResponse.data?.data?.data;
-        setModuleData(modulesData);
-        console.log(modulesData);
-        if (modulesData !== null) {
-          setErrorMessage("");
-          if (modulesData.length === 1 && modulesData[0].roles.length === 1) {
-            dispatch(setModulesRoles(modulesData));
-            const { moduleCode } = modulesData[0];
-            const { roleCode } = modulesData[0].roles[0];
-            if (moduleCode === -1 && roleCode === -1) {
-              navigate("./setup-table");
-            } else {
-              navigate("./dashboard");
-            }
-          } else {
-            setOpenSelectModule(true);
-          }
-        } else {
-          setErrorMessage("No modules data found.");
-        }
-      } else {
-        setErrorMessage(loginResponse?.data?.data?.message);
-      }
+      handleLoginResponse(loginResponse);
     } catch (error) {
       setErrorMessage(error.response?.data?.error);
     }
   };
 
-  const [openForgotPassword, setOpenForgotPassword] = useState(false);
+  const handleLoginResponse = async (loginResponse) => {
+    const token = loginResponse.data?.data?.data;
+    const messageCode = loginResponse.data?.data?.messageCode;
+    const message = loginResponse.data?.data?.message;
+
+    if (messageCode === 110105) {
+      setErrorMessage("");
+      setIsAlertError(message);
+      setIsAlertOpen(true);
+    } else if (messageCode === 110101 && token) {
+      sessionStorage.setItem("token", token);
+      await fetchModulesAndRoles(false);
+    } else if (messageCode === 110102) {
+      setErrorMessage("");
+      setIsLoggedInError(message);
+      setIsLoggedInOpen(true);
+    } else {
+      setErrorMessage(message);
+    }
+  };
+
+  const fetchModulesAndRoles = async (isChange) => {
+    try {
+      const modules_roles_Url = `users/get_user_modules_and_roles?isChange=${isChange}`;
+      const moduleResponse = await axiosInstance.get(modules_roles_Url);
+      const modulesData = moduleResponse.data?.data?.data;
+      setModuleData(modulesData);
+      if (modulesData) {
+        handleModulesData(modulesData);
+      } else {
+        setErrorMessage("No modules data found.");
+      }
+    } catch (error) {
+      setErrorMessage("Error fetching modules data.");
+    }
+  };
+
+  const handleModulesData = (modulesData) => {
+    if (modulesData.length === 1 && modulesData[0].roles.length === 1) {
+      const { moduleCode, roleCode } = modulesData[0];
+      navigate(
+        moduleCode === -1 && roleCode === -1 ? "./setup-table" : "./dashboard"
+      );
+    } else {
+      setOpenSelectModule(true);
+    }
+  };
+
+  const handleButtonClick = () => {
+    localStorage.clear()
+    sessionStorage.clear()
+    toggleFullscreen();
+    setErrorMessage("");
+    handleLogin(false);
+  };
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen()
+        .catch((error) => {
+          console.error("Fullscreen request failed:", error);
+        });
+    }
+  };
+
   const handleOpenForgotPassword = () => {
     setOpenForgotPassword(true);
   };
@@ -120,9 +155,6 @@ function Login() {
     }
   };
 
-  const [userEmail, setUserEmail] = useState("");
-
-  const [openOTPDialog, setOpenOTPDialog] = useState(false);
   const handleOpenOTPDialog = (email) => {
     setUserEmail(email);
     setOpenOTPDialog(true);
@@ -136,7 +168,6 @@ function Login() {
     }
   };
 
-  const [openResetPassword, setOpenResetPassword] = useState(false);
   const handleOpenResetPassword = () => {
     setOpenResetPassword(true);
   };
@@ -166,6 +197,14 @@ function Login() {
     setIsButtonDisabled(!username || !password);
   };
 
+  const handleCloseNoLoggedIn = () => {
+    setIsLoggedInOpen(false);
+  };
+
+  const handleCloseYesLoggedIn = () => {
+    setIsLoggedInOpen(false);
+    handleLogin(true);
+  };
   return (
     <>
       <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col">
@@ -442,11 +481,11 @@ function Login() {
       {/* Change default password */}
       <Dialog open={isAlertOpen}>
         <DialogTitle>
-          <p className="text-red-500 text-2xl text-center">Alert</p>
+          <span className="text-red-500 text-2xl text-center">Alert</span>
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            <p className="text-black">{isAlertError}</p>
+            <span className="text-black">{isAlertError}</span>
           </DialogContentText>
         </DialogContent>
         <DialogActions style={{ justifyContent: "center" }}>
@@ -456,6 +495,51 @@ function Login() {
             className="font-semibold bg-black text-gray-100 rounded-lg hover:bg-gray-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none px-4 py-2"
           >
             OK
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Is Logged In */}
+      <Dialog
+        open={isLoggedInOpen}
+        PaperProps={{
+          sx: {
+            maxWidth: "380px",
+            width: "100%",
+            maxHeight: "190px",
+            height: "100%",
+            borderRadius: "10px",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <HelpOutlineIcon sx={{ fontSize: "36px" }} />
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ textAlign: "center", fontSize: "14px" }}>
+            <span className="text-black">{isLoggedInError}</span>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "space-evenly", mb: 1 }}>
+          <button
+            type="button"
+            onClick={handleCloseYesLoggedIn}
+            className="bg-black text-gray-100 text-xs rounded-full hover:bg-gray-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none px-4 py-2"
+          >
+            YES
+          </button>
+          <button
+            type="button"
+            onClick={handleCloseNoLoggedIn}
+            className="bg-black text-gray-100 text-xs rounded-full hover:bg-gray-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none px-4 py-2"
+          >
+            NO
           </button>
         </DialogActions>
       </Dialog>

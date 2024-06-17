@@ -6,9 +6,6 @@ import "./Entitty.css";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import { IconButton } from "@mui/material";
 
-
-
-
 const ODD_OPACITY = 0.1;
 
 const StripedDataGrid = styled(DataGrid)(({ theme }) => ({

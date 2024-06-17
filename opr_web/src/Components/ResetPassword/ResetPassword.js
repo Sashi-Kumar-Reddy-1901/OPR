@@ -69,7 +69,7 @@ const ResetPassword = ({ onResetPasswordClose }) => {
                 <input
                   ref={passwordRef}
                   type={showPassword ? "text" : "password"}
-                  className="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-white placeholder-gray-500"
+                  className="w-full p-2 rounded-full font-medium bg-gray-100 border border-gray-500 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                   placeholder="Enter Password"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
@@ -92,15 +92,15 @@ const ResetPassword = ({ onResetPasswordClose }) => {
                     arrow
                     TransitionComponent={Zoom}
                   >
-                  <InfoSharpIcon
-                    style={{
-                      position: "absolute",
-                      right: "-30px",
-                      top: "1.4rem",
-                      transform: "translateY(-50%)",
-                      cursor: "pointer",
-                    }}
-                  />
+                    <InfoSharpIcon
+                      style={{
+                        position: "absolute",
+                        right: "-30px",
+                        top: "1.4rem",
+                        transform: "translateY(-50%)",
+                        cursor: "pointer",
+                      }}
+                    />
                   </Tooltip>
                 </div>
               </div>
@@ -113,9 +113,9 @@ const ResetPassword = ({ onResetPasswordClose }) => {
                 <input
                   ref={confirmPasswordRef}
                   type={showConfirmPassword ? "text" : "password"}
-                  className={`border ${
-                    passwordsMatch ? "border-grey-300" : "border-red-500"
-                  } text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-white placeholder-gray-500`}
+                  className={`w-full p-2 rounded-full font-medium bg-gray-100 border ${
+                    passwordsMatch ? "border-gray-500" : "border-red-500"
+                  } placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white`}
                   placeholder="Enter Password"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
@@ -138,7 +138,7 @@ const ResetPassword = ({ onResetPasswordClose }) => {
 
             <button
               onClick={handleButtonClick}
-              className="mt-8 bg-black text-gray-100 w-full py-2 rounded-lg hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+              className="mt-8 bg-black text-gray-100 w-full py-2 rounded-full hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
             >
               Submit
             </button>

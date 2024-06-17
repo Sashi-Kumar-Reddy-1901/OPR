@@ -3,8 +3,6 @@ import Select from "react-select";
 import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import "./SelectModule.css";
-import { useDispatch } from "react-redux";
-import { setModulesRoles } from "../../Redux-Slices/userSlice";
 
 const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const [selectedModule, setSelectedModule] = useState(null);
@@ -12,8 +10,6 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
   const [roleOptions, setRoleOptions] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
 
   useEffect(() => {
     // If there's only one module available, automatically select it
@@ -56,11 +52,6 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
         select_module_role_Url,
         {}
       );
-
-      const moduleLabel = selectedModule?.label;
-      const roleLabel = selectedRole?.label;
-      console.log(moduleLabel,roleLabel);
-      dispatch(setModulesRoles([{ moduleLabel, roleLabel }]));
 
       const settoken = module_role_response.data?.data?.data;
       sessionStorage.setItem("token", settoken);
@@ -106,7 +97,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
         placeholder="Select Module"
         isClearable
         isSearchable
-        className="custom-select-container rounded-3xl"
+        className="custom-select-container"
         classNamePrefix="custom-select"
         noOptionsMessage={() => "No modules available"}
       />
@@ -119,7 +110,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
           placeholder="Select Role"
           isClearable
           isSearchable
-          className="custom-select-container rounded-full"
+          className="custom-select-container"
           classNamePrefix="custom-select"
           isDisabled={!selectedModule}
           noOptionsMessage={() => "No roles available"}
@@ -128,7 +119,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
 
       <button
         onClick={handleButtonClick}
-        className="mt-8 bg-black text-gray-100 w-full py-2 rounded-lg hover:bg-slate-700 transition-all rounded-full duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+        className="mt-8 bg-black text-gray-100 w-full py-2 rounded-full hover:bg-slate-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
         disabled={!selectedRole}
       >
         Submit
