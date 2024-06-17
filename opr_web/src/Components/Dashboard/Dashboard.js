@@ -107,7 +107,7 @@ export default function Dashboard() {
   };
 
   const handleCloseSelectModule = () => {
-    setIsSelected(true);
+    setIsSelected(prevState => !prevState);
     setOpenSelectModule(false);
   };
 
