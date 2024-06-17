@@ -13,3 +13,7 @@
     background-color: black; /* Change to your desired color */
     color: white; /* Change text color if needed */
   }
+
+  .MuiDataGrid-root .MuiDataGrid-sortIcon{
+    color: white !important; /* Change to your desired color */
+  }

@@ -3,6 +3,8 @@ import axiosInstance from "../../api/axios";
 import { styled } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import SelectModule from "../SelectModule/SelectModule";
+import { useDispatch } from 'react-redux';
+import { callMethod } from "../../Redux-Slices/getEntitySlice";
 import {
   Box,
   CssBaseline,
@@ -101,6 +103,7 @@ export default function Dashboard() {
   const [roleName, setRoleName] = useState("");
   const [moduleName, setModuleName] = useState("");
   const [isSelected, setIsSelected] = useState(false);
+  const dispatch = useDispatch();
 
   const handleOpenModule = () => {
     setOpenSelectModule(true);
@@ -226,8 +229,11 @@ export default function Dashboard() {
       } catch (error) {
         console.error("Failed to select language:", error);
       }
+
+ 
       setLanguage(langMenuDesc[index]?.label);
       setLanguageSelected(langMenuDesc[index]?.label);
+      dispatch(callMethod());
     }
     setAnchorEl(null);
   };

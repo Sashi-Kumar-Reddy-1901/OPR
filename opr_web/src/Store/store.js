@@ -4,9 +4,10 @@ import { persistStore, persistReducer } from "redux-persist";
 import { combineReducers } from "redux";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
 import userReducer from "../Redux-Slices/userSlice"; // Adjust the import path accordingly
-
+import getEntityReducer from "../Redux-Slices/getEntitySlice";
 const rootReducer = combineReducers({
   user: userReducer,
+  method: getEntityReducer
 });
 
 const persistConfig = {

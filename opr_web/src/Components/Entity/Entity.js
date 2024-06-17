@@ -3,6 +3,8 @@ import axiosInstance from "../../api/axios";
 import { alpha, styled } from '@mui/material/styles';
 import { DataGrid, useGridApiRef, GridToolbar,gridClasses } from "@mui/x-data-grid";
 import "./Entitty.css";
+import { useDispatch, useSelector } from 'react-redux';
+import { resetMethodCall } from "../../Redux-Slices/getEntitySlice";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import { IconButton } from "@mui/material";
 
@@ -54,6 +56,8 @@ const Entity = () => {
   });
   const [sortModel, setSortModel] = useState([]);
   const [filterModel, setFilterModel] = useState({ items: [] });
+  const dispatch = useDispatch();
+  const shouldCallMethod = useSelector((state) => state.method.shouldCallMethod);
   const [headerName, setheaderName] = useState({"auth_remarks": "Auth Remarks","checker_time": "Checker"});
 
   const columns = [
@@ -78,7 +82,7 @@ const Entity = () => {
       const sort =
         sortModel.length > 0
           ? sortModel.map((sort) => ({ field: sort.field, order: sort.sort }))
-          : [{ field: "ulevel", order: "asc" }];
+          : [{ field: "ulevel", order: "asc" },{ field: "emailid", order: "asc" }];
       const response = await axiosInstance.post("/entity/get_entities", {
         pagination: {
           pageSize: paginationModel.pageSize,
@@ -110,8 +114,14 @@ const Entity = () => {
   };
 
   useEffect(() => {
+    if (shouldCallMethod) {
+      console.log('Method in Component2 called');
+      // Perform some actions here
+      dispatch(resetMethodCall()); // Reset the call state
+    }
     fetchData();
-  }, [paginationModel, sortModel, filterModel]);
+  }, [paginationModel, sortModel, filterModel,shouldCallMethod,dispatch]);
+
   const paginationMetaRef = useRef();
   const paginationMeta = useMemo(() => {
     const hasNextPage = data.length === paginationModel.pageSize;
