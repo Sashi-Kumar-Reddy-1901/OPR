@@ -61,14 +61,16 @@ const Entity = () => {
   const [headerName, setheaderName] = useState({"auth_remarks": "Auth Remarks","checker_time": "Checker"});
 
   const columns = [
-    { field: "authRemarks", headerName: headerName.auth_remarks, width: 130 , headerClassName: 'header-theme'},
-    { field: "checker", headerName: "Checker", width: 130, headerClassName: 'header-theme' },
-    { field: "checkerTime", headerName: headerName.checker_time, width: 130, headerClassName: 'header-theme' },
-    { field: "emailid", headerName: "Email Id", width: 130, headerClassName: 'header-theme' },
-    { field: "ulevel", headerName: "ULevel", width: 130, headerClassName: 'header-theme' },
-    { field: "entityStatus", headerName: "Entity Status", width: 130, headerClassName: 'header-theme' },
-    { field: "entityType", headerName: "EntityType", width: 130, headerClassName: 'header-theme' },
-    { field: "leCode", headerName: "LeCode", width: 200, headerClassName: 'header-theme' },
+    { field: "authRemarks", headerName: headerName.authRemarks, width: 130 , headerClassName: 'header-theme'},
+    { field: "emailid", headerName: headerName.emailid, width: 130, headerClassName: 'header-theme' },
+    { field: "ulevel", headerName: headerName.ulevel, width: 130, headerClassName: 'header-theme' },
+    { field: "unitName", headerName: headerName.unitName, width: 130, headerClassName: 'header-theme' },
+    { field: "entityStatus", headerName: headerName.entityStatus, width: 130, headerClassName: 'header-theme' },
+    { field: "entityType", headerName: headerName.entityType, width: 130, headerClassName: 'header-theme' },
+    { field: "checker", headerName: headerName.checker, width: 130, headerClassName: 'header-theme' },
+    { field: "checkerTime", headerName: headerName.checkerTime, width: 130, headerClassName: 'header-theme' },
+    { field: "maker", headerName: headerName.maker, width: 130, headerClassName: 'header-theme' },
+    { field: "makerTime", headerName: headerName.makerTime, width: 130, headerClassName: 'header-theme' },
   ];
 
   const fetchData = async () => {
@@ -100,6 +102,7 @@ const Entity = () => {
       length = response.data?.data?.data?.entityDTOList?.length;
       const totalRecords = response.data?.data?.data?.totalRecords;
       const columnHeader = response.data?.data?.data?.columnnHeadersForEntities;
+      console.log("columnHeader",columnHeader);
       setheaderName(columnHeader);
       console.log("totalreco",response.data?.data?.data?.totalRecords);
       console.log("length", length);
