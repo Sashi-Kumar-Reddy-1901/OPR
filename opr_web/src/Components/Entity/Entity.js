@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import axiosInstance from "../../api/axios";
 import { alpha, styled } from '@mui/material/styles';
-import { DataGrid, useGridApiRef, GridToolbar,gridClasses } from "@mui/x-data-grid";
+import { DataGrid, useGridApiRef, gridClasses } from "@mui/x-data-grid";
 import "./Entitty.css";
 import { useDispatch, useSelector } from 'react-redux';
 import { resetMethodCall } from "../../Redux-Slices/getEntitySlice";
-import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
-import { IconButton } from "@mui/material";
+import CustomToolbar from './CustomToolbar';
+import CustomHeader from "./CustomHeader";
 
 const ODD_OPACITY = 0.1;
 
@@ -28,10 +28,9 @@ const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
         backgroundColor: alpha(
           theme.palette.primary.main,
           ODD_OPACITY +
-            theme.palette.action.selectedOpacity +
-            theme.palette.action.hoverOpacity,
+          theme.palette.action.selectedOpacity +
+          theme.palette.action.hoverOpacity,
         ),
-        // Reset on touch devices, it doesn't add specificity
         '@media (hover: none)': {
           backgroundColor: alpha(
             theme.palette.primary.main,
@@ -43,12 +42,10 @@ const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
   },
 }));
 
-
 const Entity = () => {
   const apiRef = useGridApiRef();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [rowCount, setRowCount] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -58,7 +55,7 @@ const Entity = () => {
   const [filterModel, setFilterModel] = useState({ items: [] });
   const dispatch = useDispatch();
   const shouldCallMethod = useSelector((state) => state.method.shouldCallMethod);
-  const [headerName, setheaderName] = useState({"auth_remarks": "Auth Remarks","checker_time": "Checker"});
+  const [headerName, setheaderName] = useState({ "auth_remarks": "Auth Remarks", "checker_time": "Checker" });
 
   const columns = [
     { field: "authRemarks", headerName: headerName.authRemarks, width: 130 , headerClassName: 'header-theme'},
@@ -73,57 +70,48 @@ const Entity = () => {
     { field: "makerTime", headerName: headerName.makerTime, width: 130, headerClassName: 'header-theme' },
   ];
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       let searchT = "";
-      console.log(filterModel.quickFilterValues);
       if (filterModel.quickFilterValues) {
         searchT = filterModel.quickFilterValues.toString();
       }
       const sort =
         sortModel.length > 0
           ? sortModel.map((sort) => ({ field: sort.field, order: sort.sort }))
-          : [{ field: "ulevel", order: "asc" },{ field: "emailid", order: "asc" }];
+          : [{ field: "ulevel", order: "asc" }, { field: "emailid", order: "asc" }];
       const response = await axiosInstance.post("/entity/get_entities", {
         pagination: {
           pageSize: paginationModel.pageSize,
           pageNo: paginationModel.page + 1,
         },
         search: {
-          fields: [ "emailid"],
+          fields: ["emailid"],
           keyword: searchT,
         },
-
         sort: sort,
-      });  
+      });
       const resData = response.data?.data?.data?.entityDTOList;
-      let length;
-      length = response.data?.data?.data?.entityDTOList?.length;
       const totalRecords = response.data?.data?.data?.totalRecords;
       const columnHeader = response.data?.data?.data?.columnnHeadersForEntities;
       console.log("columnHeader",columnHeader);
       setheaderName(columnHeader);
-      console.log("totalreco",response.data?.data?.data?.totalRecords);
-      console.log("length", length);
-      console.log("resDaya", resData);
       setData(resData);
       setRowCount(totalRecords);
     } catch (error) {
-      setError(error);
+     console.log(error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterModel, paginationModel.pageSize, paginationModel.page, sortModel]);
 
   useEffect(() => {
     if (shouldCallMethod) {
-      console.log('Method in Component2 called');
-      // Perform some actions here
-      dispatch(resetMethodCall()); // Reset the call state
+      dispatch(resetMethodCall());
     }
     fetchData();
-  }, [paginationModel, sortModel, filterModel,shouldCallMethod,dispatch]);
+  }, [paginationModel, sortModel, filterModel, shouldCallMethod, dispatch, fetchData]);
 
   const paginationMetaRef = useRef();
   const paginationMeta = useMemo(() => {
@@ -132,18 +120,29 @@ const Entity = () => {
       paginationMetaRef.current = { hasNextPage };
     }
     return paginationMetaRef.current;
-  }, [data]);
+  }, [data, paginationModel.pageSize]);
+
+  const handleQuickFilterChange = (searchValue) => {
+    setFilterModel((prev) => ({
+      ...prev,
+      quickFilterValues: searchValue ? [searchValue] : [],
+    }));
+  };
+  const handleCellClick = (cellData) => {
+    console.log(cellData);
+  }
 
   return (
     <>
       <div style={{ width: "100%", marginTop: "50px" }}>
-        <div className="sectionHeader"></div>
-        <div className="mt-2" style={{ height: "72vh" }}>
+        <CustomHeader/>
+        <div className="mt-2" style={{ height: "74vh" }}>
           <StripedDataGrid
             apiRef={apiRef}
             rows={data}
-             getRowClassName={(params) =>
-          params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'}
+            getRowClassName={(params) =>
+              params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
+            }
             columns={columns}
             getRowId={(row) => `${row.ucode}_${row.checkerTime}`}
             loading={loading}
@@ -154,6 +153,7 @@ const Entity = () => {
             paginationMeta={paginationMeta}
             onPaginationModelChange={setPaginationModel}
             sortingMode="server"
+            density="compact"
             sortModel={sortModel}
             rowCount={rowCount}
             onSortModelChange={(newSortModel) => setSortModel(newSortModel)}
@@ -162,15 +162,14 @@ const Entity = () => {
             onFilterModelChange={(newFilterModel) =>
               setFilterModel(newFilterModel)
             }
-            slots={{ toolbar: GridToolbar }}
+            slots={{ toolbar: CustomToolbar }}
             slotProps={{
               toolbar: {
-                showQuickFilter: true,
+                onSearchChange: handleQuickFilterChange,
               },
             }}
-            initialState={{
-              density: "compact",
-            }}
+            onCellClick={(params) => handleCellClick(params)}
+            rowHeight={45}
           />
         </div>
       </div>

@@ -1,6 +1,7 @@
 .parent-node .MuiTreeItem-label {
   font-size: 14px !important;
   width: auto !important;
+  font-weight: 600!important;
 }
 
 .child-node .MuiTreeItem-label {

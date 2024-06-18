@@ -1,19 +1,16 @@
-.sectionHeader {
-    width: 100%;
-    height: 50px;
-    border: 1px solid rgba(224, 224, 224, 1);
-    border-radius: 4px;
-}
-
 .MuiDataGrid-footerContainer {
-    height: 20px !important;
-    min-height: 35px !important;
+  height: 20px !important;
+  min-height: 35px !important;
 }
-.header-theme {
-    background-color: black; /* Change to your desired color */
-    color: white; /* Change text color if needed */
-  }
 
-  .MuiDataGrid-root .MuiDataGrid-sortIcon{
-    color: white !important; /* Change to your desired color */
-  }
+.header-theme {
+  color: white;
+}
+
+.MuiDataGrid-root .MuiDataGrid-sortIcon {
+  color: white !important;
+}
+
+.MuiDataGrid-root .MuiDataGrid-container--top [role=row]{
+  background: black !important;
+}

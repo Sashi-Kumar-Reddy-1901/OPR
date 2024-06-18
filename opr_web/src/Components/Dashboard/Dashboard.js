@@ -110,7 +110,7 @@ export default function Dashboard() {
   };
 
   const handleCloseSelectModule = () => {
-    setIsSelected(prevState => !prevState);
+    setIsSelected((prevState) => !prevState);
     setOpenSelectModule(false);
   };
 
@@ -131,13 +131,19 @@ export default function Dashboard() {
           axiosInstance.get("/users/get_entitlements"),
         ]);
 
-        const {langName,loginTime,displayName,userId,roleName,moduleName } =
-          tokenDetailsResponse?.data?.data?.data;
+        const {
+          langName,
+          loginTime,
+          displayName,
+          userId,
+          roleName,
+          moduleName,
+        } = tokenDetailsResponse?.data?.data?.data;
         setLanguage(langName);
         setDisplayName(displayName);
         setUserId(userId);
         setRoleName(roleName);
-        setModuleName(moduleName)
+        setModuleName(moduleName);
 
         const date = new Date(loginTime);
         const day = date.getDate().toString().padStart(2, "0");
@@ -212,7 +218,6 @@ export default function Dashboard() {
 
   const handleChangeLanguage = (event) => {
     setAnchorEl(event.currentTarget);
-    
   };
 
   const handleCloseChangeLanguage = async (event, index) => {
@@ -245,7 +250,7 @@ export default function Dashboard() {
         <AppBar
           position="fixed"
           elevation={4}
-          sx={{ backgroundColor: "black", height: 50 }}
+          sx={{ backgroundColor: "white", height: 50 }}
         >
           <Toolbar
             sx={{
@@ -259,23 +264,19 @@ export default function Dashboard() {
             }}
           >
             <IconButton
-              color="inherit"
               aria-label="open drawer"
               onClick={() => {
                 setOpen(!open);
               }}
               edge="start"
             >
-              <MenuIcon />
+              <MenuIcon style={{color:"black"}}/>
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
-              Dashboard
-            </Typography>
 
             <Box sx={{ flexGrow: 1 }} />
             <Tooltip title="Logout" arrow TransitionComponent={Zoom}>
-              <IconButton color="inherit" onClick={handleLogout}>
-                <LogoutIcon />
+              <IconButton onClick={handleLogout}>
+                <LogoutIcon style={{color:"black"}}/>
               </IconButton>
             </Tooltip>
           </Toolbar>
@@ -304,13 +305,23 @@ export default function Dashboard() {
                 className="parent-node"
               >
                 {node.nodes.map((subNode) => (
-                  <TreeItem
+                  <Tooltip
                     key={subNode.labelCode}
-                    itemId={subNode.labelCode}
-                    label={subNode.label}
-                    className="child-node"
-                    onClick={() => handleNavigateClick(subNode)}
-                  />
+                    title={subNode.label}
+                    arrow
+                    TransitionComponent={Zoom}
+                    placement="right"
+                  >
+                    <div>
+                      <TreeItem
+                        key={subNode.labelCode}
+                        itemId={subNode.labelCode}
+                        label={subNode.label}
+                        className="child-node"
+                        onClick={() => handleNavigateClick(subNode)}
+                      />
+                    </div>
+                  </Tooltip>
                 ))}
               </TreeItem>
             ))}
