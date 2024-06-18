@@ -97,7 +97,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
         placeholder="Select Module"
         isClearable
         isSearchable
-        className="custom-select-container"
+        className="custom-select-section"
         classNamePrefix="custom-select"
         noOptionsMessage={() => "No modules available"}
       />
@@ -110,7 +110,7 @@ const SelectModule = ({ ModuleData, onCloseSelectModule }) => {
           placeholder="Select Role"
           isClearable
           isSearchable
-          className="custom-select-container"
+          className="custom-select-section"
           classNamePrefix="custom-select"
           isDisabled={!selectedModule}
           noOptionsMessage={() => "No roles available"}

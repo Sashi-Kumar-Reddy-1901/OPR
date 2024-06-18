@@ -14,7 +14,7 @@ const CustomHeader = () => {
   ];
 
   return (
-    <div>
+
       <div className="select-container">
         <div className="select-wrapper">
           <label className="select-label">Head Office</label>
@@ -61,7 +61,7 @@ const CustomHeader = () => {
           />
         </div>
       </div>
-    </div>
+
   );
 };
 

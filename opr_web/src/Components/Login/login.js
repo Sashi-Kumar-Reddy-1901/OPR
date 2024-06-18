@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Logo from "../../Images/Finakon Svg.svg";
+import Logo from "../../logo.svg";
 import axiosInstance from "../../api/axios";
 import "./login.css";
 import Visibility from "@mui/icons-material/Visibility";
@@ -209,7 +209,7 @@ function Login() {
     <>
       <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col">
         {/* Header */}
-        <header className="bg-black py-4">
+        <header className="bg-white py-4">
           <div className="max-w-screen-xl mx-auto px-4 flex justify-between items-center">
             <img src={Logo} alt="1" className="header-image" />
           </div>
@@ -217,7 +217,7 @@ function Login() {
         <div className="max-w-screen-xl m-0 sm:m-2 bg-white shadow sm:rounded-lg flex justify-center flex-1">
           <div className="lg:w-1/2 xl:w-6/12 p-6 sm:p-8">
             <div>
-              <h1 className="text-4xl font-bold">Finakon</h1>
+              <h1 className="text-4xl font-bold text-center">Finakon</h1>
             </div>
             <div className="mt-8 flex flex-col items-center">
               <div className="w-full flex-1 mt-8">
@@ -277,7 +277,7 @@ function Login() {
                     >
                       Login{" "}
                     </button>
-                    <div className="mt-2">
+                    <div className="mt-2 text-center">
                       <span
                         style={{ cursor: "pointer" }}
                         onClick={handleOpenForgotPassword}
@@ -296,8 +296,8 @@ function Login() {
         </div>
 
         {/* Footer */}
-        <footer className="bg-black text-white py-4">
-          <div className="max-w-screen-xl mx-auto px-4">
+        <footer className="bg-white text-black py-4">
+          <div className="max-w-screen-xl mx-auto px-4 text-center">
             <p style={{ margin: "0" }}>Powered by Finakon®</p>
           </div>
         </footer>

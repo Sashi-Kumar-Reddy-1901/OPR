@@ -59,6 +59,8 @@ const Entity = () => {
   const [headerName, setheaderName] = useState({ "auth_remarks": "Auth Remarks", "checker_time": "Checker" });
 
   const columns = [
+    { field: "ucode", headerName: headerName.ucode, width: 130, headerClassName: 'header-theme' },
+    { field: "puc", headerName: headerName.puc, width: 130, headerClassName: 'header-theme' },
     { field: "authRemarks", headerName: headerName.authRemarks, width: 130 , headerClassName: 'header-theme'},
     { field: "emailid", headerName: headerName.emailid, width: 130, headerClassName: 'header-theme' },
     { field: "ulevel", headerName: headerName.ulevel, width: 130, headerClassName: 'header-theme' },
@@ -69,6 +71,7 @@ const Entity = () => {
     { field: "checkerTime", headerName: headerName.checkerTime, width: 130, headerClassName: 'header-theme' },
     { field: "maker", headerName: headerName.maker, width: 130, headerClassName: 'header-theme' },
     { field: "makerTime", headerName: headerName.makerTime, width: 130, headerClassName: 'header-theme' },
+    { field: "status", headerName: headerName.status, width: 130, headerClassName: 'header-theme' },
   ];
 
   const fetchData = useCallback(async () => {
