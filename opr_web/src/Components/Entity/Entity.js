@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { resetMethodCall } from "../../Redux-Slices/getEntitySlice";
 import CustomToolbar from './CustomToolbar';
 import CustomHeader from "./CustomHeader";
+import { setEntityHeaders, setEntityRowData } from "../../Redux-Slices/getEntitySlice";
 
 const ODD_OPACITY = 0.1;
 
@@ -97,6 +98,7 @@ const Entity = () => {
       const columnHeader = response.data?.data?.data?.columnnHeadersForEntities;
       console.log("columnHeader",columnHeader);
       setheaderName(columnHeader);
+      dispatch(setEntityHeaders(columnHeader));
       setData(resData);
       setRowCount(totalRecords);
     } catch (error) {
@@ -129,7 +131,8 @@ const Entity = () => {
     }));
   };
   const handleCellClick = (cellData) => {
-    console.log(cellData);
+    console.log("rowData",cellData.row);
+    dispatch(setEntityRowData(cellData.row));
   }
 
   return (

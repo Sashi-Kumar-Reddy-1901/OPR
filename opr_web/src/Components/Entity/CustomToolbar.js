@@ -11,11 +11,16 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import GppGoodIcon from "@mui/icons-material/GppGood";
+import { useNavigate } from "react-router-dom";
 
 const CustomToolbar = ({ onSearchChange }) => {
   const handleSearchChange = (event) => {
     onSearchChange(event.target.value);
   };
+  const navigate = useNavigate();
+const AddEntity = () =>{
+  navigate("/dashboard/entity-details");
+}
 
   return (
     <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
@@ -64,7 +69,7 @@ const CustomToolbar = ({ onSearchChange }) => {
             onChange={handleSearchChange}
           />
         </Paper>
-        <IconButton color="inherit" aria-label="add">
+        <IconButton  onClick={AddEntity} color="inherit" aria-label="add">
           <Tooltip title="Add Entity" arrow TransitionComponent={Zoom}>
             <PersonAddAlt1Icon />
           </Tooltip>
