@@ -1,0 +1,76 @@
+.select-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-around;
+}
+
+.select-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.select-label {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.custom-select-container {
+  width: 170px;
+}
+
+.custom-select__menu {
+  margin-top: 0 !important;
+  max-height: 200px !important;
+}
+
+.custom-select__menu-list {
+  max-height: 104px !important;
+  padding: 0 !important;
+}
+
+.custom-select__option,
+.custom-select__single-value,
+.custom-select__placeholder {
+  font-size: 12px !important;
+}
+
+.custom-select__option {
+  background-color: transparent !important;
+  cursor: pointer !important;
+}
+
+.custom-select__option--is-focused {
+  background-color: #ccc !important;
+  color: black !important;
+}
+
+.custom-select__option--is-selected {
+  color: black !important;
+  background-color: transparent !important;
+}
+
+.custom-select__control,
+.custom-select__control--is-focused {
+  border-color: #000 !important;
+  box-shadow: none !important;
+}
+
+.MuiDataGrid-columnsManagement {
+  max-height: 200px !important;
+}
+
+.MuiFormControlLabel-root .MuiFormControlLabel-label {
+  font-size: 12px;
+}
+
+button {
+  font-size: 12px !important;
+}
+
+.css-2qz4sq-MuiPaper-root-MuiDataGrid-paper {
+  min-width: 215px !important;
+  max-height: 235px !important;
+  width: 100px !important;
+}

@@ -5,8 +5,9 @@ import { DataGrid, useGridApiRef, gridClasses } from "@mui/x-data-grid";
 import "./Entitty.css";
 import { useDispatch, useSelector } from 'react-redux';
 import { resetMethodCall } from "../../Redux-Slices/getEntitySlice";
-import CustomToolbar from './CustomToolbar';
-import CustomHeader from "./CustomHeader";
+import CustomToolbar from '../Custom/CustomToolbar';
+import CustomHeader from "../Custom/CustomHeader";
+import CustomPagination from "../Custom/CustomPagination";
 import { setEntityHeaders, setEntityRowData } from "../../Redux-Slices/getEntitySlice";
 
 const ODD_OPACITY = 0.1;
@@ -85,7 +86,7 @@ const Entity = () => {
         sortModel.length > 0
           ? sortModel.map((sort) => ({ field: sort.field, order: sort.sort }))
           : [{ field: "ulevel", order: "asc" }, { field: "emailid", order: "asc" }];
-      const response = await axiosInstance.post("/entity/get_entities", {
+      const response = await axiosInstance.post("/entity/get_entities/{level}?level=2", {
         pagination: {
           pageSize: paginationModel.pageSize,
           pageNo: paginationModel.page + 1,
@@ -99,13 +100,13 @@ const Entity = () => {
       const resData = response.data?.data?.data?.entityDTOList;
       const totalRecords = response.data?.data?.data?.totalRecords;
       const columnHeader = response.data?.data?.data?.columnnHeadersForEntities;
-      console.log("columnHeader",columnHeader);
+      console.log("columnHeader", columnHeader);
       setheaderName(columnHeader);
       dispatch(setEntityHeaders(columnHeader));
       setData(resData);
       setRowCount(totalRecords);
     } catch (error) {
-     console.log(error);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -134,14 +135,14 @@ const Entity = () => {
     }));
   };
   const handleCellClick = (cellData) => {
-    console.log("rowData",cellData.row);
+    console.log("rowData", cellData.row);
     dispatch(setEntityRowData(cellData.row));
   }
 
   return (
     <>
       <div style={{ width: "100%", marginTop: "50px" }}>
-        <CustomHeader/>
+        <CustomHeader />
         <div className="mt-2" style={{ height: "74vh" }}>
           <StripedDataGrid
             apiRef={apiRef}
@@ -168,7 +169,10 @@ const Entity = () => {
             onFilterModelChange={(newFilterModel) =>
               setFilterModel(newFilterModel)
             }
-            slots={{ toolbar: CustomToolbar }}
+            slots={{
+              toolbar: CustomToolbar,
+              pagination: CustomPagination, // Add this line to use CustomPagination
+            }}
             slotProps={{
               toolbar: {
                 onSearchChange: handleQuickFilterChange,

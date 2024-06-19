@@ -12,6 +12,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import GppGoodIcon from "@mui/icons-material/GppGood";
 import { useNavigate } from "react-router-dom";
+import './Custom.css'
 
 const CustomToolbar = ({ onSearchChange }) => {
   const handleSearchChange = (event) => {
