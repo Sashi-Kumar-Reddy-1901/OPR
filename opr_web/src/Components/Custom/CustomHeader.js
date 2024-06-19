@@ -33,9 +33,9 @@ const CustomHeader = () => {
             return acc;
           }, {});
           setHoOption(grouped[1] || []);
-          setRoOptions(grouped[2] || []);
-          setBankOptions(grouped[3] || []);
-          setBranchOptions(grouped[4] || []);
+          setRoOptions([{ value: "all", label: "-- All --" }, ...(grouped[2] || [])]);
+          setBankOptions([{ value: "all", label: "-- All --" }, ...(grouped[3] || [])]);
+          setBranchOptions([{ value: "all", label: "-- All --" }, ...(grouped[4] || [])]);
         }
       } catch (error) {
         console.log("Error fetching config:", error);
