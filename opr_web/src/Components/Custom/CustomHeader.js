@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import Select from "react-select";
 import "./Custom.css";
+import axiosInstance from "../../api/axios";
 
 const CustomHeader = () => {
   const [selectValue1, setSelectValue1] = useState(null);
@@ -12,6 +13,23 @@ const CustomHeader = () => {
     { value: "option1", label: "Option 1" },
     { value: "option2", label: "Option 2" },
   ];
+
+  useEffect(() => {
+    const fetchVisibleEntities = async () => {
+      try {
+        const response = await axiosInstance.post("/common-utils/call-stored-procedure",{
+          "procedure": "get_visible_entities",
+          "level": 0,
+          "incSelf": true
+        });
+        console.log(response.data?.data);
+      } catch (error) {
+        console.log("Error fetching config:", error);
+      }
+    };
+    fetchVisibleEntities();
+  }, []);
+  
 
   return (
 

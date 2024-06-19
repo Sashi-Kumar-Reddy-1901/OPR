@@ -127,8 +127,8 @@ function Login() {
   };
 
   const handleButtonClick = () => {
-    localStorage.clear()
-    sessionStorage.clear()
+    localStorage.clear();
+    sessionStorage.clear();
     toggleFullscreen();
     setErrorMessage("");
     handleLogin(false);
