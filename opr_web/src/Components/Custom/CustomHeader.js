@@ -67,12 +67,12 @@ const CustomHeader = () => {
   return (
     <div className="select-container">
     {levelLabels.map((level) => {
-      const isHeadOffice = level.Unit_Level === 1;
-      const levelOptions = options[level.Unit_Level] || [];
+     const isHeadOffice = level.Unit_Level === 1;
+     const levelOptions = options[level.Unit_Level] ? [...options[level.Unit_Level]] : [];
 
-      if (!isHeadOffice && levelOptions.length > 1) {
-        levelOptions.unshift({ value: "all", label: "-- All --" });
-      }
+     if (!isHeadOffice && levelOptions.length > 1 && !levelOptions.some(option => option.value === "all")) {
+       levelOptions.unshift({ value: "all", label: "-- All --" });
+     }       
 
       return (
         <div className="select-wrapper" key={level.Unit_Level}>
