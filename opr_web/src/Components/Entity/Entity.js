@@ -47,8 +47,10 @@ const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
 const Entity = () => {
   const apiRef = useGridApiRef();
   const [data, setData] = useState([]);
+  const [ucode, setUcode] = useState(["HO"]);
   const [loading, setLoading] = useState(true);
   const [rowCount, setRowCount] = useState(0);
+  const [level, setlevel] = useState(1);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
@@ -86,7 +88,7 @@ const Entity = () => {
         sortModel.length > 0
           ? sortModel.map((sort) => ({ field: sort.field, order: sort.sort }))
           : [{ field: "ulevel", order: "asc" }, { field: "emailid", order: "asc" }];
-      const response = await axiosInstance.post("/entity/get_entities/{level}?level=2", {
+      const response = await axiosInstance.post(`/entity/get_entities/{level}?level=${level}`, {
         pagination: {
           pageSize: paginationModel.pageSize,
           pageNo: paginationModel.page + 1,
@@ -97,8 +99,14 @@ const Entity = () => {
         },
         sort: sort,
       });
-      const resData = response.data?.data?.data?.entityDTOList;
-      const totalRecords = response.data?.data?.data?.totalRecords;
+      let resData = response.data?.data?.data?.entityDTOList;
+      let totalRecords = response.data?.data?.data?.totalRecords;
+      console.log("resData", resData)
+      if(resData!== undefined && ucode !== "all"){
+       resData =   resData.filter((e)=>{
+         return  e.ucode === ucode;
+        })
+      }
       const columnHeader = response.data?.data?.data?.columnnHeadersForEntities;
       console.log("columnHeader", columnHeader);
       setheaderName(columnHeader);
@@ -110,8 +118,14 @@ const Entity = () => {
     } finally {
       setLoading(false);
     }
-  }, [filterModel, paginationModel.pageSize, paginationModel.page, sortModel]);
-
+  }, [filterModel, paginationModel.pageSize, paginationModel.page, sortModel, level,ucode]);
+  
+  const handleLevelChange = (data) =>{
+    console.log(data);
+    // setlevel(data)
+    setlevel(data.level);
+    setUcode(data.ucode);
+  } 
   useEffect(() => {
     if (shouldCallMethod) {
       dispatch(resetMethodCall());
@@ -142,7 +156,7 @@ const Entity = () => {
   return (
     <>
       <div style={{ width: "100%", marginTop: "50px" }}>
-        <CustomHeader />
+        <CustomHeader selectedLevel = {handleLevelChange} />
         <div className="mt-2" style={{ height: "74vh" }}>
           <StripedDataGrid
             apiRef={apiRef}

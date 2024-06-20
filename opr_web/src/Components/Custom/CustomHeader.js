@@ -3,7 +3,7 @@ import Select from "react-select";
 import "./Custom.css";
 import axiosInstance from "../../api/axios";
 
-const CustomHeader = () => {
+const CustomHeader = ({selectedLevel}) => {
   const [selectHo, setSelectHo] = useState(null);
   const [selectRo, setSelectRo] = useState(null);
   const [selectBank, setSelectBank] = useState(null);
@@ -44,6 +44,16 @@ const CustomHeader = () => {
     fetchVisibleEntities();
   }, []);
 
+  const handleRoChange= (selectedOption)=>{
+    console.log("selected option", selectedOption);
+    const selectedRow = {
+      level: 2,
+      ucode: selectedOption.value
+    }
+    setSelectRo(selectedOption);
+    selectedLevel(selectedRow);
+  }
+
   return (
     <div className="select-container">
       <div className="select-wrapper">
@@ -61,7 +71,7 @@ const CustomHeader = () => {
         <label className="select-label">Regional Office</label>
         <Select
           value={selectRo}
-          onChange={setSelectRo}
+          onChange={handleRoChange}
           options={roOptions}
           placeholder="Select RO"
           className="custom-select-container"
