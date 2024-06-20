@@ -462,13 +462,13 @@ export default function Dashboard() {
           horizontal: "left",
         }}
       >
-        {langMenuDesc.map((item, index) => (
+        {langMenuDesc.map((option, index) => (
           <MenuItem
-            key={item.value}
+            key={option.value}
             selected={selectedIndex === index}
             onClick={(event) => handleCloseChangeLanguage(event, index)}
           >
-            {item.label}
+            {option.label}
           </MenuItem>
         ))}
       </Menu>

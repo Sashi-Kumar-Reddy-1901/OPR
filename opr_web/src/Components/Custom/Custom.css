@@ -1,7 +1,9 @@
 .select-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  background-color: #000;
+  padding: 4px;
+  border-radius: 4px;
   justify-content: space-around;
 }
 
@@ -14,10 +16,11 @@
 .select-label {
   font-weight: bold;
   font-size: 12px;
+  color: white;
 }
 
 .custom-select-container {
-  width: 170px;
+  width: 140px;
 }
 
 .custom-select__menu {

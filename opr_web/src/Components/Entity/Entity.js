@@ -67,6 +67,7 @@ const Entity = () => {
     { field: "authRemarks", headerName: headerName.authRemarks, width: 130 , headerClassName: 'header-theme'},
     { field: "emailid", headerName: headerName.emailid, width: 130, headerClassName: 'header-theme' },
     { field: "ulevel", headerName: headerName.ulevel, width: 130, headerClassName: 'header-theme' },
+    { field: "status", headerName: headerName.status, width: 130, headerClassName: 'header-theme' },
     { field: "unitName", headerName: headerName.unitName, width: 130, headerClassName: 'header-theme' },
     { field: "entityStatus", headerName: headerName.entityStatus, width: 130, headerClassName: 'header-theme' },
     { field: "entityType", headerName: headerName.entityType, width: 130, headerClassName: 'header-theme' },
@@ -74,7 +75,6 @@ const Entity = () => {
     { field: "checkerTime", headerName: headerName.checkerTime, width: 130, headerClassName: 'header-theme' },
     { field: "maker", headerName: headerName.maker, width: 130, headerClassName: 'header-theme' },
     { field: "makerTime", headerName: headerName.makerTime, width: 130, headerClassName: 'header-theme' },
-    { field: "status", headerName: headerName.status, width: 130, headerClassName: 'header-theme' },
   ];
 
   const fetchData = useCallback(async () => {
@@ -157,7 +157,7 @@ const Entity = () => {
     <>
       <div style={{ width: "100%", marginTop: "50px" }}>
         <CustomHeader selectedLevel = {handleLevelChange} />
-        <div className="mt-2" style={{ height: "74vh" }}>
+        <div className="mt-2" style={{ height: "73vh" }}>
           <StripedDataGrid
             apiRef={apiRef}
             rows={data}

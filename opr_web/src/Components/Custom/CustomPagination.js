@@ -13,10 +13,15 @@ function Pagination({ page, onPageChange, className }) {
 
   return (
     <MuiPagination
-      color="primary"
+      // color="primary"
+      showFirstButton
+      showLastButton
       className={className}
+       size="small"
       count={pageCount}
       page={page + 1}
+      variant="outlined"
+      shape="rounded"
       onChange={(event, newPage) => {
         onPageChange(event, newPage - 1);
       }}

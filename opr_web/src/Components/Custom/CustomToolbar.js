@@ -20,7 +20,13 @@ const CustomToolbar = ({ onSearchChange }) => {
   };
   const navigate = useNavigate();
 const AddEntity = () =>{
-  navigate("/dashboard/entity-details");
+  navigate("/dashboard/entity-details?Add");
+}
+const ViewEntity = () =>{
+  navigate("/dashboard/entity-details?View");
+}
+const EditEntity = () =>{
+  navigate("/dashboard/entity-details?Edit");
 }
 
   return (
@@ -75,12 +81,12 @@ const AddEntity = () =>{
             <PersonAddAlt1Icon />
           </Tooltip>
         </IconButton>
-        <IconButton color="inherit" aria-label="view">
+        <IconButton onClick={ViewEntity} color="inherit" aria-label="view">
           <Tooltip title="View Entity" arrow TransitionComponent={Zoom}>
             <VisibilityIcon />
           </Tooltip>
         </IconButton>
-        <IconButton color="inherit" aria-label="edit">
+        <IconButton onClick={EditEntity} color="inherit" aria-label="edit">
           <Tooltip title="Edit Entity" arrow TransitionComponent={Zoom}>
             <EditNoteIcon />
           </Tooltip>
