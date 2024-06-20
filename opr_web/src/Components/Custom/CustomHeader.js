@@ -13,6 +13,7 @@ const CustomHeader = () => {
   const shouldCallMethod = useSelector(
     (state) => state.method.shouldCallMethod
   );
+
   useEffect(() => {
     if (shouldCallMethod) {
       dispatch(resetMethodCall());
@@ -65,20 +66,29 @@ const CustomHeader = () => {
 
   return (
     <div className="select-container">
-      {levelLabels.map((level) => (
+    {levelLabels.map((level) => {
+      const isHeadOffice = level.Unit_Level === 1;
+      const levelOptions = options[level.Unit_Level] || [];
+
+      if (!isHeadOffice && levelOptions.length > 1) {
+        levelOptions.unshift({ value: "all", label: "-- All --" });
+      }
+
+      return (
         <div className="select-wrapper" key={level.Unit_Level}>
           <label className="select-label">{level.Level_Desc}</label>
           <Select
             value={selects[level.Unit_Level] || null}
             onChange={handleSelectChange(level.Unit_Level)}
-            options={options[level.Unit_Level] || []}
+            options={levelOptions}
             placeholder="Select"
             className="custom-select-container"
             classNamePrefix="custom-select"
           />
         </div>
-      ))}
-    </div>
+      );
+    })}
+  </div>
   );
 };
 
