@@ -121,7 +121,7 @@ const Entity = () => {
   }, [filterModel, paginationModel.pageSize, paginationModel.page, sortModel, level,ucode]);
   
   const handleLevelChange = (data) =>{
-    console.log(data);
+    console.log("Data",data);
     // setlevel(data)
     setlevel(data.level);
     setUcode(data.ucode);

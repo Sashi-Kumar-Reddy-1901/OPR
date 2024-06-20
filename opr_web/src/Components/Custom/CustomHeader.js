@@ -5,7 +5,7 @@ import axiosInstance from "../../api/axios";
 import { resetMethodCall } from "../../Redux-Slices/getEntitySlice";
 import { useSelector, useDispatch } from "react-redux";
 
-const CustomHeader = () => {
+const CustomHeader = ({selectedLevel}) => {
   const [selects, setSelects] = useState({});
   const [options, setOptions] = useState({});
   const [levelLabels, setLevelLabels] = useState([]);
@@ -61,8 +61,14 @@ const CustomHeader = () => {
   }, [shouldCallMethod]);
 
   const handleSelectChange = (unitLevel) => (selectedOption) => {
-    setSelects((prevState) => ({ ...prevState, [unitLevel]: selectedOption }));
-  };
+    setSelects((prevState) => {
+      const newSelects = { ...prevState, [unitLevel]: selectedOption };
+      console.log(selectedOption);
+      console.log(newSelects);
+      selectedLevel({ level: unitLevel, ucode: selectedOption.value });
+      return newSelects;
+    });
+  };  
 
   return (
     <div className="select-container">
