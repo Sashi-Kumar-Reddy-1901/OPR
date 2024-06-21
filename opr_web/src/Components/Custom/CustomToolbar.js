@@ -65,7 +65,7 @@ const EditEntity = () =>{
             alignItems: "center",
             width: 180,
             border: "1px solid grey",
-            height:"30px"
+            height:"25px"
           }}
         >
           <SearchIcon />

@@ -19,10 +19,6 @@
   width: 0px !important;
 }
 
-.parent-node {
-  margin-top: 14px !important;
-}
-
 .child-node {
   transition: transform 0.3s ease, font-size 0.3s ease;
 }

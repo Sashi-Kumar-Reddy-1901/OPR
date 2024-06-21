@@ -287,7 +287,6 @@ export default function Dashboard() {
             flexShrink: 0,
             "& .MuiDrawer-paper": {
               width: drawerWidth,
-              marginTop: "44px",
               boxSizing: "border-box",
               overflowY: "auto",
             },
@@ -296,36 +295,38 @@ export default function Dashboard() {
           anchor="left"
           open={open}
         >
-          <SimpleTreeView>
-            {menuData.map((node) => (
-              <TreeItem
-                key={node.labelCode}
-                itemId={node.labelCode}
-                label={node.label}
-                className="parent-node"
-              >
-                {node.nodes.map((subNode) => (
-                  <Tooltip
-                    key={subNode.labelCode}
-                    title={subNode.label}
-                    arrow
-                    TransitionComponent={Zoom}
-                    placement="right"
-                  >
-                    <div>
-                      <TreeItem
-                        key={subNode.labelCode}
-                        itemId={subNode.labelCode}
-                        label={subNode.label}
-                        className="child-node"
-                        onClick={() => handleNavigateClick(subNode)}
-                      />
-                    </div>
-                  </Tooltip>
-                ))}
-              </TreeItem>
-            ))}
-          </SimpleTreeView>
+          <div className="mt-14">
+            <SimpleTreeView>
+              {menuData.map((node) => (
+                <TreeItem
+                  key={node.labelCode}
+                  itemId={node.labelCode}
+                  label={node.label}
+                  className="parent-node"
+                >
+                  {node.nodes.map((subNode) => (
+                    <Tooltip
+                      key={subNode.labelCode}
+                      title={subNode.label}
+                      arrow
+                      TransitionComponent={Zoom}
+                      placement="right"
+                    >
+                      <div>
+                        <TreeItem
+                          key={subNode.labelCode}
+                          itemId={subNode.labelCode}
+                          label={subNode.label}
+                          className="child-node"
+                          onClick={() => handleNavigateClick(subNode)}
+                        />
+                      </div>
+                    </Tooltip>
+                  ))}
+                </TreeItem>
+              ))}
+            </SimpleTreeView>
+          </div>
         </Drawer>
         <Main open={open}>
           <Outlet />

@@ -215,6 +215,9 @@ function Login() {
           </div>
         </header>
         <div className="max-w-screen-xl m-0 sm:m-2 bg-white shadow sm:rounded-lg flex justify-center flex-1">
+        <div className="flex-1 bg-gray-100 text-center hidden lg:flex">
+            <div className="w-full bg-cover bg-center bg-no-repeat bg-Image"></div>
+          </div>
           <div className="lg:w-1/2 xl:w-6/12 p-6 sm:p-8">
             <div>
               <h1 className="text-4xl font-bold text-center">Finakon</h1>
@@ -289,9 +292,6 @@ function Login() {
                 </form>
               </div>
             </div>
-          </div>
-          <div className="flex-1 bg-gray-100 text-center hidden lg:flex">
-            <div className="w-full bg-cover bg-center bg-no-repeat bg-Image"></div>
           </div>
         </div>
 

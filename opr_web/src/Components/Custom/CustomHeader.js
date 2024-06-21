@@ -4,7 +4,7 @@ import "./Custom.css";
 import axiosInstance from "../../api/axios";
 import { resetMethodCall } from "../../Redux-Slices/getEntitySlice";
 import { useSelector, useDispatch } from "react-redux";
-import { Box, CircularProgress } from "@material-ui/core";
+import CustomOption from "./CustomOption";
 
 const CustomHeader = ({ selectedLevel }) => {
   const [selects, setSelects] = useState({});
@@ -64,22 +64,48 @@ const CustomHeader = ({ selectedLevel }) => {
     fetchVisibleEntities();
   }, [shouldCallMethod, dispatch]);
 
-  const handleSelectChange = (unitLevel) => (selectedOption) => {
-    setSelects((prevState) => {
-      const newSelects = { ...prevState, [unitLevel]: selectedOption };
-      console.log(selectedOption);
-      console.log(newSelects);
-      selectedLevel({ level: unitLevel, ucode: selectedOption.value });
-      return newSelects;
-    });
+  const handleSelectChange = (unitLevel) => async (selectedOption) => {
+    try {
+      setSelects((prevState) => {
+        const newSelects = { ...prevState, [unitLevel]: selectedOption };
+        console.log('Selected Option:', selectedOption);
+        console.log('New Selects State:', newSelects);
+        const selectedLevelData = { level: unitLevel, ucode: selectedOption.value };
+        selectedLevel(selectedLevelData);
+        console.log('Selected Level:', selectedLevelData);
+        return newSelects;
+      });
+      const response = await axiosInstance.post(`/entity/get_child_entities/${unitLevel}/${selectedOption.value}`);
+      console.log('API Response:', response.data);  
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const customStyles = {
+    control: (provided) => ({
+      ...provided,
+      minHeight: '25px',
+    }),
+    valueContainer: (provided) => ({
+      ...provided,
+      padding: '0 6px'
+    }),
+    input: (provided) => ({
+      ...provided,
+      margin: 0,
+      padding: 0
+    }),
+    indicatorsContainer: (provided) => ({
+      ...provided,
+      height: '25px'
+    })
   };
 
   return (
     <div className="select-container">
       {levelLabels.length === 0 ? (
-        <Box sx={{ display: "flex" }}>
-          <CircularProgress/>
-        </Box>
+        <div style={{ color: "white", textAlign: "center" }}>Loading ...</div>
       ) : (
         levelLabels.map((level) => {
           const isHeadOffice = level.Unit_Level === 1;
@@ -99,6 +125,8 @@ const CustomHeader = ({ selectedLevel }) => {
                 placeholder="Select"
                 className="custom-select-container"
                 classNamePrefix="custom-select"
+                components={{ Option: CustomOption}}
+                styles={customStyles}
               />
             </div>
           );

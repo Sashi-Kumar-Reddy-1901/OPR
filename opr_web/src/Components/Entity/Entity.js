@@ -62,13 +62,13 @@ const Entity = () => {
   const [headerName, setheaderName] = useState({ "auth_remarks": "Auth Remarks", "checker_time": "Checker" });
 
   const columns = [
-    { field: "ucode", headerName: headerName.ucode, width: 130, headerClassName: 'header-theme' },
+    { field: "unitName", headerName: headerName.unitName, width: 130, headerClassName: 'header-theme' },
     { field: "puc", headerName: headerName.puc, width: 130, headerClassName: 'header-theme' },
+    { field: "ucode", headerName: headerName.ucode, width: 130, headerClassName: 'header-theme' },
     { field: "authRemarks", headerName: headerName.authRemarks, width: 130 , headerClassName: 'header-theme'},
     { field: "emailid", headerName: headerName.emailid, width: 130, headerClassName: 'header-theme' },
     { field: "ulevel", headerName: headerName.ulevel, width: 130, headerClassName: 'header-theme' },
     { field: "status", headerName: headerName.status, width: 130, headerClassName: 'header-theme' },
-    { field: "unitName", headerName: headerName.unitName, width: 130, headerClassName: 'header-theme' },
     { field: "entityStatus", headerName: headerName.entityStatus, width: 130, headerClassName: 'header-theme' },
     { field: "entityType", headerName: headerName.entityType, width: 130, headerClassName: 'header-theme' },
     { field: "checker", headerName: headerName.checker, width: 130, headerClassName: 'header-theme' },
@@ -157,7 +157,7 @@ const Entity = () => {
     <>
       <div style={{ width: "100%", marginTop: "50px" }}>
         <CustomHeader selectedLevel = {handleLevelChange} />
-        <div className="mt-2" style={{ height: "73vh" }}>
+        <div className="mt-2" style={{ height: "71vh" }}>
           <StripedDataGrid
             apiRef={apiRef}
             rows={data}
@@ -193,7 +193,7 @@ const Entity = () => {
               },
             }}
             onCellClick={(params) => handleCellClick(params)}
-            rowHeight={45}
+            rowHeight={42}
           />
         </div>
       </div>
