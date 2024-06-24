@@ -75,8 +75,8 @@ const CustomHeader = ({ selectedLevel }) => {
         console.log('Selected Level:', selectedLevelData);
         return newSelects;
       });
-      const response = await axiosInstance.post(`/entity/get_child_entities/${unitLevel}/${selectedOption.value}`);
-      console.log('API Response:', response.data);  
+      const childEntities = await axiosInstance.post(`/entity/get_child_entities/${unitLevel}/${selectedOption.value}`);
+      console.log(childEntities.data?.data?.data);        
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -111,8 +111,8 @@ const CustomHeader = ({ selectedLevel }) => {
           const isHeadOffice = level.Unit_Level === 1;
           const levelOptions = options[level.Unit_Level] ? [...options[level.Unit_Level]] : [];
 
-          if (!isHeadOffice && levelOptions.length > 1 && !levelOptions.some((option) => option.value === "all")) {
-            levelOptions.unshift({ value: "all", label: "-- All --" });
+          if (!isHeadOffice && levelOptions.length > 1 && !levelOptions.some((option) => option.value === "--all--")) {
+            levelOptions.unshift({ value: "--all--", label: "-- All --" });
           }
 
           return (

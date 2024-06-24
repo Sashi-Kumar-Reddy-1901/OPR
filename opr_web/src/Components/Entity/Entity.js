@@ -102,7 +102,7 @@ const Entity = () => {
       let resData = response.data?.data?.data?.entityDTOList;
       let totalRecords = response.data?.data?.data?.totalRecords;
       console.log("resData", resData)
-      if(resData!== undefined && ucode !== "all"){
+      if(resData!== undefined && ucode !== "--all--"){
        resData =   resData.filter((e)=>{
          return  e.ucode === ucode;
         })

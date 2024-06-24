@@ -12,35 +12,39 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import GppGoodIcon from "@mui/icons-material/GppGood";
 import { useNavigate } from "react-router-dom";
-import './Custom.css'
+import "./Custom.css";
 
 const CustomToolbar = ({ onSearchChange }) => {
   const handleSearchChange = (event) => {
     onSearchChange(event.target.value);
   };
   const navigate = useNavigate();
-const AddEntity = () =>{
-  navigate("/dashboard/entity-details?Add");
-}
-const ViewEntity = () =>{
-  navigate("/dashboard/entity-details?View");
-}
-const EditEntity = () =>{
-  navigate("/dashboard/entity-details?Edit");
-}
+  const AddEntity = () => {
+    navigate("/dashboard/entity-details?Add");
+  };
+  const ViewEntity = () => {
+    navigate("/dashboard/entity-details?View");
+  };
+  const EditEntity = () => {
+    navigate("/dashboard/entity-details?Edit");
+  };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-      <GridToolbarContainer
-        sx={{ color: "black", "& .MuiButtonBase-root": { color: "black" } }}
-      >
-        <GridToolbarColumnsButton />
-        <GridToolbarExport
-          slotProps={{
-            tooltip: { title: "Export data" },
-          }}
-        />
-      </GridToolbarContainer>
+    <GridToolbarContainer
+      sx={{
+        color: "black",
+        "& .MuiButtonBase-root": { color: "black" },
+        display: "flex",
+        alignItems: "center",
+        width: "100%"
+      }}
+    >
+      <GridToolbarColumnsButton />
+      <GridToolbarExport
+        slotProps={{
+          tooltip: { title: "Export data" },
+        }}
+      />
 
       <h1
         style={{
@@ -65,7 +69,7 @@ const EditEntity = () =>{
             alignItems: "center",
             width: 180,
             border: "1px solid grey",
-            height:"25px"
+            height: "25px",
           }}
         >
           <SearchIcon />
@@ -76,7 +80,7 @@ const EditEntity = () =>{
             onChange={handleSearchChange}
           />
         </Paper>
-        <IconButton  onClick={AddEntity} color="inherit" aria-label="add">
+        <IconButton onClick={AddEntity} color="inherit" aria-label="add">
           <Tooltip title="Add Entity" arrow TransitionComponent={Zoom}>
             <PersonAddAlt1Icon />
           </Tooltip>
@@ -102,7 +106,7 @@ const EditEntity = () =>{
           </Tooltip>
         </IconButton>
       </div>
-    </div>
+    </GridToolbarContainer>
   );
 };
 
