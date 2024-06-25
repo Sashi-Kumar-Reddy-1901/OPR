@@ -165,26 +165,24 @@ const EntityDetails = () => {
           </div>
         </div>
         <div className="flex justify-end gap-4 mt-4">
-          <button type="button" className="button" onClick={onCancel}>
+          <button className="custom-button" onClick={onCancel}>
             Cancel
           </button>
-          <button type="button" className="button" onClick={onReset}>
+          <button className="custom-button" onClick={onReset}>
             Reset
           </button>
-          <button type="button" className="button" onClick={handleSubmit(onSave)}>
+          <button className="custom-button" onClick={handleSubmit(onSave)}>
             Save
           </button>
-          <button type="submit" className="button">
-            Submit
-          </button>
-          <button type="button" className="button" onClick={onDelete}>
+          <button className="custom-button">Submit</button>
+          <button className="custom-button" onClick={onDelete}>
             Delete
           </button>
-          <button type="button" className="button" onClick={onReject}>
+          <button className="custom-button" onClick={onReject}>
             Reject
           </button>
-          <button type="button" className="button" onClick={onAuthorise}>
-           Authorise
+          <button className="custom-button" onClick={onAuthorise}>
+            Authorise
           </button>
         </div>
       </form>
