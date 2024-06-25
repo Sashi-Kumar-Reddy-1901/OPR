@@ -76,9 +76,11 @@ const CustomHeader = ({ selectedLevel }) => {
         }
         console.log("Selected Option:", selectedOption);
         console.log("New Selects State:", newSelects);
+        console.log("parentunit", parentUnitCode)
         const selectedLevelData = {
           level: unitLevel,
           ucode: selectedOption.value,
+          parentucode : parentUnitCode
         };
         selectedLevel(selectedLevelData);
         console.log("Selected Level:", selectedLevelData);
@@ -92,23 +94,52 @@ const CustomHeader = ({ selectedLevel }) => {
         {
           procedure: "get_visible_entities",
           unitCode: unitCode,
-          level: unitLevel + 1,
+          level: 0,
           incSelf: true,
         }
       );
-      const childEntities = response.data?.data?.data;
-      if (childEntities && childEntities.length > 0) {
-        setOptions((prevState) => {
-          const newOptions = { ...prevState };
-          const nextLevel = unitLevel + 1;
-          newOptions[nextLevel] = childEntities.map((entity) => ({
-            value: entity.unitCode,
-            label: entity.unitName,
-          }));
-          console.log('Updated options with child entities:', newOptions);
-          return newOptions;
-        });
+ 
+     
+ 
+
+let childEntities = response.data?.data?.data;
+
+if (childEntities && childEntities.length > 0) {
+  setOptions((prevState) => {
+    const newOptions = { ...prevState };
+
+    childEntities.forEach((entity) => {
+      const entityLevel = entity.unitLevel; // Get the level from the entity
+      if (!newOptions[entityLevel]) {
+        newOptions[entityLevel] = [];
       }
+      newOptions[entityLevel].push({
+        value: entity.unitCode,
+        label: entity.unitName,
+      });
+    });
+
+    console.log('Updated options with child entities:', newOptions);
+    return newOptions;
+  // setOptions((prevState) => {
+  //   const newOptions = { ...prevState };
+  //   let nextLevel = unitLevel + 1;
+
+  //   childEntities.forEach((entity) => {
+  //     if (!newOptions[nextLevel]) {
+  //       newOptions[nextLevel] = [];
+  //     }
+  //     newOptions[nextLevel].push({
+  //       value: entity.unitCode,
+  //       label: entity.unitName,
+  //     });
+  //     nextLevel += 1; 
+  //   });
+
+  //   console.log('Updated options with child entities:', newOptions);
+  //   return newOptions;
+  });
+}
     } catch (error) {
       console.error("Error fetching data:", error);
     }

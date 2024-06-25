@@ -178,6 +178,7 @@ export default function Dashboard() {
     };
 
     fetchInitialData();
+    fetchLabels();
   }, [isSelected, languageSelected]);
 
   const navigate = useNavigate();
@@ -188,6 +189,16 @@ export default function Dashboard() {
     setOpenLogout(true);
   };
 
+  const fetchLabels = async() =>{
+    const response = await axiosInstance.post(
+      "/common-utils/call-stored-procedure",
+      {
+        procedure: "get_labels",
+ 
+      }
+    );
+    console.log("labels",response);
+  }
   const handleCloseNoLogout = () => {
     setOpenLogout(false);
   };

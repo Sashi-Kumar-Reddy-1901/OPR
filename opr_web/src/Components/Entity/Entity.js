@@ -9,9 +9,9 @@ import CustomToolbar from '../Custom/CustomToolbar';
 import CustomHeader from "../Custom/CustomHeader";
 import CustomPagination from "../Custom/CustomPagination";
 import { setEntityHeaders, setEntityRowData } from "../../Redux-Slices/getEntitySlice";
-
+ 
 const ODD_OPACITY = 0.1;
-
+ 
 const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
   [`& .${gridClasses.row}.even`]: {
     backgroundColor: theme.palette.grey[200],
@@ -43,11 +43,12 @@ const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
     },
   },
 }));
-
+ 
 const Entity = () => {
   const apiRef = useGridApiRef();
   const [data, setData] = useState([]);
   const [ucode, setUcode] = useState(["HO"]);
+  const [parentucode, setparentUcode] = useState(["HO"]);
   const [loading, setLoading] = useState(true);
   const [rowCount, setRowCount] = useState(0);
   const [level, setlevel] = useState(1);
@@ -60,7 +61,7 @@ const Entity = () => {
   const dispatch = useDispatch();
   const shouldCallMethod = useSelector((state) => state.method.shouldCallMethod);
   const [headerName, setheaderName] = useState({ "auth_remarks": "Auth Remarks", "checker_time": "Checker" });
-
+ 
   const columns = [
     { field: "unitName", headerName: headerName.unitName, width: 130, headerClassName: 'header-theme' },
     { field: "puc", headerName: headerName.puc, width: 130, headerClassName: 'header-theme' },
@@ -76,8 +77,9 @@ const Entity = () => {
     { field: "maker", headerName: headerName.maker, width: 130, headerClassName: 'header-theme' },
     { field: "makerTime", headerName: headerName.makerTime, width: 130, headerClassName: 'header-theme' },
   ];
-
+ 
   const fetchData = useCallback(async () => {
+    setData("");
     try {
       setLoading(true);
       let searchT = "";
@@ -88,7 +90,15 @@ const Entity = () => {
         sortModel.length > 0
           ? sortModel.map((sort) => ({ field: sort.field, order: sort.sort }))
           : [{ field: "ulevel", order: "asc" }, { field: "emailid", order: "asc" }];
-      const response = await axiosInstance.post(`/entity/get_entities/{level}?level=${level}`, {
+       let unitcode = ucode   
+       if(ucode === "--all--"){
+        if(parentucode === "--all--"){
+          unitcode = "HO"
+        }else{
+          unitcode = parentucode;
+        }
+       }   
+      const response = await axiosInstance.post(`/entity/get_entities/{level}/{unitCode}?level=${level}&unitCode=${unitcode}`, {
         pagination: {
           pageSize: paginationModel.pageSize,
           pageNo: paginationModel.page + 1,
@@ -102,11 +112,11 @@ const Entity = () => {
       let resData = response.data?.data?.data?.entityDTOList;
       let totalRecords = response.data?.data?.data?.totalRecords;
       console.log("resData", resData)
-      if(resData!== undefined && ucode !== "--all--"){
-       resData =   resData.filter((e)=>{
-         return  e.ucode === ucode;
-        })
-      }
+      // if(resData!== undefined && ucode !== "--all--"){
+      //  resData =   resData.filter((e)=>{
+      //    return  e.ucode === ucode;
+      //   })
+      // }
       const columnHeader = response.data?.data?.data?.columnnHeadersForEntities;
       console.log("columnHeader", columnHeader);
       setheaderName(columnHeader);
@@ -119,20 +129,21 @@ const Entity = () => {
       setLoading(false);
     }
   }, [filterModel, paginationModel.pageSize, paginationModel.page, sortModel, level,ucode]);
-  
+ 
   const handleLevelChange = (data) =>{
     console.log("Data",data);
     // setlevel(data)
     setlevel(data.level);
     setUcode(data.ucode);
-  } 
+    setparentUcode(data.parentucode);
+  }
   useEffect(() => {
     if (shouldCallMethod) {
       dispatch(resetMethodCall());
     }
     fetchData();
   }, [paginationModel, sortModel, filterModel, shouldCallMethod, dispatch, fetchData]);
-
+ 
   const paginationMetaRef = useRef();
   const paginationMeta = useMemo(() => {
     const hasNextPage = data.length === paginationModel.pageSize;
@@ -141,7 +152,7 @@ const Entity = () => {
     }
     return paginationMetaRef.current;
   }, [data, paginationModel.pageSize]);
-
+ 
   const handleQuickFilterChange = (searchValue) => {
     setFilterModel((prev) => ({
       ...prev,
@@ -152,7 +163,7 @@ const Entity = () => {
     console.log("rowData", cellData.row);
     dispatch(setEntityRowData(cellData.row));
   }
-
+ 
   return (
     <>
       <div style={{ width: "100%", marginTop: "50px" }}>
@@ -200,5 +211,5 @@ const Entity = () => {
     </>
   );
 };
-
+ 
 export default Entity;
