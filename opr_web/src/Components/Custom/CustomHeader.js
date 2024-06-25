@@ -14,6 +14,7 @@ const CustomHeader = ({ selectedLevel }) => {
   const shouldCallMethod = useSelector(
     (state) => state.method.shouldCallMethod
   );
+  const unitCode = useSelector((state) => state.method.unitCode);
 
   useEffect(() => {
     if (shouldCallMethod) {
@@ -21,10 +22,24 @@ const CustomHeader = ({ selectedLevel }) => {
     }
     const fetchVisibleEntities = async () => {
       try {
+        // Fetch levels data first
+        const LevelsResponse = await axiosInstance.post(
+          "/common-utils/call-stored-procedure",
+          {
+            procedure: "get_visible_entities_levels",
+            incSelf: true,
+            incParent: false,
+          }
+        );
+        const levelsData = LevelsResponse.data?.data?.data;
+        console.log(levelsData);
+        setLevelLabels(levelsData || []);
+        // Fetch visible entities data next
         const response = await axiosInstance.post(
           "/common-utils/call-stored-procedure",
           {
             procedure: "get_visible_entities",
+            unitCode: unitCode,
             level: 0,
             incSelf: true,
           }
@@ -41,21 +56,8 @@ const CustomHeader = ({ selectedLevel }) => {
             return acc;
           }, {});
           setOptions(grouped);
-
-          const LevelsResponse = await axiosInstance.post(
-            "/common-utils/call-stored-procedure",
-            {
-              procedure: "get_visible_entities_levels",
-              incSelf: true,
-              incParent: true,
-            }
-          );
-          const levelsData = LevelsResponse.data?.data?.data;
-          console.log(levelsData);
-          setLevelLabels(levelsData || []);
         } else {
           setOptions({});
-          setLevelLabels([]);
         }
       } catch (error) {
         console.log("Error fetching config:", error);
@@ -64,42 +66,72 @@ const CustomHeader = ({ selectedLevel }) => {
     fetchVisibleEntities();
   }, [shouldCallMethod, dispatch]);
 
-  const handleSelectChange = (unitLevel) => async (selectedOption) => {
+  const handleSelectChange = (unitLevel, parentUnitCode) => async (selectedOption) => {
     try {
       setSelects((prevState) => {
         const newSelects = { ...prevState, [unitLevel]: selectedOption };
-        console.log('Selected Option:', selectedOption);
-        console.log('New Selects State:', newSelects);
-        const selectedLevelData = { level: unitLevel, ucode: selectedOption.value };
+        // Reset child levels' selected options
+        for (let level = unitLevel + 1; level <= Math.max(...Object.keys(prevState).map(Number)); level++) {
+          delete newSelects[level];
+        }
+        console.log("Selected Option:", selectedOption);
+        console.log("New Selects State:", newSelects);
+        const selectedLevelData = {
+          level: unitLevel,
+          ucode: selectedOption.value,
+        };
         selectedLevel(selectedLevelData);
-        console.log('Selected Level:', selectedLevelData);
+        console.log("Selected Level:", selectedLevelData);
         return newSelects;
       });
-      const childEntities = await axiosInstance.post(`/entity/get_child_entities/${unitLevel}/${selectedOption.value}`);
-      console.log(childEntities.data?.data?.data);        
+
+      const unitCode = selectedOption.value === "--all--" ? parentUnitCode : selectedOption.value;
+
+      const response = await axiosInstance.post(
+        "/common-utils/call-stored-procedure",
+        {
+          procedure: "get_visible_entities",
+          unitCode: unitCode,
+          level: unitLevel + 1,
+          incSelf: true,
+        }
+      );
+      const childEntities = response.data?.data?.data;
+      if (childEntities && childEntities.length > 0) {
+        setOptions((prevState) => {
+          const newOptions = { ...prevState };
+          const nextLevel = unitLevel + 1;
+          newOptions[nextLevel] = childEntities.map((entity) => ({
+            value: entity.unitCode,
+            label: entity.unitName,
+          }));
+          console.log('Updated options with child entities:', newOptions);
+          return newOptions;
+        });
+      }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
 
   const customStyles = {
     control: (provided) => ({
       ...provided,
-      minHeight: '25px',
+      minHeight: "25px",
     }),
     valueContainer: (provided) => ({
       ...provided,
-      padding: '0 6px'
+      padding: "0 6px",
     }),
     input: (provided) => ({
       ...provided,
       margin: 0,
-      padding: 0
+      padding: 0,
     }),
     indicatorsContainer: (provided) => ({
       ...provided,
-      height: '25px'
-    })
+      height: "25px",
+    }),
   };
 
   return (
@@ -109,23 +141,29 @@ const CustomHeader = ({ selectedLevel }) => {
       ) : (
         levelLabels.map((level) => {
           const isHeadOffice = level.Unit_Level === 1;
-          const levelOptions = options[level.Unit_Level] ? [...options[level.Unit_Level]] : [];
+          const levelOptions = options[level.Unit_Level]
+            ? [...options[level.Unit_Level]]
+            : [];
 
-          if (!isHeadOffice && levelOptions.length > 1 && !levelOptions.some((option) => option.value === "--all--")) {
+          if (
+            !isHeadOffice &&
+            levelOptions.length > 1 &&
+            !levelOptions.some((option) => option.value === "--all--")
+          ) {
             levelOptions.unshift({ value: "--all--", label: "-- All --" });
           }
-
+          const parentUnitCode = selects[level.Unit_Level - 1]?.value || unitCode;
           return (
             <div className="select-wrapper" key={level.Unit_Level}>
               <label className="select-label">{level.Level_Desc}</label>
               <Select
                 value={selects[level.Unit_Level] || null}
-                onChange={handleSelectChange(level.Unit_Level)}
+                onChange={handleSelectChange(level.Unit_Level, parentUnitCode)}
                 options={levelOptions}
                 placeholder="Select"
                 className="custom-select-container"
                 classNamePrefix="custom-select"
-                components={{ Option: CustomOption}}
+                components={{ Option: CustomOption }}
                 styles={customStyles}
               />
             </div>

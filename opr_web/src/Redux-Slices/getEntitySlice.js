@@ -18,9 +18,12 @@ export const getEntitySlice = createSlice({
     setEntityRowData: (state, action) => {
       state.rowData = action.payload;
     },
+    setUnitCode:(state, action) =>{
+      state.unitCode = action.payload
+    }
   },
 });
 
-export const { callMethod, resetMethodCall,setEntityHeaders,setEntityRowData } = getEntitySlice.actions;
+export const { callMethod, resetMethodCall,setEntityHeaders,setEntityRowData ,setUnitCode} = getEntitySlice.actions;
 
 export default getEntitySlice.reducer;

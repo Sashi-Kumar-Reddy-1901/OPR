@@ -16,14 +16,79 @@
     padding: 0.5rem;
     border-radius: 8px; 
     font-weight: 500; 
-    background-color: #f3f4f6; 
     border: 1px solid #6b7280;
-    color: #6b7280;
-    font-size: 0.875rem;
+    color: black;
+    font-size: 12px;
     outline: none;
   }
   
   .form-input:focus {
     border-color: #9ca3af;
     background-color: #fff;
+  }
+
+  .form-input:disabled{
+    background-color: hsl(0, 0%, 95%);
+  }
+
+  .form-input::placeholder{
+    font-size: 12px;
+  }
+
+  .custom__menu {
+    margin-top: 0 !important;
+    max-height: 200px !important;
+  }
+  
+  .custom__menu-list {
+    max-height: 104px !important;
+    padding: 0 !important;
+  }
+  
+  .custom__option,
+  .custom__single-value,
+  .custom__placeholder {
+    font-size: 12px !important;
+  }
+  
+  .custom__option {
+    background-color: transparent !important;
+    cursor: pointer !important;
+  }
+  
+  .custom__option--is-focused{
+    background-color: #ccc !important;
+    color: black !important;
+  }
+  .custom__option--is-selected {
+    color: black !important;
+    background-color: transparent !important;
+  }
+  
+  .custom__control,
+  .custom__control--is-focused {
+    border-color: #6b7280 !important;
+    box-shadow: none !important;
+    border-radius: 8px !important;
+  }
+  
+  .custom-select-dropdown {
+    width: 100% !important; 
+  } 
+
+  .button {
+    color: white; 
+    background-color: #1f2937; 
+    font-weight: 500; 
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    padding: 0.625rem 1.25rem;
+    margin-inline-end: 0.5rem;
+    margin-bottom: 0.5rem;
+    outline: none;
+    transition: background-color 0.2s, box-shadow 0.2s; 
+  }
+  
+  .button:hover {
+    background-color: #111827;
   }

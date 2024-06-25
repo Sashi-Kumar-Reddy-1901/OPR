@@ -4,7 +4,7 @@ import { styled } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import SelectModule from "../SelectModule/SelectModule";
 import { useDispatch } from 'react-redux';
-import { callMethod } from "../../Redux-Slices/getEntitySlice";
+import { callMethod, setUnitCode } from "../../Redux-Slices/getEntitySlice";
 import {
   Box,
   CssBaseline,
@@ -138,12 +138,14 @@ export default function Dashboard() {
           userId,
           roleName,
           moduleName,
+          unitCode
         } = tokenDetailsResponse?.data?.data?.data;
         setLanguage(langName);
         setDisplayName(displayName);
         setUserId(userId);
         setRoleName(roleName);
         setModuleName(moduleName);
+        dispatch(setUnitCode(unitCode))
 
         const date = new Date(loginTime);
         const day = date.getDate().toString().padStart(2, "0");
