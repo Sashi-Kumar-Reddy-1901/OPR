@@ -52,7 +52,11 @@ const CustomHeader = ({ selectedLevel }) => {
             if (!acc[unitLevel]) {
               acc[unitLevel] = [];
             }
-            acc[unitLevel].push({ value: unit.unitCode, label: unit.unitName });
+            acc[unitLevel].push({
+              value: unit.unitCode,
+              label: unit.unitName,
+              level: unit.unitLevel,
+            });
             return acc;
           }, {});
           setOptions(grouped);
@@ -66,28 +70,38 @@ const CustomHeader = ({ selectedLevel }) => {
     fetchVisibleEntities();
   }, [shouldCallMethod, dispatch]);
 
-  const handleSelectChange = (unitLevel, parentUnitCode) => async (selectedOption) => {
+ 
+
+const handleSelectChange =
+  (unitLevel, parentUnitCode) => async (selectedOption) => {
     try {
       setSelects((prevState) => {
         const newSelects = { ...prevState, [unitLevel]: selectedOption };
         // Reset child levels' selected options
-        for (let level = unitLevel + 1; level <= Math.max(...Object.keys(prevState).map(Number)); level++) {
+        for (
+          let level = unitLevel + 1;
+          level <= Math.max(...Object.keys(prevState).map(Number));
+          level++
+        ) {
           delete newSelects[level];
         }
         console.log("Selected Option:", selectedOption);
         console.log("New Selects State:", newSelects);
-        console.log("parentunit", parentUnitCode)
+        console.log("parentunit", parentUnitCode);
         const selectedLevelData = {
           level: unitLevel,
           ucode: selectedOption.value,
-          parentucode : parentUnitCode
+          parentucode: parentUnitCode,
         };
         selectedLevel(selectedLevelData);
         console.log("Selected Level:", selectedLevelData);
         return newSelects;
       });
 
-      const unitCode = selectedOption.value === "--all--" ? parentUnitCode : selectedOption.value;
+      const unitCode =
+        selectedOption.value === "--all--"
+          ? parentUnitCode
+          : selectedOption.value;
 
       const response = await axiosInstance.post(
         "/common-utils/call-stored-procedure",
@@ -98,48 +112,62 @@ const CustomHeader = ({ selectedLevel }) => {
           incSelf: true,
         }
       );
- 
-     
- 
 
-let childEntities = response.data?.data?.data;
-
-if (childEntities && childEntities.length > 0) {
-  setOptions((prevState) => {
-    const newOptions = { ...prevState };
-
-    childEntities.forEach((entity) => {
-      const entityLevel = entity.unitLevel; // Get the level from the entity
-      if (!newOptions[entityLevel]) {
-        newOptions[entityLevel] = [];
+      let childEntities;
+      if (response.data?.data?.data.length > 1) {
+        childEntities = response.data?.data?.data.slice(1);
+      } else {
+        childEntities = response.data?.data?.data;
       }
-      newOptions[entityLevel].push({
-        value: entity.unitCode,
-        label: entity.unitName,
-      });
-    });
 
-    console.log('Updated options with child entities:', newOptions);
-    return newOptions;
-  // setOptions((prevState) => {
-  //   const newOptions = { ...prevState };
-  //   let nextLevel = unitLevel + 1;
+      if (childEntities && childEntities.length > 0) {
+        setOptions((prevState) => {
+          const newOptions = { ...prevState };
 
-  //   childEntities.forEach((entity) => {
-  //     if (!newOptions[nextLevel]) {
-  //       newOptions[nextLevel] = [];
-  //     }
-  //     newOptions[nextLevel].push({
-  //       value: entity.unitCode,
-  //       label: entity.unitName,
-  //     });
-  //     nextLevel += 1; 
-  //   });
+          // Clear existing options for levels present in childEntities
+          childEntities.forEach((entity) => {
+            const entityLevel = entity.unitLevel;
+            console.log("entityLevel", entityLevel);
+            if (
+              childEntities.length > 1 &&
+              (!newOptions[entityLevel] || newOptions[entityLevel].length > 0)
+            ) {
+              newOptions[entityLevel] = []; // Clear the array for this level
+            }
+          });
 
-  //   console.log('Updated options with child entities:', newOptions);
-  //   return newOptions;
-  });
-}
+          // Clear options for levels greater than the highest level in childEntities
+          const maxChildLevel = Math.max(
+            ...childEntities.map((e) => e.unitLevel)
+          );
+          for (
+            let level = maxChildLevel + 1;
+            level <= Math.max(...Object.keys(prevState).map(Number));
+            level++
+          ) {
+            if (newOptions[level]) {
+              delete newOptions[level];
+            }
+          }
+
+          // Populate newOptions with childEntities only if childEntities.length > 1
+          if (childEntities.length > 1) {
+            childEntities.forEach((entity) => {
+              const entityLevel = entity.unitLevel;
+
+              if (entityLevel) {
+                newOptions[entityLevel].push({
+                  value: entity.unitCode,
+                  label: entity.unitName,
+                });
+              }
+            });
+          }
+
+          console.log("Updated options with child entities:", newOptions);
+          return newOptions;
+        });
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -178,12 +206,13 @@ if (childEntities && childEntities.length > 0) {
 
           if (
             !isHeadOffice &&
-            levelOptions.length > 1 &&
+            // levelOptions.length > 1 &&
             !levelOptions.some((option) => option.value === "--all--")
           ) {
             levelOptions.unshift({ value: "--all--", label: "-- All --" });
           }
-          const parentUnitCode = selects[level.Unit_Level - 1]?.value || unitCode;
+          const parentUnitCode =
+            selects[level.Unit_Level - 1]?.value || unitCode;
           return (
             <div className="select-wrapper" key={level.Unit_Level}>
               <label className="select-label">{level.Level_Desc}</label>
