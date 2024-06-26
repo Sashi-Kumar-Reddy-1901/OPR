@@ -92,3 +92,8 @@
     background-color: #374151;
   }
   
+  .custom-button:disabled {
+    background-color: #ccc;
+    color: #999; 
+    cursor: not-allowed;
+  }

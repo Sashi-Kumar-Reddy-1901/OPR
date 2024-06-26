@@ -9,7 +9,8 @@
   }
   
   .bg-Image{
-    background-image: url("../../Images/opsriskbg_adobe_express.svg");
+    /* background-image: url("../../Images/opsriskbg_adobe_express.svg"); */
+    background-image: url("../../Images/ops_image.jpg");
   }
 
   .Toastify__close-button--light {
