@@ -3,7 +3,7 @@ import axiosInstance from "../../api/axios";
 import { styled } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import SelectModule from "../SelectModule/SelectModule";
-import { useDispatch } from 'react-redux';
+import { useDispatch } from "react-redux";
 import { callMethod, setUnitCode } from "../../Redux-Slices/getEntitySlice";
 import {
   Box,
@@ -138,14 +138,14 @@ export default function Dashboard() {
           userId,
           roleName,
           moduleName,
-          unitCode
+          unitCode,
         } = tokenDetailsResponse?.data?.data?.data;
         setLanguage(langName);
         setDisplayName(displayName);
         setUserId(userId);
         setRoleName(roleName);
         setModuleName(moduleName);
-        dispatch(setUnitCode(unitCode))
+        dispatch(setUnitCode(unitCode));
 
         const date = new Date(loginTime);
         const day = date.getDate().toString().padStart(2, "0");
@@ -189,16 +189,20 @@ export default function Dashboard() {
     setOpenLogout(true);
   };
 
-  const fetchLabels = async() =>{
-    const response = await axiosInstance.post(
-      "/common-utils/call-stored-procedure",
-      {
-        procedure: "get_labels",
- 
-      }
-    );
-    console.log("labels",response);
-  }
+  const fetchLabels = async () => {
+    try {
+      const response = await axiosInstance.post(
+        "/common-utils/call-stored-procedure",
+        {
+          procedure: "get_labels",
+        }
+      );
+      console.log("labels", response.data);
+    } catch (error) {
+      console.error("Error fetching labels:", error);
+    }
+  };
+
   const handleCloseNoLogout = () => {
     setOpenLogout(false);
   };
@@ -218,13 +222,9 @@ export default function Dashboard() {
 
   const handleNavigateClick = (subNode) => {
     const navigateLabelcode = subNode.labelCode;
-    if (navigateLabelcode === "MENU101_2") {
+    if (navigateLabelcode === "menu1_1") {
       navigate("/dashboard/entity");
-    } else if (navigateLabelcode === "MENU102_2") {
-      navigate("");
-    } else if (navigateLabelcode === "MENU201_2") {
-      navigate("");
-    } else if (navigateLabelcode === "MENU202_2") {
+    } else if (navigateLabelcode === "menu1_2") {
       navigate("");
     }
   };
@@ -247,8 +247,6 @@ export default function Dashboard() {
       } catch (error) {
         console.error("Failed to select language:", error);
       }
-
- 
       setLanguage(langMenuDesc[index]?.label);
       setLanguageSelected(langMenuDesc[index]?.label);
       dispatch(callMethod());
@@ -283,13 +281,13 @@ export default function Dashboard() {
               }}
               edge="start"
             >
-              <MenuIcon style={{color:"black"}}/>
+              <MenuIcon style={{ color: "black" }} />
             </IconButton>
 
             <Box sx={{ flexGrow: 1 }} />
             <Tooltip title="Logout" arrow TransitionComponent={Zoom}>
               <IconButton onClick={handleLogout}>
-                <LogoutIcon style={{color:"black"}}/>
+                <LogoutIcon style={{ color: "black" }} />
               </IconButton>
             </Tooltip>
           </Toolbar>
