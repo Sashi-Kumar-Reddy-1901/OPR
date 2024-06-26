@@ -52,6 +52,7 @@ const Entity = () => {
   const [loading, setLoading] = useState(true);
   const [rowCount, setRowCount] = useState(0);
   const [level, setlevel] = useState(1);
+  const [labels, setLabel] = useState();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
@@ -110,7 +111,9 @@ const Entity = () => {
         sort: sort,
       });
       let resData = response.data?.data?.data?.entityDTOList;
+      // alert(resData.length)
       let totalRecords = response.data?.data?.data?.totalRecords;
+      // let totalRecords = resData.length
       console.log("resData", resData)
       // if(resData!== undefined && ucode !== "--all--"){
       //  resData =   resData.filter((e)=>{
@@ -138,6 +141,8 @@ const Entity = () => {
     setparentUcode(data.parentucode);
   }
   useEffect(() => {
+    const label = JSON.parse(sessionStorage.getItem("Labels"));
+    setLabel(label);
     if (shouldCallMethod) {
       dispatch(resetMethodCall());
     }

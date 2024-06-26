@@ -1,4 +1,4 @@
-import React from "react";
+import React,  { useState, useEffect } from "react";
 import {
   GridToolbarContainer,
   GridToolbarColumnsButton,
@@ -29,6 +29,14 @@ const CustomToolbar = ({ onSearchChange }) => {
     navigate("/dashboard/entity-details?Edit");
   };
 
+  const [labels, setLabel] = useState();
+
+  useEffect(()=>{
+    const label = JSON.parse(sessionStorage.getItem("Labels"));
+    console.log(label);
+    setLabel(label);
+  },[]);
+
   return (
     <GridToolbarContainer
       sx={{
@@ -55,7 +63,7 @@ const CustomToolbar = ({ onSearchChange }) => {
           fontWeight: "900",
         }}
       >
-        Legal Entity
+        {labels?.LX1}
       </h1>
 
       <div
@@ -81,27 +89,27 @@ const CustomToolbar = ({ onSearchChange }) => {
           />
         </Paper>
         <IconButton onClick={AddEntity} color="inherit" aria-label="add">
-          <Tooltip title="Add Entity" arrow TransitionComponent={Zoom}>
+          <Tooltip title={labels?.LX5} arrow TransitionComponent={Zoom}>
             <PersonAddAlt1Icon />
           </Tooltip>
         </IconButton>
         <IconButton onClick={ViewEntity} color="inherit" aria-label="view">
-          <Tooltip title="View Entity" arrow TransitionComponent={Zoom}>
+          <Tooltip title={labels?.LX6} arrow TransitionComponent={Zoom}>
             <VisibilityIcon />
           </Tooltip>
         </IconButton>
         <IconButton onClick={EditEntity} color="inherit" aria-label="edit">
-          <Tooltip title="Edit Entity" arrow TransitionComponent={Zoom}>
+          <Tooltip title={labels?.LX9} arrow TransitionComponent={Zoom}>
             <EditNoteIcon />
           </Tooltip>
         </IconButton>
         <IconButton color="inherit" aria-label="authorise">
-          <Tooltip title="Authorise Entity" arrow TransitionComponent={Zoom}>
+          <Tooltip title={labels?.LX8} arrow TransitionComponent={Zoom}>
             <GppGoodIcon />
           </Tooltip>
         </IconButton>
         <IconButton color="inherit" aria-label="delete">
-          <Tooltip title="Delete Entity" arrow TransitionComponent={Zoom}>
+          <Tooltip title={labels?.LX7} arrow TransitionComponent={Zoom}>
             <DeleteIcon />
           </Tooltip>
         </IconButton>

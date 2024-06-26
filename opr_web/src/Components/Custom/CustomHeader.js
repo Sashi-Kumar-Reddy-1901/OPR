@@ -10,6 +10,7 @@ const CustomHeader = ({ selectedLevel }) => {
   const [selects, setSelects] = useState({});
   const [options, setOptions] = useState({});
   const [levelLabels, setLevelLabels] = useState([]);
+  const [labels, setLabel] = useState();
   const dispatch = useDispatch();
   const shouldCallMethod = useSelector(
     (state) => state.method.shouldCallMethod
@@ -17,6 +18,8 @@ const CustomHeader = ({ selectedLevel }) => {
   const unitCode = useSelector((state) => state.method.unitCode);
 
   useEffect(() => {
+    const label = JSON.parse(sessionStorage.getItem("Labels"));
+    setLabel(label);
     if (shouldCallMethod) {
       dispatch(resetMethodCall());
     }

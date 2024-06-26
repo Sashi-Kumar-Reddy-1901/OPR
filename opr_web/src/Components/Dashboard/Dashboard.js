@@ -103,6 +103,7 @@ export default function Dashboard() {
   const [roleName, setRoleName] = useState("");
   const [moduleName, setModuleName] = useState("");
   const [isSelected, setIsSelected] = useState(false);
+  const [labels, setLabel] = useState();
   const dispatch = useDispatch();
 
   const handleOpenModule = () => {
@@ -197,7 +198,17 @@ export default function Dashboard() {
           procedure: "get_labels",
         }
       );
-      console.log("labels", response.data);
+      console.log("labels", response.data.data.data.data);
+      const labels =  response.data.data.data.data;
+      const transformedLabels = labels.reduce((acc, curr) => {
+        acc[curr.labelCode] = curr.label;
+        return acc;
+      }, {});
+     
+      sessionStorage.setItem("Labels", JSON.stringify(transformedLabels));
+     setLabel(transformedLabels);
+      console.log(transformedLabels);
+
     } catch (error) {
       console.error("Error fetching labels:", error);
     }
@@ -285,7 +296,7 @@ export default function Dashboard() {
             </IconButton>
 
             <Box sx={{ flexGrow: 1 }} />
-            <Tooltip title="Logout" arrow TransitionComponent={Zoom}>
+            <Tooltip title={labels?.LX2} arrow TransitionComponent={Zoom}>
               <IconButton onClick={handleLogout}>
                 <LogoutIcon style={{ color: "black" }} />
               </IconButton>
@@ -351,7 +362,7 @@ export default function Dashboard() {
           <p>{moduleName}</p>
           <p>{roleName}</p>
           <p>{loginTime}</p>
-          <Tooltip title="Change Language" arrow TransitionComponent={Zoom}>
+          <Tooltip title={labels?.LX4} arrow TransitionComponent={Zoom}>
             <span
               onClick={handleChangeLanguage}
               className="language-button-container"
