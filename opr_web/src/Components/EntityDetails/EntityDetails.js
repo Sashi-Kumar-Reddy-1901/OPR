@@ -33,6 +33,7 @@ const EntityDetails = () => {
     control,
     reset,
     setValue,
+    clearErrors,
     formState: { errors },
   } = useForm();
   const columnHeader = useSelector((state) => state.method.columnHeader);
@@ -156,6 +157,7 @@ const EntityDetails = () => {
       setParentUnit(parentLevels);
       if (parentLevels.length === 1) {
         setValue("puc", parentLevels[0]);
+        clearErrors("puc");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
