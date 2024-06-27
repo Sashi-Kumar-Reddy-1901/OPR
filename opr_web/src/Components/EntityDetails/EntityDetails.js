@@ -18,6 +18,7 @@ const EntityDetails = () => {
   const [unitLevels, setUnitLevels] = useState([]);
   const [parentUnit, setParentUnit] = useState([]);
   const [unitType, setUnitType] = useState([]);
+  const [entityStatus, setEntityStatus] = useState([]);
   const parentUnitRef = useRef(null);
 
   const getTitle = () => {
@@ -77,6 +78,21 @@ const EntityDetails = () => {
           label: eType.eTypeDesc,
         }));
         setUnitType(unitType);
+
+        // Fetch Entity Status
+        const entityStatusResponse = await axiosInstance.post(
+          "/common-utils/call-stored-procedure",
+          {
+            procedure: "get_entity_status",
+          }
+        );
+        const entityStatusData = entityStatusResponse.data?.data?.data || [];
+        console.log(entityStatusData);
+        const entityStatus = entityStatusData.map((eStatus) => ({
+          value: eStatus.code,
+          label: eStatus.desc,
+        }));
+        setEntityStatus(entityStatus);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -84,27 +100,35 @@ const EntityDetails = () => {
     fetchData();
   }, [shouldCallMethod, dispatch]);
 
-  const onSubmit = (data) => {
-    const transformedData = {
+  const onSubmit = async (data) => {
+    const entityData = {
       ...data,
       ulevel: data.ulevel?.value,
       puc: data.puc?.value,
       entityType: data.entityType?.value,
       entityStatus: data.entityStatus?.value,
     };
-    console.log("Submit data:", transformedData);
-    onReset();
+    console.log("Submit data:", entityData);
+    try {
+      await axiosInstance.post("/entity/add_entity/true", entityData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
-  const onSave = (data) => {
-    const transformedData = {
+  const onSave = async (data) => {
+    const entityData = {
       ...data,
       ulevel: data.ulevel?.value,
       puc: data.puc?.value,
       entityType: data.entityType?.value,
       entityStatus: data.entityStatus?.value,
     };
-    console.log("Save data:", transformedData);
+    try {
+      await axiosInstance.post("/entity/add_entity/false", entityData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   const onCancel = () => {
@@ -163,12 +187,6 @@ const EntityDetails = () => {
       console.error("Error fetching data:", error);
     }
   };
-
-  const options = [
-    { value: "option1", label: "Option 1" },
-    { value: "option2", label: "Option 2" },
-    { value: "option3", label: "Option 3" },
-  ];
 
   return (
     <div className="w-full mt-12">
@@ -316,7 +334,7 @@ const EntityDetails = () => {
                 <>
                   <Select
                     {...field}
-                    options={options}
+                    options={entityStatus}
                     isDisabled={isView}
                     className="custom-select-dropdown"
                     classNamePrefix="custom"
