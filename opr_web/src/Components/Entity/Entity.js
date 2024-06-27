@@ -99,7 +99,7 @@ const Entity = () => {
           unitcode = parentucode;
         }
        }   
-      const response = await axiosInstance.post(`/entity/get_entities/{level}/{unitCode}?level=${level}&unitCode=${unitcode}`, {
+      const response = await axiosInstance.post(`/entity/get_entities/${level}/${unitcode}`, {
         pagination: {
           pageSize: paginationModel.pageSize,
           pageNo: paginationModel.page + 1,
