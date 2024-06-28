@@ -1,0 +1,22 @@
+
+.custom-button {
+    background-color: black; 
+    color: #f7fafc; 
+    font-size: 0.75rem; 
+    border-radius: 9999px; 
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    transition: background-color 0.3s ease-in-out; 
+  }
+  
+  .custom-button:hover {
+    background-color: #374151;
+  }
+  
+  .custom-button:disabled {
+    background-color: #ccc;
+    color: #999; 
+    cursor: not-allowed;
+  }

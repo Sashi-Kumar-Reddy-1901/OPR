@@ -8,7 +8,8 @@ import { resetMethodCall } from "../../Redux-Slices/getEntitySlice";
 import CustomToolbar from '../Custom/CustomToolbar';
 import CustomHeader from "../Custom/CustomHeader";
 import CustomPagination from "../Custom/CustomPagination";
-import { setEntityHeaders, setEntityRowData } from "../../Redux-Slices/getEntitySlice";
+import { setEntityHeaders } from "../../Redux-Slices/getEntitySlice";
+import { setRowData } from "../../Redux-Slices/nonPersistedSlice";
  
 const ODD_OPACITY = 0.1;
  
@@ -52,7 +53,6 @@ const Entity = () => {
   const [loading, setLoading] = useState(true);
   const [rowCount, setRowCount] = useState(0);
   const [level, setlevel] = useState(1);
-  const [labels, setLabel] = useState();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
@@ -141,8 +141,6 @@ const Entity = () => {
     setparentUcode(data.parentucode);
   }
   useEffect(() => {
-    const label = JSON.parse(sessionStorage.getItem("Labels"));
-    setLabel(label);
     if (shouldCallMethod) {
       dispatch(resetMethodCall());
     }
@@ -166,7 +164,8 @@ const Entity = () => {
   };
   const handleCellClick = (cellData) => {
     console.log("rowData", cellData.row);
-    dispatch(setEntityRowData(cellData.row));
+    dispatch(setRowData(cellData.row));
+    sessionStorage.setItem("entityRowData",JSON.stringify(cellData.row))
   }
  
   return (

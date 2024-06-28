@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./EntityDetails.css";
 import axiosInstance from "../../api/axios";
 import { resetMethodCall } from "../../Redux-Slices/getEntitySlice";
+import '../Custom/CustomButtons.css'
 
 const EntityDetails = () => {
   const location = useLocation();
@@ -20,11 +21,12 @@ const EntityDetails = () => {
   const [unitType, setUnitType] = useState([]);
   const [entityStatus, setEntityStatus] = useState([]);
   const parentUnitRef = useRef(null);
+  const [labels, setLabels] = useState();
 
   const getTitle = () => {
-    if (isAdd) return "Add Entity";
-    if (isView) return "View Entity";
-    if (isEdit) return "Edit Entity";
+    if (isAdd) return labels?.LX5;
+    if (isView) return labels?.LX6;
+    if (isEdit) return labels?.LX9;
     return "Entity Details";
   };
 
@@ -38,12 +40,17 @@ const EntityDetails = () => {
     formState: { errors },
   } = useForm();
   const columnHeader = useSelector((state) => state.method.columnHeader);
+  const rowData = useSelector((state) => state.method.rowData);
+  console.log(rowData);
   const shouldCallMethod = useSelector(
     (state) => state.method.shouldCallMethod
   );
   const unitCode = useSelector((state) => state.method.unitCode);
 
   useEffect(() => {
+    const labels = JSON.parse(sessionStorage.getItem("Labels"));
+    console.log(labels);
+    setLabels(labels);
     const fetchData = async () => {
       try {
         if (shouldCallMethod) {
@@ -88,7 +95,11 @@ const EntityDetails = () => {
         );
         const entityStatusData = entityStatusResponse.data?.data?.data || [];
         console.log(entityStatusData);
-        const entityStatus = entityStatusData.map((eStatus) => ({
+        // Filter out "Closed" status if isAdd is true
+        const filteredEntityStatusData = isAdd
+          ? entityStatusData.filter((status) => status.code !== "C")
+          : entityStatusData;
+        const entityStatus = filteredEntityStatusData.map((eStatus) => ({
           value: eStatus.code,
           label: eStatus.desc,
         }));
@@ -98,7 +109,7 @@ const EntityDetails = () => {
       }
     };
     fetchData();
-  }, [shouldCallMethod, dispatch]);
+  }, []);
 
   const onSubmit = async (data) => {
     const entityData = {
@@ -209,6 +220,21 @@ const EntityDetails = () => {
             )}
           </div>
           <div className="mb-4">
+            <label className="form-label">{columnHeader?.unitName}</label>
+            <input
+              className="form-input"
+              {...register("unitName", { required: true })}
+              type="text"
+              disabled={isView}
+              placeholder="Enter"
+            />
+            {errors.unitName && (
+              <p className="text-red-500 text-xs">
+                {columnHeader?.unitName} is required
+              </p>
+            )}
+          </div>
+          <div className="mb-4">
             <label className="form-label">{columnHeader?.ulevel}</label>
             <Controller
               name="ulevel"
@@ -263,6 +289,28 @@ const EntityDetails = () => {
             />
           </div>
           <div className="mb-4">
+            <label className="form-label">{columnHeader?.emailid}</label>
+            <input
+              type="email"
+              className="form-input"
+              {...register("emailId", {
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Enter a valid email address",
+                },
+                required: true,
+              })}
+              disabled={isView}
+              placeholder="Enter"
+            />
+            {errors.emailId && (
+              <p className="text-red-500 text-xs">
+                {errors.emailId.message ||
+                  `${columnHeader?.emailid} is required`}
+              </p>
+            )}
+          </div>
+          <div className="mb-4">
             <label className="form-label">{columnHeader?.entityType}</label>
             <Controller
               name="entityType"
@@ -286,43 +334,6 @@ const EntityDetails = () => {
                 </>
               )}
             />
-          </div>
-          <div className="mb-4">
-            <label className="form-label">{columnHeader?.unitName}</label>
-            <input
-              className="form-input"
-              {...register("unitName", { required: true })}
-              type="text"
-              disabled={isView}
-              placeholder="Enter"
-            />
-            {errors.unitName && (
-              <p className="text-red-500 text-xs">
-                {columnHeader?.unitName} is required
-              </p>
-            )}
-          </div>
-          <div className="mb-4">
-            <label className="form-label">{columnHeader?.emailid}</label>
-            <input
-              type="email"
-              className="form-input"
-              {...register("emailId", {
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Enter a valid email address",
-                },
-                required: true,
-              })}
-              disabled={isView}
-              placeholder="Enter"
-            />
-            {errors.emailId && (
-              <p className="text-red-500 text-xs">
-                {errors.emailId.message ||
-                  `${columnHeader?.emailid} is required`}
-              </p>
-            )}
           </div>
           <div className="mb-4">
             <label className="form-label">{columnHeader?.entityStatus}</label>
@@ -350,25 +361,33 @@ const EntityDetails = () => {
             />
           </div>
         </div>
-        {(isAdd || isEdit) && (
+        {isView ? (
           <div className="flex flex-wrap justify-end gap-4 mt-4">
             <button className="custom-button" type="button" onClick={onCancel}>
               Cancel
             </button>
-            <button className="custom-button" type="button" onClick={onReset}>
-              Reset
-            </button>
-            <button
-              className="custom-button"
-              type="button"
-              onClick={handleSubmit(onSave)}
-            >
-              Save
-            </button>
-            <button className="custom-button" type="submit">
-              Submit
-            </button>
           </div>
+        ) : (
+          (isAdd || isEdit) && (
+            <div className="flex flex-wrap justify-end gap-4 mt-4">
+              <button className="custom-button" type="button" onClick={onCancel}>
+                Cancel
+              </button>
+              <button className="custom-button" type="button" onClick={onReset}>
+                Reset
+              </button>
+              <button
+                className="custom-button"
+                type="button"
+                onClick={handleSubmit(onSave)}
+              >
+                Save
+              </button>
+              <button className="custom-button" type="submit">
+                Submit
+              </button>
+            </div>
+          )
         )}
         {/* <div className="flex flex-wrap justify-end gap-4 mt-4">
           <button className="custom-button" type="button" onClick={onDelete}>

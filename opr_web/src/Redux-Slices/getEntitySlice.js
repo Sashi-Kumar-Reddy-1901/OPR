@@ -15,15 +15,12 @@ export const getEntitySlice = createSlice({
     setEntityHeaders: (state, action) => {
       state.columnHeader = action.payload;
     },
-    setEntityRowData: (state, action) => {
-      state.rowData = action.payload;
-    },
     setUnitCode:(state, action) =>{
       state.unitCode = action.payload
     }
   },
 });
 
-export const { callMethod, resetMethodCall,setEntityHeaders,setEntityRowData ,setUnitCode} = getEntitySlice.actions;
+export const { callMethod, resetMethodCall,setEntityHeaders ,setUnitCode} = getEntitySlice.actions;
 
 export default getEntitySlice.reducer;

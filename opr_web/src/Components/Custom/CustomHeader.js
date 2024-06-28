@@ -10,7 +10,6 @@ const CustomHeader = ({ selectedLevel }) => {
   const [selects, setSelects] = useState({});
   const [options, setOptions] = useState({});
   const [levelLabels, setLevelLabels] = useState([]);
-  const [labels, setLabel] = useState();
   const dispatch = useDispatch();
   const shouldCallMethod = useSelector(
     (state) => state.method.shouldCallMethod
@@ -18,8 +17,6 @@ const CustomHeader = ({ selectedLevel }) => {
   const unitCode = useSelector((state) => state.method.unitCode);
 
   useEffect(() => {
-    const label = JSON.parse(sessionStorage.getItem("Labels"));
-    setLabel(label);
     if (shouldCallMethod) {
       dispatch(resetMethodCall());
     }
@@ -73,108 +70,106 @@ const CustomHeader = ({ selectedLevel }) => {
     fetchVisibleEntities();
   }, [shouldCallMethod, dispatch]);
 
- 
-
-const handleSelectChange =
-  (unitLevel, parentUnitCode) => async (selectedOption) => {
-    try {
-      setSelects((prevState) => {
-        const newSelects = { ...prevState, [unitLevel]: selectedOption };
-        // Reset child levels' selected options
-        for (
-          let level = unitLevel + 1;
-          level <= Math.max(...Object.keys(prevState).map(Number));
-          level++
-        ) {
-          delete newSelects[level];
-        }
-        console.log("Selected Option:", selectedOption);
-        console.log("New Selects State:", newSelects);
-        console.log("parentunit", parentUnitCode);
-        const selectedLevelData = {
-          level: unitLevel,
-          ucode: selectedOption.value,
-          parentucode: parentUnitCode,
-        };
-        selectedLevel(selectedLevelData);
-        console.log("Selected Level:", selectedLevelData);
-        return newSelects;
-      });
-
-      const unitCode =
-        selectedOption.value === "--all--"
-          ? parentUnitCode
-          : selectedOption.value;
-
-      const response = await axiosInstance.post(
-        "/common-utils/call-stored-procedure",
-        {
-          procedure: "get_visible_entities",
-          unitCode: unitCode,
-          level: 0,
-          incSelf: true,
-        }
-      );
-
-      let childEntities;
-      if (response.data?.data?.data.length > 1) {
-        childEntities = response.data?.data?.data.slice(1);
-      } else {
-        childEntities = response.data?.data?.data;
-      }
-
-      if (childEntities && childEntities.length > 0) {
-        setOptions((prevState) => {
-          const newOptions = { ...prevState };
-
-          // Clear existing options for levels present in childEntities
-          childEntities.forEach((entity) => {
-            const entityLevel = entity.unitLevel;
-            console.log("entityLevel", entityLevel);
-            if (
-              childEntities.length > 1 &&
-              (!newOptions[entityLevel] || newOptions[entityLevel].length > 0)
-            ) {
-              newOptions[entityLevel] = []; // Clear the array for this level
-            }
-          });
-
-          // Clear options for levels greater than the highest level in childEntities
-          const maxChildLevel = Math.max(
-            ...childEntities.map((e) => e.unitLevel)
-          );
+  const handleSelectChange =
+    (unitLevel, parentUnitCode) => async (selectedOption) => {
+      try {
+        setSelects((prevState) => {
+          const newSelects = { ...prevState, [unitLevel]: selectedOption };
+          // Reset child levels' selected options
           for (
-            let level = maxChildLevel + 1;
+            let level = unitLevel + 1;
             level <= Math.max(...Object.keys(prevState).map(Number));
             level++
           ) {
-            if (newOptions[level]) {
-              delete newOptions[level];
-            }
+            delete newSelects[level];
           }
+          console.log("Selected Option:", selectedOption);
+          console.log("New Selects State:", newSelects);
+          console.log("parentunit", parentUnitCode);
+          const selectedLevelData = {
+            level: unitLevel,
+            ucode: selectedOption.value,
+            parentucode: parentUnitCode,
+          };
+          selectedLevel(selectedLevelData);
+          console.log("Selected Level:", selectedLevelData);
+          return newSelects;
+        });
 
-          // Populate newOptions with childEntities only if childEntities.length > 1
-          if (childEntities.length > 1) {
+        const unitCode =
+          selectedOption.value === "--all--"
+            ? parentUnitCode
+            : selectedOption.value;
+
+        const response = await axiosInstance.post(
+          "/common-utils/call-stored-procedure",
+          {
+            procedure: "get_visible_entities",
+            unitCode: unitCode,
+            level: 0,
+            incSelf: true,
+          }
+        );
+
+        let childEntities;
+        if (response.data?.data?.data.length > 1) {
+          childEntities = response.data?.data?.data.slice(1);
+        } else {
+          childEntities = response.data?.data?.data;
+        }
+
+        if (childEntities && childEntities.length > 0) {
+          setOptions((prevState) => {
+            const newOptions = { ...prevState };
+
+            // Clear existing options for levels present in childEntities
             childEntities.forEach((entity) => {
               const entityLevel = entity.unitLevel;
-
-              if (entityLevel) {
-                newOptions[entityLevel].push({
-                  value: entity.unitCode,
-                  label: entity.unitName,
-                });
+              console.log("entityLevel", entityLevel);
+              if (
+                childEntities.length > 1 &&
+                (!newOptions[entityLevel] || newOptions[entityLevel].length > 0)
+              ) {
+                newOptions[entityLevel] = []; // Clear the array for this level
               }
             });
-          }
 
-          console.log("Updated options with child entities:", newOptions);
-          return newOptions;
-        });
+            // Clear options for levels greater than the highest level in childEntities
+            const maxChildLevel = Math.max(
+              ...childEntities.map((e) => e.unitLevel)
+            );
+            for (
+              let level = maxChildLevel + 1;
+              level <= Math.max(...Object.keys(prevState).map(Number));
+              level++
+            ) {
+              if (newOptions[level]) {
+                delete newOptions[level];
+              }
+            }
+
+            // Populate newOptions with childEntities only if childEntities.length > 1
+            if (childEntities.length > 1) {
+              childEntities.forEach((entity) => {
+                const entityLevel = entity.unitLevel;
+
+                if (entityLevel) {
+                  newOptions[entityLevel].push({
+                    value: entity.unitCode,
+                    label: entity.unitName,
+                  });
+                }
+              });
+            }
+
+            console.log("Updated options with child entities:", newOptions);
+            return newOptions;
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+    };
 
   const customStyles = {
     control: (provided) => ({

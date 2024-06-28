@@ -34,6 +34,7 @@ import { Outlet } from "react-router-dom";
 import "./Dashboard.css";
 import TranslateIcon from "@mui/icons-material/Translate";
 import WorkspacesIcon from "@mui/icons-material/Workspaces";
+import "../Custom/CustomButtons.css";
 
 const drawerWidth = 150;
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
@@ -172,7 +173,9 @@ export default function Dashboard() {
         }));
         setLangMenuDesc(transformedArray);
 
-        console.log(entitlementsResponse?.data);
+        const entitlements = entitlementsResponse?.data?.data?.data || [];
+        console.log(entitlements);
+        sessionStorage.setItem("Entitlements", JSON.stringify(entitlements));
       } catch (error) {
         console.log(error?.response?.data?.message);
       }
@@ -199,16 +202,15 @@ export default function Dashboard() {
         }
       );
       console.log("labels", response.data.data.data.data);
-      const labels =  response.data.data.data.data;
+      const labels = response.data.data.data.data;
       const transformedLabels = labels.reduce((acc, curr) => {
         acc[curr.labelCode] = curr.label;
         return acc;
       }, {});
-     
-      sessionStorage.setItem("Labels", JSON.stringify(transformedLabels));
-     setLabel(transformedLabels);
-      console.log(transformedLabels);
 
+      sessionStorage.setItem("Labels", JSON.stringify(transformedLabels));
+      setLabel(transformedLabels);
+      console.log(transformedLabels);
     } catch (error) {
       console.error("Error fetching labels:", error);
     }
@@ -233,10 +235,13 @@ export default function Dashboard() {
 
   const handleNavigateClick = (subNode) => {
     const navigateLabelcode = subNode.labelCode;
+    sessionStorage.setItem("labelCode", navigateLabelcode);
     if (navigateLabelcode === "menu1_1") {
       navigate("/dashboard/entity");
     } else if (navigateLabelcode === "menu1_2") {
       navigate("");
+    } else if (navigateLabelcode === "menu1_55") {
+      navigate("/dashboard/new-entity");
     }
   };
 
@@ -390,9 +395,9 @@ export default function Dashboard() {
         open={openLogout}
         PaperProps={{
           sx: {
-            maxWidth: "350px",
+            maxWidth: "300px",
             width: "100%",
-            maxHeight: "200px",
+            maxHeight: "170px",
             height: "100%",
             borderRadius: "10px",
           },
@@ -405,27 +410,27 @@ export default function Dashboard() {
             alignItems: "center",
           }}
         >
-          <HelpOutlineIcon sx={{ fontSize: "3rem" }} />
+          <HelpOutlineIcon sx={{ fontSize: "36px" }} />
         </DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ textAlign: "center", fontSize: "1rem" }}>
+          <DialogContentText sx={{ textAlign: "center", fontSize: "14px" }}>
             <span className="text-black">Are you sure you want to Logout?</span>
           </DialogContentText>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: "space-evenly", mb: 2 }}>
+        <DialogActions sx={{ justifyContent: "space-evenly", mb: 1 }}>
           <button
             type="button"
             onClick={handleCloseNoLogout}
-            className="bg-black text-gray-100 text-sm rounded-full hover:bg-gray-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none px-4 py-2"
+            className="custom-button"
           >
-            NO
+            No
           </button>
           <button
             type="button"
             onClick={handleCloseYesLogout}
-            className="bg-black text-gray-100 text-sm rounded-full hover:bg-gray-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none px-4 py-2"
+            className="custom-button"
           >
-            YES
+            Yes
           </button>
         </DialogActions>
       </Dialog>
