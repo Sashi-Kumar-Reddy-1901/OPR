@@ -9,7 +9,7 @@ import CustomToolbar from '../Custom/CustomToolbar';
 import CustomHeader from "../Custom/CustomHeader";
 import CustomPagination from "../Custom/CustomPagination";
 import { setEntityHeaders } from "../../Redux-Slices/getEntitySlice";
-import { setRowData } from "../../Redux-Slices/nonPersistedSlice";
+import { setRowData, setTriggerEffect } from "../../Redux-Slices/nonPersistedSlice";
  
 const ODD_OPACITY = 0.1;
  
@@ -62,6 +62,7 @@ const Entity = () => {
   const dispatch = useDispatch();
   const shouldCallMethod = useSelector((state) => state.method.shouldCallMethod);
   const [headerName, setheaderName] = useState({ "auth_remarks": "Auth Remarks", "checker_time": "Checker" });
+  const triggerEffect = useSelector((state) => state.nonPersisted.triggerEffect);
  
   const columns = [
     { field: "unitName", headerName: headerName.unitName, width: 130, headerClassName: 'header-theme' },
@@ -144,8 +145,11 @@ const Entity = () => {
     if (shouldCallMethod) {
       dispatch(resetMethodCall());
     }
+    if (triggerEffect) {
+      dispatch(setTriggerEffect());
+    }
     fetchData();
-  }, [paginationModel, sortModel, filterModel, shouldCallMethod, dispatch, fetchData]);
+  }, [paginationModel, sortModel, filterModel, shouldCallMethod, dispatch, fetchData , triggerEffect]);
  
   const paginationMetaRef = useRef();
   const paginationMeta = useMemo(() => {

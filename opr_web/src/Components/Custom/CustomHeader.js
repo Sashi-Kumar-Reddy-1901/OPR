@@ -5,6 +5,7 @@ import axiosInstance from "../../api/axios";
 import { resetMethodCall } from "../../Redux-Slices/getEntitySlice";
 import { useSelector, useDispatch } from "react-redux";
 import CustomOption from "./CustomOption";
+import { setTriggerEffect } from "../../Redux-Slices/nonPersistedSlice";
 
 const CustomHeader = ({ selectedLevel }) => {
   const [selects, setSelects] = useState({});
@@ -15,10 +16,14 @@ const CustomHeader = ({ selectedLevel }) => {
     (state) => state.method.shouldCallMethod
   );
   const unitCode = useSelector((state) => state.method.unitCode);
+  const triggerEffect = useSelector((state) => state.nonPersisted.triggerEffect);
 
   useEffect(() => {
     if (shouldCallMethod) {
       dispatch(resetMethodCall());
+    }
+    if (triggerEffect) {
+      dispatch(setTriggerEffect());
     }
     const fetchVisibleEntities = async () => {
       try {
@@ -68,7 +73,7 @@ const CustomHeader = ({ selectedLevel }) => {
       }
     };
     fetchVisibleEntities();
-  }, [shouldCallMethod, dispatch]);
+  }, [shouldCallMethod, triggerEffect,dispatch]);
 
   const handleSelectChange =
     (unitLevel, parentUnitCode) => async (selectedOption) => {

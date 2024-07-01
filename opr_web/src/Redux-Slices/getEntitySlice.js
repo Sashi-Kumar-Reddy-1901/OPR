@@ -17,10 +17,13 @@ export const getEntitySlice = createSlice({
     },
     setUnitCode:(state, action) =>{
       state.unitCode = action.payload
+    },
+    setLoginUserId:(state, action) =>{
+     state.userId = action.payload
     }
   },
 });
 
-export const { callMethod, resetMethodCall,setEntityHeaders ,setUnitCode} = getEntitySlice.actions;
+export const { callMethod, resetMethodCall,setEntityHeaders ,setUnitCode ,setLoginUserId} = getEntitySlice.actions;
 
 export default getEntitySlice.reducer;

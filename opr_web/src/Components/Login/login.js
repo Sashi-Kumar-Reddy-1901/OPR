@@ -532,14 +532,14 @@ function Login() {
             onClick={handleCloseYesLoggedIn}
             className="bg-black text-gray-100 text-xs rounded-full hover:bg-gray-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none px-4 py-2"
           >
-            YES
+            Yes
           </button>
           <button
             type="button"
             onClick={handleCloseNoLoggedIn}
             className="bg-black text-gray-100 text-xs rounded-full hover:bg-gray-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none px-4 py-2"
           >
-            NO
+            No
           </button>
         </DialogActions>
       </Dialog>

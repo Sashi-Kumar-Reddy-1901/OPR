@@ -1,9 +1,10 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const nonPersistedSlice = createSlice({
-  name: 'nonPersisted',
+  name: "nonPersisted",
   initialState: {
     rowData: {},
+    triggerEffect: false,
   },
   reducers: {
     setRowData: (state, action) => {
@@ -12,8 +13,11 @@ const nonPersistedSlice = createSlice({
     clearRowData: (state) => {
       state.rowData = {};
     },
+    setTriggerEffect: (state) => {
+      state.triggerEffect = !state.triggerEffect;
+    },
   },
 });
 
-export const { setRowData, clearRowData } = nonPersistedSlice.actions;
+export const { setRowData, clearRowData, setTriggerEffect } = nonPersistedSlice.actions;
 export default nonPersistedSlice.reducer;

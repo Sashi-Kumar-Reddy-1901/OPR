@@ -4,7 +4,7 @@ import { styled } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import SelectModule from "../SelectModule/SelectModule";
 import { useDispatch } from "react-redux";
-import { callMethod, setUnitCode } from "../../Redux-Slices/getEntitySlice";
+import { callMethod, setLoginUserId, setUnitCode } from "../../Redux-Slices/getEntitySlice";
 import {
   Box,
   CssBaseline,
@@ -148,6 +148,7 @@ export default function Dashboard() {
         setRoleName(roleName);
         setModuleName(moduleName);
         dispatch(setUnitCode(unitCode));
+        dispatch(setLoginUserId(userId));
 
         const date = new Date(loginTime);
         const day = date.getDate().toString().padStart(2, "0");
@@ -420,17 +421,17 @@ export default function Dashboard() {
         <DialogActions sx={{ justifyContent: "space-evenly", mb: 1 }}>
           <button
             type="button"
-            onClick={handleCloseNoLogout}
-            className="custom-button"
-          >
-            No
-          </button>
-          <button
-            type="button"
             onClick={handleCloseYesLogout}
             className="custom-button"
           >
             Yes
+          </button>
+          <button
+            type="button"
+            onClick={handleCloseNoLogout}
+            className="custom-button"
+          >
+            No
           </button>
         </DialogActions>
       </Dialog>

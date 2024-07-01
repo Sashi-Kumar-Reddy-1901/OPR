@@ -6,7 +6,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./EntityDetails.css";
 import axiosInstance from "../../api/axios";
 import { resetMethodCall } from "../../Redux-Slices/getEntitySlice";
-import '../Custom/CustomButtons.css'
+import "../Custom/CustomButtons.css";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from "@mui/material";
 
 const EntityDetails = () => {
   const location = useLocation();
@@ -14,6 +21,7 @@ const EntityDetails = () => {
   const isAdd = queryParams.has("Add");
   const isView = queryParams.has("View");
   const isEdit = queryParams.has("Edit");
+  const isAuthorReject = queryParams.has("AuthorReject");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [unitLevels, setUnitLevels] = useState([]);
@@ -22,11 +30,22 @@ const EntityDetails = () => {
   const [entityStatus, setEntityStatus] = useState([]);
   const parentUnitRef = useRef(null);
   const [labels, setLabels] = useState();
+  const [showPucField, setShowPucField] = useState(true);
+  const [isReset, setIsReset] = useState(false);
+  const [isError, setIsError] = useState("");
+  const [isAuthorise, setIsAuthorise] = useState(false);
+  const [isReject, setIsReject] = useState(false);
+  const [entityUnitCode, setEntityUnitCode] = useState("");
+  const authRemarksRef = useRef(null);
+  const rejectRemarksRef = useRef(null);
+  const [remarks, setRemarks] = useState("");
 
   const getTitle = () => {
-    if (isAdd) return labels?.LX5;
-    if (isView) return labels?.LX6;
-    if (isEdit) return labels?.LX9;
+    if (isAdd) return `${labels?.LX5} ${labels?.LX1}`;
+    if (isView) return `${labels?.LX6} ${labels?.LX1}`;
+    if (isEdit) return `${labels?.LX9} ${labels?.LX1}`;
+    if (isAuthorReject)
+      return `${labels?.LX8} / ${labels?.LX12} ${labels?.LX1}`;
     return "Entity Details";
   };
 
@@ -40,8 +59,6 @@ const EntityDetails = () => {
     formState: { errors },
   } = useForm();
   const columnHeader = useSelector((state) => state.method.columnHeader);
-  const rowData = useSelector((state) => state.method.rowData);
-  console.log(rowData);
   const shouldCallMethod = useSelector(
     (state) => state.method.shouldCallMethod
   );
@@ -51,6 +68,33 @@ const EntityDetails = () => {
     const labels = JSON.parse(sessionStorage.getItem("Labels"));
     console.log(labels);
     setLabels(labels);
+
+    const entityDetails = JSON.parse(sessionStorage.getItem("entityRowData"));
+    console.log(entityDetails);
+    setEntityUnitCode(entityDetails?.ucode);
+
+    if (entityDetails && (isView || isEdit || isAuthorReject)) {
+      setValue("ucode", entityDetails.ucode);
+      setValue("unitName", entityDetails.unitName);
+      setValue("ulevel", {
+        value: entityDetails.ulevelCode,
+        label: entityDetails.ulevel,
+      });
+      setValue("puc", { value: entityDetails.puc, label: entityDetails.puc });
+      setValue("emailId", entityDetails.emailid);
+      setValue("entityType", {
+        value: entityDetails.entityTypeCode,
+        label: entityDetails.entityType,
+      });
+      setValue("entityStatus", {
+        value: entityDetails.entityStatusCode,
+        label: entityDetails.entityStatus,
+      });
+    }
+    if (entityDetails?.puc === "0") {
+      setShowPucField(false);
+    }
+
     const fetchData = async () => {
       try {
         if (shouldCallMethod) {
@@ -109,7 +153,7 @@ const EntityDetails = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [isAdd, isView, isEdit, isReset]);
 
   const onSubmit = async (data) => {
     const entityData = {
@@ -122,6 +166,7 @@ const EntityDetails = () => {
     console.log("Submit data:", entityData);
     try {
       await axiosInstance.post("/entity/add_entity/true", entityData);
+      navigate("/dashboard/entity");
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -136,7 +181,13 @@ const EntityDetails = () => {
       entityStatus: data.entityStatus?.value,
     };
     try {
-      await axiosInstance.post("/entity/add_entity/false", entityData);
+      const saveResponse = await axiosInstance.post(
+        "/entity/add_entity/false",
+        entityData
+      );
+      if (saveResponse?.data?.data?.status) {
+        navigate("/dashboard/entity");
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -146,16 +197,50 @@ const EntityDetails = () => {
     navigate("/dashboard/entity");
   };
 
-  const onDelete = () => {
-    console.log("Deleted");
-  };
-
   const onAuthorise = () => {
-    console.log("Authorise");
+    setIsAuthorise(true);
   };
 
   const onReject = () => {
-    console.log("Reject");
+    setIsReject(true);
+  };
+
+  const submitAuthorise = async () => {
+    try {
+      const authResponse = await axiosInstance.post("/entity/update_status", {
+        remarks: authRemarksRef.current.value,
+        isReject: false,
+        ucode: entityUnitCode,
+      });
+      console.log(authResponse);
+    } catch (error) {
+      console.log("Error", error);
+    }
+  };
+
+  const cancelAuthorise = () => {
+    setIsAuthorise(false);
+  };
+
+  const submitReject = async () => {
+    try {
+      const rejectResponse = await axiosInstance.post("/entity/update_status", {
+        remarks: rejectRemarksRef.current.value,
+        isReject: true,
+        ucode: entityUnitCode,
+      });
+      console.log(rejectResponse);
+    } catch (error) {
+      console.log("Error", error);
+    }
+  };
+
+  const cancelReject = () => {
+    setIsReject(false);
+  };
+
+  const handleRemarksChange = (event) => {
+    setRemarks(event.target.value);
   };
 
   const onReset = () => {
@@ -165,6 +250,7 @@ const EntityDetails = () => {
     setValue("entityType", null);
     setValue("entityStatus", null);
     setParentUnit([]);
+    setIsReset((prevState) => !prevState);
   };
 
   const handleUnitLevelChange = async (selectedOption, field) => {
@@ -199,209 +285,357 @@ const EntityDetails = () => {
     }
   };
 
+  const onBlurHandler = async (event) => {
+    const unitCode = event.target.value;
+    if (!unitCode) {
+      setIsError(`${columnHeader?.ucode} is required`);
+      return;
+    }
+    try {
+      const uCodeResponse = await axiosInstance.get(
+        `/entity/getEntityOrUserPresentOrNot?val=${unitCode}&isEntity=true`
+      );
+      console.log(uCodeResponse?.data?.data);
+      if (uCodeResponse?.data?.data?.status) {
+        setIsError(uCodeResponse?.data?.data?.message);
+      } else {
+        setIsError("");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
+    }
+  };
+
   return (
-    <div className="w-full mt-12">
-      <h2 className="text-center text-2xl font-bold">{getTitle()}</h2>
-      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 mt-6">
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="mb-4">
-            <label className="form-label">{columnHeader?.ucode}</label>
-            <input
-              className="form-input"
-              {...register("ucode", { required: true })}
-              type="text"
-              disabled={isView}
-              placeholder="Enter"
-            />
-            {errors.ucode && (
-              <p className="text-red-500 text-xs">
-                {columnHeader?.ucode} is required
-              </p>
+    <>
+      <div className="w-full mt-12">
+        <h2 className="text-center text-2xl font-bold">{getTitle()}</h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 mt-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="mb-4">
+              <label className="form-label">{columnHeader?.ucode}</label>
+              <input
+                className="form-input"
+                {...register("ucode", { required: true })}
+                type="text"
+                disabled={isView || isAuthorReject}
+                placeholder="Enter"
+                onBlur={onBlurHandler}
+              />
+              {errors.ucode && (
+                <p className="text-red-500 text-xs">
+                  {columnHeader?.ucode} is required
+                </p>
+              )}
+              {isError && <p className="text-red-500 text-xs">{isError}</p>}
+            </div>
+            <div className="mb-4">
+              <label className="form-label">{columnHeader?.unitName}</label>
+              <input
+                className="form-input"
+                {...register("unitName", { required: true })}
+                type="text"
+                disabled={isView || isAuthorReject}
+                placeholder="Enter"
+              />
+              {errors.unitName && (
+                <p className="text-red-500 text-xs">
+                  {columnHeader?.unitName} is required
+                </p>
+              )}
+            </div>
+            <div className="mb-4">
+              <label className="form-label">{columnHeader?.ulevel}</label>
+              <Controller
+                name="ulevel"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <>
+                    <Select
+                      {...field}
+                      options={unitLevels}
+                      isDisabled={isView || isAuthorReject}
+                      className="custom-select-dropdown"
+                      classNamePrefix="custom"
+                      placeholder="Select"
+                      onChange={(selectedOption) =>
+                        handleUnitLevelChange(selectedOption, field)
+                      }
+                    />
+                    {errors.ulevel && (
+                      <p className="text-red-500 text-xs">
+                        {columnHeader?.ulevel} is required
+                      </p>
+                    )}
+                  </>
+                )}
+              />
+            </div>
+            {showPucField && (
+              <div className="mb-4">
+                <label className="form-label">{columnHeader?.puc}</label>
+                <Controller
+                  name="puc"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <>
+                      <Select
+                        {...field}
+                        ref={parentUnitRef}
+                        options={parentUnit}
+                        isDisabled={isView || isAuthorReject}
+                        className="custom-select-dropdown"
+                        classNamePrefix="custom"
+                        placeholder="Select"
+                      />
+                      {errors.puc && (
+                        <p className="text-red-500 text-xs">
+                          {columnHeader?.puc} is required
+                        </p>
+                      )}
+                    </>
+                  )}
+                />
+              </div>
             )}
-          </div>
-          <div className="mb-4">
-            <label className="form-label">{columnHeader?.unitName}</label>
-            <input
-              className="form-input"
-              {...register("unitName", { required: true })}
-              type="text"
-              disabled={isView}
-              placeholder="Enter"
-            />
-            {errors.unitName && (
-              <p className="text-red-500 text-xs">
-                {columnHeader?.unitName} is required
-              </p>
-            )}
-          </div>
-          <div className="mb-4">
-            <label className="form-label">{columnHeader?.ulevel}</label>
-            <Controller
-              name="ulevel"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <>
-                  <Select
-                    {...field}
-                    options={unitLevels}
-                    isDisabled={isView}
-                    className="custom-select-dropdown"
-                    classNamePrefix="custom"
-                    placeholder="Select"
-                    onChange={(selectedOption) =>
-                      handleUnitLevelChange(selectedOption, field)
-                    }
-                  />
-                  {errors.ulevel && (
-                    <p className="text-red-500 text-xs">
-                      {columnHeader?.ulevel} is required
-                    </p>
-                  )}
-                </>
+            <div className="mb-4">
+              <label className="form-label">{columnHeader?.emailid}</label>
+              <input
+                type="email"
+                className="form-input"
+                {...register("emailId", {
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Enter a valid email address",
+                  },
+                  required: true,
+                })}
+                disabled={isView || isAuthorReject}
+                placeholder="Enter"
+              />
+              {errors.emailId && (
+                <p className="text-red-500 text-xs">
+                  {errors.emailId.message ||
+                    `${columnHeader?.emailid} is required`}
+                </p>
               )}
-            />
+            </div>
+            <div className="mb-4">
+              <label className="form-label">{columnHeader?.entityType}</label>
+              <Controller
+                name="entityType"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <>
+                    <Select
+                      {...field}
+                      options={unitType}
+                      isDisabled={isView || isAuthorReject}
+                      className="custom-select-dropdown"
+                      classNamePrefix="custom"
+                      placeholder="Select"
+                    />
+                    {errors.entityType && (
+                      <p className="text-red-500 text-xs">
+                        {columnHeader?.entityType} is required
+                      </p>
+                    )}
+                  </>
+                )}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="form-label">{columnHeader?.entityStatus}</label>
+              <Controller
+                name="entityStatus"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <>
+                    <Select
+                      {...field}
+                      options={entityStatus}
+                      isDisabled={isView || isAuthorReject}
+                      className="custom-select-dropdown"
+                      classNamePrefix="custom"
+                      placeholder="Select"
+                    />
+                    {errors.entityStatus && (
+                      <p className="text-red-500 text-xs">
+                        {columnHeader?.entityStatus} is required
+                      </p>
+                    )}
+                  </>
+                )}
+              />
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="form-label">{columnHeader?.puc}</label>
-            <Controller
-              name="puc"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <>
-                  <Select
-                    {...field}
-                    ref={parentUnitRef}
-                    options={parentUnit}
-                    isDisabled={isView}
-                    className="custom-select-dropdown"
-                    classNamePrefix="custom"
-                    placeholder="Select"
-                  />
-                  {errors.puc && (
-                    <p className="text-red-500 text-xs">
-                      {columnHeader?.puc} is required
-                    </p>
-                  )}
-                </>
-              )}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="form-label">{columnHeader?.emailid}</label>
-            <input
-              type="email"
-              className="form-input"
-              {...register("emailId", {
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Enter a valid email address",
-                },
-                required: true,
-              })}
-              disabled={isView}
-              placeholder="Enter"
-            />
-            {errors.emailId && (
-              <p className="text-red-500 text-xs">
-                {errors.emailId.message ||
-                  `${columnHeader?.emailid} is required`}
-              </p>
-            )}
-          </div>
-          <div className="mb-4">
-            <label className="form-label">{columnHeader?.entityType}</label>
-            <Controller
-              name="entityType"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <>
-                  <Select
-                    {...field}
-                    options={unitType}
-                    isDisabled={isView}
-                    className="custom-select-dropdown"
-                    classNamePrefix="custom"
-                    placeholder="Select"
-                  />
-                  {errors.entityType && (
-                    <p className="text-red-500 text-xs">
-                      {columnHeader?.entityType} is required
-                    </p>
-                  )}
-                </>
-              )}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="form-label">{columnHeader?.entityStatus}</label>
-            <Controller
-              name="entityStatus"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <>
-                  <Select
-                    {...field}
-                    options={entityStatus}
-                    isDisabled={isView}
-                    className="custom-select-dropdown"
-                    classNamePrefix="custom"
-                    placeholder="Select"
-                  />
-                  {errors.entityStatus && (
-                    <p className="text-red-500 text-xs">
-                      {columnHeader?.entityStatus} is required
-                    </p>
-                  )}
-                </>
-              )}
-            />
-          </div>
-        </div>
-        {isView ? (
-          <div className="flex flex-wrap justify-end gap-4 mt-4">
-            <button className="custom-button" type="button" onClick={onCancel}>
-              Cancel
-            </button>
-          </div>
-        ) : (
-          (isAdd || isEdit) && (
+          {isView ? (
             <div className="flex flex-wrap justify-end gap-4 mt-4">
-              <button className="custom-button" type="button" onClick={onCancel}>
+              <button
+                className="custom-button"
+                type="button"
+                onClick={onCancel}
+              >
                 Cancel
               </button>
-              <button className="custom-button" type="button" onClick={onReset}>
-                Reset
+            </div>
+          ) : (
+            (isAdd || isEdit) && (
+              <div className="flex flex-wrap justify-end gap-4 mt-4">
+                <button
+                  className="custom-button"
+                  type="button"
+                  onClick={onCancel}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="custom-button"
+                  type="button"
+                  onClick={onReset}
+                >
+                  Reset
+                </button>
+                <button
+                  className="custom-button"
+                  type="button"
+                  onClick={handleSubmit(onSave)}
+                >
+                  Save
+                </button>
+                <button className="custom-button" type="submit">
+                  Submit
+                </button>
+              </div>
+            )
+          )}
+          {isAuthorReject && (
+            <div className="flex flex-wrap justify-end gap-4 mt-4">
+              <button
+                className="custom-button"
+                type="button"
+                onClick={onCancel}
+              >
+                Cancel
               </button>
               <button
                 className="custom-button"
                 type="button"
-                onClick={handleSubmit(onSave)}
+                onClick={onAuthorise}
               >
-                Save
+                Authorise
               </button>
-              <button className="custom-button" type="submit">
-                Submit
+              <button
+                className="custom-button"
+                type="button"
+                onClick={onReject}
+              >
+                Reject
               </button>
             </div>
-          )
-        )}
-        {/* <div className="flex flex-wrap justify-end gap-4 mt-4">
-          <button className="custom-button" type="button" onClick={onDelete}>
-            Delete
+          )}
+        </form>
+      </div>
+
+      {/*Authorise Entity */}
+      <Dialog
+        open={isAuthorise}
+        PaperProps={{
+          sx: {
+            maxWidth: "350px",
+            width: "100%",
+            maxHeight: "255px",
+            height: "100%",
+            borderRadius: "10px",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{ textAlign: "center", fontWeight: "700", fontSize: "1.2rem" }}
+        >
+          {labels?.LX8}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <span className="text-gray-950 text-xs">Please add Remarks:</span>
+            <textarea
+              className="custom-textarea"
+              ref={authRemarksRef}
+            ></textarea>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "space-evenly", mb: 1 }}>
+          <button
+            type="button"
+            className="custom-button"
+            onClick={submitAuthorise}
+          >
+            Submit
           </button>
-          <button className="custom-button" type="button"  onClick={onReject}>
-            Reject
+          <button
+            type="button"
+            className="custom-button"
+            onClick={cancelAuthorise}
+          >
+            Cancel
           </button>
-          <button className="custom-button" type="button" onClick={onAuthorise}>
-            Authorise
+        </DialogActions>
+      </Dialog>
+
+      {/*Reject Entity */}
+      <Dialog
+        open={isReject}
+        PaperProps={{
+          sx: {
+            maxWidth: "350px",
+            width: "100%",
+            maxHeight: "255px",
+            height: "100%",
+            borderRadius: "10px",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{ textAlign: "center", fontWeight: "700", fontSize: "1.2rem" }}
+        >
+          {labels?.LX12}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <span className="text-gray-950 text-xs">
+              Remarks are Mandatory *
+            </span>
+            <textarea
+              className="custom-textarea"
+              ref={rejectRemarksRef}
+              value={remarks}
+              onChange={handleRemarksChange}
+            ></textarea>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "space-evenly", mb: 1 }}>
+          <button
+            type="button"
+            className="custom-button"
+            onClick={submitReject}
+            disabled={!remarks.trim()}
+          >
+            Submit
           </button>
-        </div> */}
-      </form>
-    </div>
+          <button
+            type="button"
+            className="custom-button"
+            onClick={cancelReject}
+          >
+            Cancel
+          </button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
