@@ -244,6 +244,10 @@ export default function Dashboard() {
     } else if (navigateLabelcode === "menu1_55") {
       navigate("/dashboard/new-entity");
     }
+    else if (navigateLabelcode === "menu2_2") {
+      navigate("/dashboard/entity-upload");
+    }
+    
   };
 
   const handleChangeLanguage = (event) => {
