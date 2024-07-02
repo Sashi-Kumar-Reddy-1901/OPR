@@ -7,6 +7,7 @@ import Entity from "../Entity/Entity";
 import { checkAuthLoader } from "../../utils/auth";
 import EntityDetails from "../EntityDetails/EntityDetails";
 import EntityUpload from "../EntityUpload/EntityUpload";
+import UserDetails from "../UserMaintenace/UserDetails";
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -31,6 +32,11 @@ const Body = () => {
         {
           path: "entity-upload",
           element: <EntityUpload />,
+          loader: checkAuthLoader,
+        },
+        {
+          path: "user-details",
+          element: <UserDetails />,
           loader: checkAuthLoader,
         },
       ],

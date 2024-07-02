@@ -50,7 +50,7 @@ const EntityDetails = () => {
   };
 
   const {
-    register,
+    register: entityDetails,
     handleSubmit,
     control,
     reset,
@@ -280,7 +280,6 @@ const EntityDetails = () => {
   const onBlurHandler = async (event) => {
     const unitCode = event.target.value;
     if (!unitCode) {
-      setIsError(`${columnHeader?.ucode} is required`);
       return;
     }
     try {
@@ -308,7 +307,7 @@ const EntityDetails = () => {
               <label className="form-label">{columnHeader?.ucode}</label>
               <input
                 className="form-input"
-                {...register("ucode", { required: true })}
+                {...entityDetails("ucode", { required: true })}
                 type="text"
                 disabled={isView || isAuthorReject}
                 placeholder="Enter"
@@ -325,7 +324,7 @@ const EntityDetails = () => {
               <label className="form-label">{columnHeader?.unitName}</label>
               <input
                 className="form-input"
-                {...register("unitName", { required: true })}
+                {...entityDetails("unitName", { required: true })}
                 type="text"
                 disabled={isView || isAuthorReject}
                 placeholder="Enter"
@@ -397,7 +396,7 @@ const EntityDetails = () => {
               <input
                 type="email"
                 className="form-input"
-                {...register("emailId", {
+                {...entityDetails("emailId", {
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                     message: "Enter a valid email address",

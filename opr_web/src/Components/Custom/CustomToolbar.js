@@ -166,7 +166,7 @@ const CustomToolbar = ({ onSearchChange, iconsVisible, setIconsVisible }) => {
           </IconButton>
         )}
 
-        {iconsVisible && entitlementsList.includes(31) && rowData && Object.keys(rowData).length !== 0 && rowData.statusCode !== 'M' && (
+        {iconsVisible && entitlementsList.includes(31) && rowData && Object.keys(rowData).length !== 0 && rowData.statusCode !== 'M' &&rowData.statusCode !== 'U' && (
           <IconButton onClick={EditEntity} color="inherit" aria-label="edit">
             <Tooltip title={labels?.LX9} arrow TransitionComponent={Zoom}>
               <EditNoteIcon />

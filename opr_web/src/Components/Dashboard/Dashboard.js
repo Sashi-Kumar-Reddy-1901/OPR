@@ -240,14 +240,10 @@ export default function Dashboard() {
     if (navigateLabelcode === "menu1_1") {
       navigate("/dashboard/entity");
     } else if (navigateLabelcode === "menu1_2") {
-      navigate("");
-    } else if (navigateLabelcode === "menu1_55") {
-      navigate("/dashboard/new-entity");
-    }
-    else if (navigateLabelcode === "menu2_2") {
+      navigate("/dashboard/user-details");
+    }else if (navigateLabelcode === "menu2_2") {
       navigate("/dashboard/entity-upload");
     }
-    
   };
 
   const handleChangeLanguage = (event) => {
