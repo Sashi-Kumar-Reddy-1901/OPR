@@ -14,6 +14,7 @@ import {
   DialogContentText,
   DialogActions,
 } from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
 
 const EntityDetails = () => {
   const location = useLocation();
@@ -33,12 +34,11 @@ const EntityDetails = () => {
   const [showPucField, setShowPucField] = useState(true);
   const [isReset, setIsReset] = useState(false);
   const [isError, setIsError] = useState("");
-  const [isAuthorise, setIsAuthorise] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isReject, setIsReject] = useState(false);
-  const [entityUnitCode, setEntityUnitCode] = useState("");
-  const authRemarksRef = useRef(null);
-  const rejectRemarksRef = useRef(null);
   const [remarks, setRemarks] = useState("");
+  const remarksRef = useRef(null);
+  const [entityUnitCode, setEntityUnitCode] = useState("");
 
   const getTitle = () => {
     if (isAdd) return `${labels?.LX5} ${labels?.LX1}`;
@@ -197,46 +197,38 @@ const EntityDetails = () => {
     navigate("/dashboard/entity");
   };
 
-  const onAuthorise = () => {
-    setIsAuthorise(true);
+  const handleOpenDialog = (isRejectAction) => {
+    setIsReject(isRejectAction);
+    setIsDialogOpen(true);
   };
 
-  const onReject = () => {
-    setIsReject(true);
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setRemarks("");
   };
 
-  const submitAuthorise = async () => {
+  const handleAuthorRejectSubmit = async () => {
+    const url = "/entity/update_status";
+    const data = {
+      remarks: remarksRef.current.value,
+      isReject,
+      ucode: entityUnitCode,
+    };
     try {
-      const authResponse = await axiosInstance.post("/entity/update_status", {
-        remarks: authRemarksRef.current.value,
-        isReject: false,
-        ucode: entityUnitCode,
-      });
-      console.log(authResponse);
+      const authorRejectResponse = await axiosInstance.post(url, data);
+      console.log(authorRejectResponse?.data?.data);
+      if (authorRejectResponse?.data?.data?.messageCode === 140504) {
+        handleCloseDialog();
+        navigate("/dashboard/entity");
+      }else{
+        toast.error(authorRejectResponse?.data?.data?.message, {
+          className: "custom-toast",
+        });
+        handleCloseDialog();
+      }
     } catch (error) {
       console.log("Error", error);
     }
-  };
-
-  const cancelAuthorise = () => {
-    setIsAuthorise(false);
-  };
-
-  const submitReject = async () => {
-    try {
-      const rejectResponse = await axiosInstance.post("/entity/update_status", {
-        remarks: rejectRemarksRef.current.value,
-        isReject: true,
-        ucode: entityUnitCode,
-      });
-      console.log(rejectResponse);
-    } catch (error) {
-      console.log("Error", error);
-    }
-  };
-
-  const cancelReject = () => {
-    setIsReject(false);
   };
 
   const handleRemarksChange = (event) => {
@@ -525,14 +517,14 @@ const EntityDetails = () => {
               <button
                 className="custom-button"
                 type="button"
-                onClick={onAuthorise}
+                onClick={() => handleOpenDialog(false)}
               >
                 Authorise
               </button>
               <button
                 className="custom-button"
                 type="button"
-                onClick={onReject}
+                onClick={() => handleOpenDialog(true)}
               >
                 Reject
               </button>
@@ -541,54 +533,22 @@ const EntityDetails = () => {
         </form>
       </div>
 
-      {/*Authorise Entity */}
-      <Dialog
-        open={isAuthorise}
-        PaperProps={{
-          sx: {
-            maxWidth: "350px",
-            width: "100%",
-            maxHeight: "255px",
-            height: "100%",
-            borderRadius: "10px",
-          },
-        }}
-      >
-        <DialogTitle
-          sx={{ textAlign: "center", fontWeight: "700", fontSize: "1.2rem" }}
-        >
-          {labels?.LX8}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            <span className="text-gray-950 text-xs">Please add Remarks:</span>
-            <textarea
-              className="custom-textarea"
-              ref={authRemarksRef}
-            ></textarea>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: "space-evenly", mb: 1 }}>
-          <button
-            type="button"
-            className="custom-button"
-            onClick={submitAuthorise}
-          >
-            Submit
-          </button>
-          <button
-            type="button"
-            className="custom-button"
-            onClick={cancelAuthorise}
-          >
-            Cancel
-          </button>
-        </DialogActions>
-      </Dialog>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        closeButton
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
 
-      {/*Reject Entity */}
+      {/* Authorise or Reject Entity  */}
       <Dialog
-        open={isReject}
+        open={isDialogOpen}
         PaperProps={{
           sx: {
             maxWidth: "350px",
@@ -602,16 +562,16 @@ const EntityDetails = () => {
         <DialogTitle
           sx={{ textAlign: "center", fontWeight: "700", fontSize: "1.2rem" }}
         >
-          {labels?.LX12}
+          {isReject ? labels?.LX12 : labels?.LX8}
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
             <span className="text-gray-950 text-xs">
-              Remarks are Mandatory *
+              {isReject ? "Remarks are Mandatory *" : "Please add Remarks:"}
             </span>
             <textarea
               className="custom-textarea"
-              ref={rejectRemarksRef}
+              ref={remarksRef}
               value={remarks}
               onChange={handleRemarksChange}
             ></textarea>
@@ -621,15 +581,15 @@ const EntityDetails = () => {
           <button
             type="button"
             className="custom-button"
-            onClick={submitReject}
-            disabled={!remarks.trim()}
+            onClick={handleAuthorRejectSubmit}
+            disabled={isReject && !remarks.trim()}
           >
             Submit
           </button>
           <button
             type="button"
             className="custom-button"
-            onClick={cancelReject}
+            onClick={handleCloseDialog}
           >
             Cancel
           </button>
