@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
-import CustomHeader from '../Custom/CustomHeader'
-import CustomHeaderUpload from '../Custom/CustomHeaderUpload';
+import CustomHeaderUpload from './CustomHeaderUpload';
 import { DataGrid, useGridApiRef, gridClasses } from "@mui/x-data-grid";
 import { alpha, styled } from '@mui/material/styles';
 
