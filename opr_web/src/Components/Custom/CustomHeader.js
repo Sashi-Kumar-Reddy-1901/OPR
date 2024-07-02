@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import CustomOption from "./CustomOption";
 import { setTriggerEffect } from "../../Redux-Slices/nonPersistedSlice";
 
-const CustomHeader = ({ selectedLevel }) => {
+const CustomHeader = ({ selectedLevel, setIconsVisible }) => {
   const [selects, setSelects] = useState({});
   const [options, setOptions] = useState({});
   const [levelLabels, setLevelLabels] = useState([]);
@@ -78,6 +78,7 @@ const CustomHeader = ({ selectedLevel }) => {
   const handleSelectChange =
     (unitLevel, parentUnitCode) => async (selectedOption) => {
       try {
+        setIconsVisible(false);
         setSelects((prevState) => {
           const newSelects = { ...prevState, [unitLevel]: selectedOption };
           // Reset child levels' selected options

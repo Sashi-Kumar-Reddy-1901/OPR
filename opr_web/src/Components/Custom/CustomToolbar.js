@@ -26,17 +26,14 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { ToastContainer, toast } from "react-toastify";
 import axiosInstance from "../../api/axios";
 
-const CustomToolbar = ({ onSearchChange }) => {
+const CustomToolbar = ({ onSearchChange, iconsVisible, setIconsVisible }) => {
   const [labels, setLabels] = useState({});
   const [entitlementsList, setEntitlementsList] = useState([]);
   const [deleteEntity , setDeleteEntity] = useState(false)
-  const [iconsVisible, setIconsVisible] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const rowData = useSelector((state) => state.nonPersisted.rowData);
-  console.log(rowData);
   const loginUserId = useSelector((state) => state.method.userId)
-  console.log(loginUserId);
 
   const handleSearchChange = (event) => {
     onSearchChange(event.target.value);
@@ -87,7 +84,6 @@ const CustomToolbar = ({ onSearchChange }) => {
   const handleYesDelete = async () => {
     try {
       const deleteEntityResponse = await axiosInstance.post(`/entity/delete_entity/${rowData?.ucode}`)
-      console.log(deleteEntityResponse?.data?.data);
       if (deleteEntityResponse?.data?.data?.status) {
         toast.success(deleteEntityResponse?.data?.data?.message, {
           className: "custom-toast",

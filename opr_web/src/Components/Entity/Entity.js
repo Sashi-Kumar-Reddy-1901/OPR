@@ -63,6 +63,7 @@ const Entity = () => {
   const shouldCallMethod = useSelector((state) => state.method.shouldCallMethod);
   const [headerName, setheaderName] = useState({ "auth_remarks": "Auth Remarks", "checker_time": "Checker" });
   const triggerEffect = useSelector((state) => state.nonPersisted.triggerEffect);
+  const [iconsVisible, setIconsVisible] = useState(true);
  
   const columns = [
     { field: "unitName", headerName: headerName.unitName, width: 130, headerClassName: 'header-theme' },
@@ -170,12 +171,13 @@ const Entity = () => {
     console.log("rowData", cellData.row);
     dispatch(setRowData(cellData.row));
     sessionStorage.setItem("entityRowData",JSON.stringify(cellData.row))
+    setIconsVisible(true)
   }
  
   return (
     <>
       <div style={{ width: "100%", marginTop: "50px" }}>
-        <CustomHeader selectedLevel = {handleLevelChange} />
+      <CustomHeader selectedLevel={handleLevelChange} setIconsVisible={setIconsVisible} />
         <div className="mt-2" style={{ height: "71vh" }}>
           <StripedDataGrid
             apiRef={apiRef}
@@ -209,6 +211,7 @@ const Entity = () => {
             slotProps={{
               toolbar: {
                 onSearchChange: handleQuickFilterChange,
+                iconsVisible,
               },
             }}
             onCellClick={(params) => handleCellClick(params)}
